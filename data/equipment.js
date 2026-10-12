@@ -19,18 +19,18 @@
 
   // ランク（素材の格）ごとの固定ステータス（index 0 = ランク1）
   const rankStats = {
-    weapon:    { main: [3, 5, 8] },
-    head:      { hp: [5, 8, 12],  def: [1, 2, 3] },
-    body:      { hp: [8, 12, 18], def: [2, 3, 4] },
+    weapon:    { main: [3, 5, 8, 11] },
+    head:      { hp: [5, 8, 12, 16], def: [1, 2, 3, 4] },
+    body:      { hp: [8, 12, 18, 24], def: [2, 3, 4, 5] },
     accessory: {}
   };
 
   // ランダム枠「ステータス上昇」の値（ランクごと）。良い枠（grade）ほど倍率が上がる
   const statRolls = {
-    atk: [1, 2, 3],
-    def: [1, 1, 2],
-    mag: [1, 2, 3],
-    hp:  [3, 5, 7]
+    atk: [1, 2, 3, 4],
+    def: [1, 1, 2, 2],
+    mag: [1, 2, 3, 4],
+    hp:  [3, 5, 7, 9]
   };
   // grade（ランダム枠の良さ）：0=並 1=良 2=極
   const gradeMult = [1, 1.5, 2];
@@ -94,6 +94,23 @@
     star_charm:     { name: '星のお守り',   type: 'accessory', slot: 'accessory', rank: 3, fixedCard: 'acc_quick', mats: { star_shard: 1, quartz: 2 },  difficulty: 11 }
   };
 
+  // --- ランク4（難易度2以上のダンジョンで出る上位素材で作る） ---
+  Object.assign(bases, {
+    star_sword:    { name: '星鋼の剣',     type: 'sword',     slot: 'weapon', rank: 4, fixedCard: 'sword_breaker',  mats: { star_steel: 3, dragon_scale: 1 },    difficulty: 17 },
+    star_dagger:   { name: '星鋼の短剣',   type: 'dagger',    slot: 'weapon', rank: 4, fixedCard: 'dagger_venom',   mats: { star_steel: 2, phantom_cloth: 1 },   difficulty: 17 },
+    star_helm:     { name: '星鋼の兜',     type: 'heavy',     slot: 'head',   rank: 4, fixedCard: 'heavy_harden',   mats: { star_steel: 2, gargoyle_stone: 1 },  difficulty: 16 },
+    star_armor:    { name: '星鋼の鎧',     type: 'heavy',     slot: 'body',   rank: 4, fixedCard: 'heavy_ironwall', mats: { star_steel: 4, gargoyle_stone: 1 },  difficulty: 18 },
+    world_staff:   { name: '世界樹の杖',   type: 'staff',     slot: 'weapon', rank: 4, fixedCard: 'staff_blizzard', mats: { world_wood: 3, dragon_scale: 1 },    difficulty: 17 },
+    world_board:   { name: '世界樹の星盤', type: 'starboard', slot: 'weapon', rank: 4, fixedCard: 'star_comet',     mats: { world_wood: 2, star_shard: 2 },      difficulty: 17 },
+    world_bow:     { name: '世界樹の弓',   type: 'bow',       slot: 'weapon', rank: 4, fixedCard: 'bow_pin',        mats: { world_wood: 3, phantom_cloth: 1 },   difficulty: 17 },
+    world_scepter: { name: '世界樹の錫杖', type: 'scepter',   slot: 'weapon', rank: 4, fixedCard: 'scep_offering',  mats: { world_wood: 2, gargoyle_stone: 1 },  difficulty: 17 },
+    moon_hat:      { name: '月光の帽子',   type: 'robe',      slot: 'head',   rank: 4, fixedCard: 'robe_insight',   mats: { moon_silk: 2, phantom_cloth: 1 },    difficulty: 16 },
+    moon_robe:     { name: '月光のローブ', type: 'robe',      slot: 'body',   rank: 4, fixedCard: 'robe_ward',      mats: { moon_silk: 3, phantom_cloth: 1 },    difficulty: 18 },
+    moon_hood:     { name: '月光の頭巾',   type: 'light',     slot: 'head',   rank: 4, fixedCard: 'light_scout',    mats: { moon_silk: 2, dragon_scale: 1 },     difficulty: 16 },
+    moon_garb:     { name: '月光の装束',   type: 'light',     slot: 'body',   rank: 4, fixedCard: 'light_evade',    mats: { moon_silk: 3, dragon_scale: 1 },     difficulty: 18 },
+    dragon_amulet: { name: '竜玉の首飾り', type: 'accessory', slot: 'accessory', rank: 4, fixedCard: 'acc_second', mats: { dragon_scale: 1, star_steel: 1, quartz: 2 }, difficulty: 16 }
+  });
+
   // 採集道具（良い道具ほど採集ミニゲームが楽になる）
   const tools = {
     copper_pick:  { name: '銅のツルハシ',     kind: 'pick', power: 1.0, craft: 'smith',     mats: { copper_ore: 2, oak: 1 },        difficulty: 1 },
@@ -101,7 +118,9 @@
     mithril_pick: { name: 'ミスリルのツルハシ', kind: 'pick', power: 2.0, craft: 'smith',   mats: { mithril_ore: 2, ancient_wood: 1 }, difficulty: 12 },
     copper_axe:   { name: '銅のオノ',         kind: 'axe',  power: 1.0, craft: 'carpenter', mats: { oak: 2, copper_ore: 1 },        difficulty: 1 },
     iron_axe:     { name: '鉄のオノ',         kind: 'axe',  power: 1.5, craft: 'carpenter', mats: { maple: 2, iron_ore: 1 },        difficulty: 6 },
-    mithril_axe:  { name: 'ミスリルのオノ',   kind: 'axe',  power: 2.0, craft: 'carpenter', mats: { ancient_wood: 2, mithril_ore: 1 }, difficulty: 12 }
+    mithril_axe:  { name: 'ミスリルのオノ',   kind: 'axe',  power: 2.0, craft: 'carpenter', mats: { ancient_wood: 2, mithril_ore: 1 }, difficulty: 12 },
+    star_pick:    { name: '星鋼のツルハシ',   kind: 'pick', power: 2.5, craft: 'smith',     mats: { star_steel: 2, world_wood: 1 },    difficulty: 16 },
+    star_axe:     { name: '星鋼のオノ',       kind: 'axe',  power: 2.5, craft: 'carpenter', mats: { world_wood: 2, star_steel: 1 },    difficulty: 16 }
   };
 
   R.DATA.equipment = { types, rankStats, statRolls, gradeMult, slotNames, bases, tools };

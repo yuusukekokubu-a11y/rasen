@@ -113,6 +113,26 @@
           accessory: { base: 'star_charm', randomCard: 'acc_quick', power: 'pw_as_stargaze' } } }
       ]
     },
+    rank4_plain: {
+      name: 'ランク4・ふつう・付与なし',
+      party: [
+        { job: 'swordsman', gear: {
+          weapon: { base: 'star_sword', randomCard: 'sword_heavy' },
+          head: { base: 'star_helm', randomCard: 'heavy_defend' },
+          body: { base: 'star_armor', randomCard: 'heavy_endure' },
+          accessory: { base: 'dragon_amulet', randomCard: 'acc_charm', power: 'pw_sw_fighting' } } },
+        { job: 'mage', gear: {
+          weapon: { base: 'world_staff', randomCard: 'staff_fire' },
+          head: { base: 'moon_hat', randomCard: 'robe_ward' },
+          body: { base: 'moon_robe', randomCard: 'robe_barrier' },
+          accessory: { base: 'dragon_amulet', randomCard: 'acc_spark', power: 'pw_mg_cycle' } } },
+        { job: 'astrologer', gear: {
+          weapon: { base: 'world_board', randomCard: 'star_beam' },
+          head: { base: 'moon_hat', randomCard: 'robe_meditate' },
+          body: { base: 'moon_robe', randomCard: 'robe_ward' },
+          accessory: { base: 'dragon_amulet', randomCard: 'acc_quick', power: 'pw_as_stargaze' } } }
+      ]
+    },
     rank2_enchanted: {
       name: 'ランク2・上質・付与あり（厳選済みの例）',
       party: [

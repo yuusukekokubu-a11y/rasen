@@ -169,6 +169,24 @@
 }
   };
 
+  // 難易度段階（すべてのダンジョンをクリアすると、各ダンジョンに難易度2・3…が開く）
+  //   難易度Nは、同じダンジョンの難易度N−1をクリアすると開く
+  R.DATA.difficulty = {
+    max: 5,
+    hpPerLevel: 0.35,          // 難易度が1上がるごとの敵HPの増え方（難易度2で×1.35）
+    dmgPerLevel: 0.25,         // 難易度が1上がるごとの敵の攻撃力・ブロックの増え方
+    // 上位素材：戦闘勝利・採集・宝箱のたびに、この確率で上位素材が1つ追加で出る
+    highDropPerLevel: 0.3,     // 難易度が1上がるごとの確率（難易度2で30%、上限90%）
+    highDropMax: 0.9,
+    // ダンジョンごとの上位素材の出やすさ
+    highDrops: {
+      cave:   { star_steel: 3, world_wood: 1, moon_silk: 1 },
+      forest: { world_wood: 3, star_steel: 1, moon_silk: 1 },
+      marsh:  { moon_silk: 3, world_wood: 1, star_steel: 1 },
+      ruins:  { star_steel: 2, world_wood: 2, moon_silk: 2, dragon_scale: 1, gargoyle_stone: 1, phantom_cloth: 1 }
+    }
+  };
+
   // 採集ミニゲーム「鉱脈探し」の設定
   // 4×4のマスに鉱脈が隠れている。1回振るごとに1マス掘る。
   // 外れのマスには「まわり8マスにある鉱脈の数」が出るので、それを手がかりに探す

@@ -12,6 +12,7 @@
     let n = 200;
     let hpRatio = 1;
     let dungeonId = Object.keys(R.DATA.dungeons)[0];
+    let difficulty = 1;
     let results = null;
 
     function render() {
@@ -34,6 +35,8 @@
           h('button', { class: 'primary', onclick: run }, '実行'),
           R.Sim.runDungeons ? h('select', { 'aria-label': 'ダンジョン', onchange: (e) => { dungeonId = e.target.value; } },
             Object.entries(R.DATA.dungeons).map(([id, d]) => h('option', { value: id, selected: id === dungeonId }, d.name))) : null,
+          R.Sim.runDungeons ? h('select', { 'aria-label': '難易度', onchange: (e) => { difficulty = Number(e.target.value); } },
+            [...Array(R.DATA.difficulty.max).keys()].map(i => h('option', { value: i + 1, selected: i + 1 === difficulty }, `難易度${i + 1}`))) : null,
           R.Sim.runDungeons ? h('button', { onclick: runDungeon }, 'ダンジョンを通しで実行') : null)));
 
       if (results) el.appendChild(results);
@@ -62,9 +65,9 @@
     }
 
     function runDungeon() {
-      const r = R.Sim.runDungeons({ members: members(), n, seed: Date.now() % 100000, dungeonId });
+      const r = R.Sim.runDungeons({ members: members(), n, seed: Date.now() % 100000, dungeonId, difficulty });
       results = h('div', { class: 'panel' },
-        h('div', null, `${R.DATA.dungeons[dungeonId].name} ${n}回：クリア率 ${(r.clearRate * 100).toFixed(1)}%`),
+        h('div', null, `${R.DATA.dungeons[dungeonId].name}（難易度${difficulty}） ${n}回：クリア率 ${(r.clearRate * 100).toFixed(1)}%`),
         h('div', null, `平均到達戦闘数 ${r.avgBattles.toFixed(1)} ／ クリア時の平均HP ${r.avgHpLeftOnClear.toFixed(1)}`),
         h('table', null,
           h('tr', null, h('th', null, '全滅した場所'), h('th', null, '回数')),

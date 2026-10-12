@@ -20,8 +20,17 @@
   }
 
   // ===== 出発準備 =====
+  // 難易度の説明（敵の強さ・上位素材の出やすさ）
+  function difficultyText(d) {
+    const D = R.DATA.difficulty;
+    if (d <= 1) return '難易度1（通常）';
+    const lv = d - 1;
+    return `難易度${d}：敵HP×${(1 + D.hpPerLevel * lv).toFixed(2)}・攻撃×${(1 + D.dmgPerLevel * lv).toFixed(2)}・上位素材${Math.round(Math.min(D.highDropMax, D.highDropPerLevel * lv) * 100)}%`;
+  }
+
   function departScreen(el) {
     const s = G().state;
+    const chosenDiff = {};
     if (G().run) { R.UI.show(runScreen); return; }
     const jobs = Object.keys(R.DATA.jobs).filter(j => R.DATA.jobs[j].enabled);
 
@@ -58,6 +67,7 @@
 
       el.appendChild(h('h2', null, 'ダンジョン'));
       el.appendChild(h('div', { class: 'muted' }, '全滅すると、集めた素材と持ち込みアイテムをすべて失います。途中で帰ることはできません。'));
+      if (G().allCleared()) el.appendChild(h('div', { class: 'panel good' }, 'すべてのダンジョンをクリア済み：各ダンジョンで難易度を上げて挑めます。上の難易度ほど上位素材（ランク4装備の材料）が出やすくなります。'));
       for (const [id, d] of Object.entries(R.DATA.dungeons)) {
         const open = G().isUnlocked(id);
         const clears = s.clears[id] || 0;
@@ -67,10 +77,20 @@
             h('div', null, h('b', null, '？？？'), h('span', { class: 'muted' }, `　${need.join('と')}をクリアすると開く`))));
           continue;
         }
+        const maxD = G().maxUnlockedDifficulty(id);
+        if (!chosenDiff[id] || chosenDiff[id] > maxD) chosenDiff[id] = maxD > 1 ? (s.maxDifficulty[id] || 1) : 1;
+        const best = s.maxDifficulty[id] || 0;
         el.appendChild(h('div', { class: 'panel dungeon' },
-          h('div', null, h('b', null, d.name), h('span', { class: clears ? 'good' : 'muted' }, clears ? `　クリア ${clears}回` : '　未クリア')),
+          h('div', null, h('b', null, d.name),
+            h('span', { class: clears ? 'good' : 'muted' }, clears ? `　クリア ${clears}回` : '　未クリア'),
+            best > 1 ? h('span', { class: 'good' }, `・最高難易度${best}`) : null),
           d.recommend ? h('div', { class: 'muted' }, d.recommend) : null,
-          h('button', { class: 'primary', disabled: s.party.length !== 3, onclick: () => { G().startRun(id); R.UI.show(runScreen); } },
+          maxD > 1 ? h('div', { class: 'row' }, '難易度：',
+            h('select', { id: 'diff-' + id, onchange: (e) => { chosenDiff[id] = Number(e.target.value); render(); } },
+              [...Array(maxD).keys()].map(i => h('option', { value: i + 1, selected: i + 1 === chosenDiff[id] }, String(i + 1)))),
+            h('span', { class: 'muted' }, difficultyText(chosenDiff[id])),
+            maxD < R.DATA.difficulty.max ? h('span', { class: 'muted' }, `（難易度${maxD}をクリアすると次が開く）`) : null) : null,
+          h('button', { class: 'primary', disabled: s.party.length !== 3, onclick: () => { G().startRun(id, chosenDiff[id]); R.UI.show(runScreen); } },
             s.party.length === 3 ? '出発する' : 'パーティを3人選んでください')));
       }
     }
@@ -82,7 +102,7 @@
     const run = G().run;
     if (!run) { R.UI.show(departScreen); return; }
     clear(el);
-    el.appendChild(R.UI.header(`${run.def.name}`));
+    el.appendChild(R.UI.header(`${run.def.name}${run.difficulty > 1 ? `（難易度${run.difficulty}）` : ''}`));
 
     // 進み具合
     const prog = h('div', { class: 'panel' },
@@ -124,7 +144,7 @@
         h('div', { class: 'result ' + (cleared ? 'result-win' : 'result-lose') }, cleared ? 'ダンジョンクリア！' : '全滅してしまった…'),
         cleared ? h('div', null, '持ち帰った素材：' + matText(res.bag)) : h('div', null, '失った素材：' + matText(res.lost)),
         cleared && res.newlyUnlocked.length ? h('div', { class: 'good' }, `新しいダンジョンが開いた：${res.newlyUnlocked.map(i => R.DATA.dungeons[i].name).join('・')}`) : null,
-        cleared && res.allClearedNow ? h('div', { class: 'good' }, 'すべてのダンジョンをクリアした！') : null,
+        cleared && res.allClearedNow ? h('div', { class: 'good' }, 'すべてのダンジョンをクリアした！ 各ダンジョンで難易度2に挑めるようになった') : null,
         h('button', { class: 'primary', onclick: () => R.UI.show(R.UI.homeScreen) }, '拠点へ戻る')));
     }
   }

@@ -186,3 +186,27 @@ test('すべてのダンジョンのデータが正しい（敵・素材・解�
   }
   for (const e of Object.values(R.DATA.enemies)) for (const m of Object.keys(e.drops || {})) assert.ok(R.DATA.materials[m], `${e.name} の ${m}`);
 });
+
+test('難易度段階：全クリア後に開き、1つずつ上がる・敵が強くなり上位素材が出る', () => {
+  const G = R.Game;
+  G.newState();
+  const clear = (id, d) => { const run = G.startRun(id, d); run.phase = 'cleared'; return G.endRun(); };
+  clear('cave');
+  assert.strictEqual(G.maxUnlockedDifficulty('cave'), 1, '全クリア前は難易度1だけ');
+  assert.throws(() => G.startRun('cave', 2));
+  clear('forest'); clear('marsh'); clear('ruins');
+  assert.strictEqual(G.maxUnlockedDifficulty('cave'), 2);
+  clear('cave', 2);
+  assert.strictEqual(G.maxUnlockedDifficulty('cave'), 3);
+  assert.strictEqual(G.maxUnlockedDifficulty('forest'), 2);
+  // 敵の強さ
+  const r1 = new R.DungeonRun({ dungeonId: 'cave', difficulty: 1, members: R.Sim.presetMembers('starter'), rng: R.createRng(1) });
+  const r3 = new R.DungeonRun({ dungeonId: 'cave', difficulty: 3, members: R.Sim.presetMembers('starter'), rng: R.createRng(1) });
+  assert.ok(r3.currentScale().hp > r1.currentScale().hp && r3.currentScale().dmg > r1.currentScale().dmg);
+  // 上位素材
+  let high = 0;
+  for (let i = 0; i < 200; i++) { const bag = {}; r3._highDrop(bag); high += Object.keys(bag).length; }
+  assert.ok(high > 50);
+  const bag1 = {}; for (let i = 0; i < 50; i++) r1._highDrop(bag1);
+  assert.deepStrictEqual(bag1, {});
+});

@@ -13,6 +13,7 @@
       this.tools = opts.tools || { pick: 1, axe: 1 };
       if (restored) { Object.assign(this, restored); return; }
       this.dungeonId = opts.dungeonId;
+      this.difficulty = opts.difficulty || 1;
       this.members = JSON.parse(JSON.stringify(opts.members));
       const party = R.Gear.buildParty(this.members);
       this.maxHp = party.maxHp;
@@ -41,6 +42,23 @@
       });
     }
 
+    // 敵の強さの倍率（階ごとの倍率 × 難易度の倍率）
+    currentScale() {
+      const f = this.def.floors[this.floor].scale;
+      const D = R.DATA.difficulty;
+      const lv = (this.difficulty || 1) - 1;
+      return { hp: f.hp * (1 + D.hpPerLevel * lv), dmg: f.dmg * (1 + D.dmgPerLevel * lv) };
+    }
+
+    // 難易度2以上：一定の確率で上位素材が追加で出る
+    _highDrop(bag) {
+      const D = R.DATA.difficulty;
+      const lv = (this.difficulty || 1) - 1;
+      const table = D.highDrops[this.dungeonId];
+      if (lv <= 0 || !table) return;
+      if (this.rng.chance(Math.min(D.highDropMax, D.highDropPerLevel * lv))) R.Gather.addMat(bag, this.rng.weighted(table), 1);
+    }
+
     totalBattles() { return this.plan.reduce((a, f) => a + f.length, 0); }
     currentEncounterId() { return this.plan[this.floor][this.index]; }
     isBossNext() { return !!R.DATA.encounters[this.currentEncounterId()].boss; }
@@ -52,7 +70,7 @@
       const enc = R.DATA.encounters[this.currentEncounterId()];
       return new R.Combat({
         party, hp: this.hp, encounter: enc.enemies, rng: rng || this.rng,
-        scale: this.def.floors[this.floor].scale, items: this.items
+        scale: this.currentScale(), items: this.items
       }).start();
     }
 
@@ -72,6 +90,7 @@
       for (const e of combat.enemies) {
         for (const [m, n] of Object.entries(e.def.drops || {})) R.Gather.addMat(drops, m, n);
       }
+      this._highDrop(drops);
       for (const [m, n] of Object.entries(drops)) R.Gather.addMat(this.bag, m, n);
       this.battlesWon++;
       this.history.push({ where: this.whereText(), result: '勝利', drops });
@@ -108,6 +127,7 @@
       }
       if (kind === 'gathering' || kind === 'treasure') {
         const bag = R.Gather.rollTable(g[kind][this.floor], this.rng);
+        this._highDrop(bag);
         for (const [m, n] of Object.entries(bag)) R.Gather.addMat(this.bag, m, n);
         this._advance();
         return { ok: true, kind, bag };
@@ -134,6 +154,7 @@
       const gn = this.gatherNode;
       gn.board.done = true;
       const res = R.Gather.boardResult(gn.node, gn.board, this.rng);
+      if (res.found) this._highDrop(res.bag);
       for (const [m, n] of Object.entries(res.bag)) R.Gather.addMat(this.bag, m, n);
       const ups = R.Life.addExp(this.lives[gn.life], res.exp);
       this.gatherNode = null;
@@ -151,7 +172,7 @@
     // セーブ用（乱数と経験値の参照は保存しない）
     serialize() {
       const o = {};
-      for (const k of ['dungeonId', 'members', 'maxHp', 'hp', 'items', 'bag', 'floor', 'index', 'battlesWon', 'phase', 'rewardOptions', 'gatherNode', 'history', 'plan']) {
+      for (const k of ['dungeonId', 'difficulty', 'members', 'maxHp', 'hp', 'items', 'bag', 'floor', 'index', 'battlesWon', 'phase', 'rewardOptions', 'gatherNode', 'history', 'plan']) {
         o[k] = JSON.parse(JSON.stringify(this[k] === undefined ? null : this[k]));
       }
       return o;
@@ -167,7 +188,7 @@
     const deathsAt = {};
     for (let i = 0; i < n; i++) {
       const run = new DungeonRun({
-        dungeonId: opts.dungeonId || 'cave', members: opts.members,
+        dungeonId: opts.dungeonId || 'cave', difficulty: opts.difficulty || 1, members: opts.members,
         rng: R.createRng(Math.floor(rng.next() * 2 ** 32)),
         lives: opts.lives ? JSON.parse(JSON.stringify(opts.lives)) : R.Life.newLives(),
         tools: opts.tools || { pick: 1, axe: 1 }, items: opts.items

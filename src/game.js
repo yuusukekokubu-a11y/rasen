@@ -21,6 +21,7 @@
         bring: [],             // 持ち込むアイテムの uid（最大3）
         life: R.Life.newLives(),
         clears: {},            // { ダンジョンID: クリア回数 }
+        maxDifficulty: {},     // { ダンジョンID: クリアした一番高い難易度 }
         runs: 0,
         run: null              // 進行中のダンジョン
       };
@@ -48,6 +49,8 @@
         if (R.DATA.jobs[job].enabled && !s.equipped[job]) this.giveStarter(job);
       }
       for (const k of Object.keys(R.Life.LIVES)) if (!s.life[k]) s.life[k] = { lv: 1, exp: 0 };
+      if (!s.maxDifficulty) s.maxDifficulty = {};
+      for (const [id, n] of Object.entries(s.clears)) if (n > 0 && !s.maxDifficulty[id]) s.maxDifficulty[id] = 1;
       s.party = s.party.filter(j => R.DATA.jobs[j] && R.DATA.jobs[j].enabled);
     },
 
@@ -148,16 +151,25 @@
     // すべてのダンジョンをクリアしたか（やり込み要素の解禁条件）
     allCleared() { return Object.keys(R.DATA.dungeons).every(id => (this.state.clears[id] || 0) > 0); },
 
+    // 難易度段階：すべてクリア後に開く。難易度Nは同じダンジョンの難易度N−1クリアで開く
+    maxUnlockedDifficulty(id) {
+      if (!this.isUnlocked(id)) return 0;
+      if (!this.allCleared()) return 1;
+      return Math.min(R.DATA.difficulty.max, (this.state.maxDifficulty[id] || 0) + 1);
+    },
+
     // ===== ダンジョン =====
-    startRun(dungeonId) {
+    startRun(dungeonId, difficulty) {
       if (!this.isUnlocked(dungeonId)) throw new Error('まだ開いていないダンジョンです');
+      difficulty = difficulty || 1;
+      if (difficulty > this.maxUnlockedDifficulty(dungeonId)) throw new Error('まだ開いていない難易度です');
       const s = this.state;
       const bring = s.bring.map(uid => s.consumables.find(c => c.uid === uid)).filter(Boolean).slice(0, R.DATA.config.combat.itemSlots);
       // 持ち込んだアイテムは手元から消える（クリアすれば残りが戻る）
       s.consumables = s.consumables.filter(c => !bring.includes(c));
       s.bring = [];
       const run = new R.DungeonRun({
-        dungeonId, members: this.currentMembers(), lives: s.life,
+        dungeonId, difficulty, members: this.currentMembers(), lives: s.life,
         tools: { pick: this.toolPower('pick'), axe: this.toolPower('axe') }, items: bring
       });
       s.runs++;
@@ -185,6 +197,7 @@
         this.addMaterials(run.bag);
         for (const it of run.items) s.consumables.push(it);
         s.clears[run.dungeonId] = (s.clears[run.dungeonId] || 0) + 1;
+        s.maxDifficulty[run.dungeonId] = Math.max(s.maxDifficulty[run.dungeonId] || 0, run.difficulty || 1);
         result = {
           cleared: true, bag: run.bag, items: run.items,
           newlyUnlocked: this.unlockedDungeons().filter(id => !before.includes(id)),

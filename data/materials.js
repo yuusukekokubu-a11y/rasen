@@ -28,6 +28,10 @@
     queen_scale:  { name: '女王の鱗',     kind: 'monster', rank: 3 },
     gargoyle_stone: { name: 'ガーゴイルの石', kind: 'monster', rank: 3 },
     phantom_cloth:  { name: '亡霊の布',     kind: 'monster', rank: 3 },
-    dragon_scale:   { name: '星竜の鱗',     kind: 'monster', rank: 3 }
+    dragon_scale:   { name: '星竜の鱗',     kind: 'monster', rank: 3 },
+    // ランク4（難易度2以上のダンジョンで出る上位素材）
+    star_steel:   { name: '星鋼',         kind: 'ore',     rank: 4 },
+    world_wood:   { name: '世界樹の枝',   kind: 'wood',    rank: 4 },
+    moon_silk:    { name: '月光の絹',     kind: 'plant',   rank: 4 }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});
