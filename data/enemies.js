@@ -61,9 +61,9 @@
       drops: { spider_silk: 1 }
     },
     golem: {
-      name: '岩窟の主', hp: [340, 340], boss: true,
+      name: '岩窟の主', hp: [240, 240], boss: true,
       moves: {
-        smash:   { name: '岩砕き', dmg: 26 },
+        smash:   { name: '岩砕き', dmg: 22 },
         quake:   { name: '地響き', dmg: 10, hits: 2, debuff: { s: 'vulnerable', v: 1 } },
         fortify: { name: '岩の鎧', block: 25, str: 3 },
         charge:  { name: '力を溜める', str: 5 }

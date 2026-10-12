@@ -22,3 +22,32 @@ module.exports.push(
     await page.click('text=もどる');
   } }
 );
+// ダンジョンを最後（クリアか全滅）まで自動で進める
+async function playDungeon(page) {
+  for (let i = 0; i < 600; i++) {
+    const has = async (sel) => (await page.locator(sel).count()) > 0;
+    if (await has('text=拠点へ戻る')) { await page.click('text=拠点へ戻る'); return; }
+    if (await has('.modal button')) { await page.click('.modal button'); continue; }
+    if (await has('button:has-text("次へ")')) { await page.click('button:has-text("次へ")'); continue; }
+    if (await has('button:has-text("自動で1ターン")')) { await page.click('button:has-text("自動で1ターン")'); continue; }
+    if (await has('button:has-text("戦う")')) { await page.click('button:has-text("戦う")'); continue; }
+    if (await has('.minigame button:not([disabled])')) { await page.click('.minigame button'); continue; }
+    if (await has('.menu-item')) { await page.click('.menu-item >> nth=0'); continue; }
+    await page.waitForTimeout(100);
+  }
+  throw new Error('ダンジョンが終わらない');
+}
+module.exports.playDungeon = playDungeon;
+module.exports.push(
+  { name: 'ダンジョンを最後まで進める', run: async (page) => {
+    await page.click('text=ダンジョンへ出発');
+    await page.click('text=出発する');
+    await playDungeon(page);
+    await page.waitForSelector('text=拠点');
+  } },
+  { name: '持ち物画面', run: async (page) => {
+    await page.click('text=持ち物・ライフ');
+    await page.waitForSelector('text=ライフ（生産・採集のレベル）');
+    await page.click('text=もどる');
+  } }
+);
