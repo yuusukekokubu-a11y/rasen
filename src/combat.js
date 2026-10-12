@@ -453,7 +453,8 @@
           break;
         }
         case 'heal': {
-          const amount = Math.max(0, Math.floor((e.v + this.statOf(ctx.owner, 'mag')) * mult));
+          const magRate = e.magRate === undefined ? 1 : e.magRate;
+          const amount = Math.max(0, Math.floor((e.v + Math.floor(this.statOf(ctx.owner, 'mag') * magRate)) * mult));
           const before = this.party.hp;
           this.party.hp = Math.min(this.party.maxHp, this.party.hp + amount);
           this._log(`　HPが${this.party.hp - before}回復`);
@@ -524,6 +525,15 @@
         this.queue.unshift(...fns);
         this._log(`　${def.displayName}の捨て札発動`);
       }
+      this._triggerPowers('cardDiscarded');
+    }
+
+    // パワー：捨てたとき・廃棄したとき
+    _triggerPowers(hook) {
+      for (const pw of this.powers) {
+        const pd = R.DATA.powers[pw.id];
+        if (pd[hook]) for (const e of pd[hook]) this.queue.push(() => this._applyEffect(e, { owner: pw.owner, mult: 1 }));
+      }
     }
 
     _exhaustCard(inst) {
@@ -532,6 +542,7 @@
       this.exhaust.push(inst);
       this.counters.exhaustedThisCombat++;
       if (this.hasEnchant(inst, 'lastWords')) this.queue.unshift(() => this._drawCards(1));
+      this._triggerPowers('cardExhausted');
     }
 
     _randomAliveIndex() {

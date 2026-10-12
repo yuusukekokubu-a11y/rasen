@@ -119,6 +119,74 @@
     acc_second:     { name: '集中力', pool: 'accessory', type: 'skill', cost: 1, exhaust: true,
       effects: [{ t: 'energy', v: 2 }], upgrade: { cost: 0 } },
 
+    // ===== 短剣（盗賊） =====
+    dagger_stab:    { name: '刺突', pool: 'dagger', type: 'attack', cost: 1,
+      effects: [{ t: 'dmg', v: 6 }], upgrade: { effects: [{ t: 'dmg', v: 9 }] } },
+    dagger_prepare: { name: '下準備', pool: 'dagger', type: 'skill', cost: 0,
+      effects: [{ t: 'draw', v: 2 }, { t: 'discard', v: 1 }], upgrade: { effects: [{ t: 'draw', v: 3 }, { t: 'discard', v: 1 }] } },
+    dagger_flurry:  { name: '乱れ斬り', pool: 'dagger', type: 'attack', cost: 1,
+      effects: [{ t: 'dmg', v: 3, plusPer: { what: 'discardedThisTurn', v: 3 } }],
+      upgrade: { effects: [{ t: 'dmg', v: 4, plusPer: { what: 'discardedThisTurn', v: 4 } }] } },
+    dagger_toss:    { name: '投げナイフ', pool: 'dagger', type: 'attack', cost: 0,
+      effects: [{ t: 'dmg', v: 3 }], upgrade: { effects: [{ t: 'dmg', v: 5 }] } },
+    dagger_shadow:  { name: '影討ち', pool: 'dagger', type: 'attack', cost: 1,
+      effects: [{ t: 'dmg', v: 6 }, { t: 'draw', v: 1 }, { t: 'discard', v: 1 }],
+      upgrade: { effects: [{ t: 'dmg', v: 8 }, { t: 'draw', v: 1 }, { t: 'discard', v: 1 }] } },
+    dagger_venom:   { name: '毒刃', pool: 'dagger', type: 'attack', cost: 1,
+      effects: [{ t: 'dmg', v: 4 }, { t: 'status', s: 'weak', v: 1 }, { t: 'status', s: 'vulnerable', v: 1 }],
+      upgrade: { effects: [{ t: 'dmg', v: 6 }, { t: 'status', s: 'weak', v: 2 }, { t: 'status', s: 'vulnerable', v: 2 }] } },
+    dagger_reflex:  { name: '身のこなし', pool: 'dagger', type: 'skill', cost: 1,
+      effects: [{ t: 'block', v: 5 }, { t: 'draw', v: 1 }, { t: 'discard', v: 1 }],
+      upgrade: { effects: [{ t: 'block', v: 8 }, { t: 'draw', v: 1 }, { t: 'discard', v: 1 }] } },
+
+    // ===== 軽装（盗賊・弓使いの頭・胴） =====
+    light_dodge:    { name: '回避', pool: 'light', type: 'skill', cost: 1,
+      effects: [{ t: 'block', v: 6 }], upgrade: { effects: [{ t: 'block', v: 9 }] } },
+    light_step:     { name: '軽業', pool: 'light', type: 'skill', cost: 0,
+      effects: [{ t: 'block', v: 3 }], upgrade: { effects: [{ t: 'block', v: 5 }] } },
+    light_scout:    { name: '偵察', pool: 'light', type: 'skill', cost: 1,
+      effects: [{ t: 'block', v: 3 }, { t: 'scry', v: 3 }], upgrade: { effects: [{ t: 'block', v: 5 }, { t: 'scry', v: 3 }] } },
+    light_evade:    { name: '見切り', pool: 'light', type: 'skill', cost: 2,
+      effects: [{ t: 'block', v: 12 }], upgrade: { effects: [{ t: 'block', v: 16 }] } },
+    light_rush:     { name: '駆け抜け', pool: 'light', type: 'skill', cost: 1,
+      effects: [{ t: 'draw', v: 2 }, { t: 'discard', v: 1 }], upgrade: { effects: [{ t: 'draw', v: 3 }, { t: 'discard', v: 1 }] } },
+
+    // ===== 弓（弓使い） =====
+    bow_shot:       { name: '射撃', pool: 'bow', type: 'attack', cost: 1,
+      effects: [{ t: 'dmg', v: 3, hits: 2 }], upgrade: { effects: [{ t: 'dmg', v: 4, hits: 2 }] } },
+    bow_rain:       { name: '矢の雨', pool: 'bow', type: 'attack', cost: 2,
+      effects: [{ t: 'dmg', v: 2, hits: 3, target: 'all' }], upgrade: { effects: [{ t: 'dmg', v: 3, hits: 3, target: 'all' }] } },
+    bow_quick:      { name: '速射', pool: 'bow', type: 'attack', cost: 0,
+      effects: [{ t: 'dmg', v: 1, hits: 2 }], upgrade: { effects: [{ t: 'dmg', v: 2, hits: 2 }] } },
+    bow_aim:        { name: '狙い撃ち', pool: 'bow', type: 'attack', cost: 2,
+      effects: [{ t: 'dmg', v: 13 }, { t: 'status', s: 'vulnerable', v: 1 }],
+      upgrade: { effects: [{ t: 'dmg', v: 17 }, { t: 'status', s: 'vulnerable', v: 2 }] } },
+    bow_volley:     { name: '連射', pool: 'bow', type: 'attack', cost: 1,
+      effects: [{ t: 'dmg', v: 1, hits: 4, target: 'random' }], upgrade: { effects: [{ t: 'dmg', v: 2, hits: 4, target: 'random' }] } },
+    bow_focus:      { name: '集中射撃', pool: 'bow', type: 'skill', cost: 1,
+      effects: [{ t: 'buff', stat: 'atk', v: 2, who: 'self' }], upgrade: { effects: [{ t: 'buff', stat: 'atk', v: 3, who: 'self' }] } },
+    bow_pin:        { name: '足止め', pool: 'bow', type: 'attack', cost: 1,
+      effects: [{ t: 'dmg', v: 4 }, { t: 'status', s: 'weak', v: 2 }], upgrade: { effects: [{ t: 'dmg', v: 6 }, { t: 'status', s: 'weak', v: 2 }] } },
+
+    // ===== 錫杖（僧侶） =====
+    scep_prayer:    { name: '祈り', pool: 'scepter', type: 'skill', cost: 1, tags: ['magic'], exhaust: true,
+      effects: [{ t: 'heal', v: 4 }], upgrade: { effects: [{ t: 'heal', v: 6 }] } },
+    scep_smite:     { name: '聖撃', pool: 'scepter', type: 'attack', cost: 1, tags: ['magic'],
+      effects: [{ t: 'dmg', v: 6, scale: 'mag' }], upgrade: { effects: [{ t: 'dmg', v: 9, scale: 'mag' }] } },
+    scep_purge:     { name: '浄化', pool: 'scepter', type: 'skill', cost: 0,
+      effects: [{ t: 'exhaustChoice', v: 1 }, { t: 'draw', v: 2 }], upgrade: { effects: [{ t: 'exhaustChoice', v: 1 }, { t: 'draw', v: 3 }] } },
+    scep_offering:  { name: '献身', pool: 'scepter', type: 'skill', cost: 1, tags: ['magic'],
+      effects: [{ t: 'exhaustChoice', v: 1 }, { t: 'block', v: 7, scale: 'mag' }],
+      upgrade: { effects: [{ t: 'exhaustChoice', v: 1 }, { t: 'block', v: 10, scale: 'mag' }] } },
+    scep_judgement: { name: '裁き', pool: 'scepter', type: 'attack', cost: 2, tags: ['magic'],
+      effects: [{ t: 'dmg', v: 6, scale: 'mag', plusPer: { what: 'exhaustedThisCombat', v: 3 } }],
+      upgrade: { effects: [{ t: 'dmg', v: 8, scale: 'mag', plusPer: { what: 'exhaustedThisCombat', v: 4 } }] } },
+    scep_sanctuary: { name: '聖域', pool: 'scepter', type: 'skill', cost: 2, tags: ['magic'], exhaust: true,
+      effects: [{ t: 'block', v: 10, scale: 'mag' }, { t: 'heal', v: 2 }],
+      upgrade: { effects: [{ t: 'block', v: 14, scale: 'mag' }, { t: 'heal', v: 3 }] } },
+    scep_lightray:  { name: '光の矢', pool: 'scepter', type: 'attack', cost: 0, tags: ['magic'], exhaust: true,
+      effects: [{ t: 'dmg', v: 5, scale: 'mag' }], upgrade: { effects: [{ t: 'dmg', v: 8, scale: 'mag' }] } },
+
     // ===== パワー（職業ごと） =====
     pw_sw_fighting: { name: '闘気', pool: 'power_swordsman', type: 'power', cost: 1, effects: [{ t: 'power', id: 'sw_fighting' }] },
     pw_sw_stance:   { name: '不動の構え', pool: 'power_swordsman', type: 'power', cost: 1, effects: [{ t: 'power', id: 'sw_stance' }] },
@@ -133,6 +201,21 @@
     pw_as_stargaze: { name: '星見', pool: 'power_astrologer', type: 'power', cost: 1, effects: [{ t: 'power', id: 'as_stargaze' }] },
     pw_as_aegis:    { name: '星の守り', pool: 'power_astrologer', type: 'power', cost: 1, effects: [{ t: 'power', id: 'as_aegis' }] },
     pw_as_orbit:    { name: '星の巡り', pool: 'power_astrologer', type: 'power', cost: 2, effects: [{ t: 'power', id: 'as_orbit' }] },
-    pw_as_zodiac:   { name: '星座の加護', pool: 'power_astrologer', type: 'power', cost: 3, effects: [{ t: 'power', id: 'as_zodiac' }] }
+    pw_as_zodiac:   { name: '星座の加護', pool: 'power_astrologer', type: 'power', cost: 3, effects: [{ t: 'power', id: 'as_zodiac' }] },
+
+    pw_th_shadow:   { name: '影走り', pool: 'power_thief', type: 'power', cost: 1, effects: [{ t: 'power', id: 'th_shadow' }] },
+    pw_th_nimble:   { name: '身軽', pool: 'power_thief', type: 'power', cost: 1, effects: [{ t: 'power', id: 'th_nimble' }] },
+    pw_th_mist:     { name: '霧隠れ', pool: 'power_thief', type: 'power', cost: 1, effects: [{ t: 'power', id: 'th_mist' }] },
+    pw_th_vital:    { name: '急所狙い', pool: 'power_thief', type: 'power', cost: 1, effects: [{ t: 'power', id: 'th_vital' }] },
+
+    pw_ar_stance:   { name: '速射の構え', pool: 'power_archer', type: 'power', cost: 2, effects: [{ t: 'power', id: 'ar_stance' }] },
+    pw_ar_quiver:   { name: '矢筒', pool: 'power_archer', type: 'power', cost: 1, effects: [{ t: 'power', id: 'ar_quiver' }] },
+    pw_ar_eagle:    { name: '鷹の目', pool: 'power_archer', type: 'power', cost: 2, effects: [{ t: 'power', id: 'ar_eagle' }] },
+    pw_ar_hunter:   { name: '狩人の心得', pool: 'power_archer', type: 'power', cost: 1, effects: [{ t: 'power', id: 'ar_hunter' }] },
+
+    pw_pr_ward:     { name: '結界', pool: 'power_priest', type: 'power', cost: 1, effects: [{ t: 'power', id: 'pr_ward' }] },
+    pw_pr_ascetic:  { name: '苦行', pool: 'power_priest', type: 'power', cost: 1, effects: [{ t: 'power', id: 'pr_ascetic' }] },
+    pw_pr_grace:    { name: '恩寵', pool: 'power_priest', type: 'power', cost: 2, effects: [{ t: 'power', id: 'pr_grace' }] },
+    pw_pr_faith:    { name: '信仰', pool: 'power_priest', type: 'power', cost: 1, effects: [{ t: 'power', id: 'pr_faith' }] }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

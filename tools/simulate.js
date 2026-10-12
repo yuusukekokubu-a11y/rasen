@@ -6,6 +6,7 @@
 //   node tools/simulate.js --enc boss_golem --n 1000
 //   node tools/simulate.js --hp 0.5                … HP半分から開始
 //   node tools/simulate.js --dungeon               … ダンジョンを最初から最後まで自動で通す
+//   node tools/simulate.js --combos                … 全職業の組み合わせ（初期装備）でダンジョンを比べる
 //   node tools/simulate.js --list                  … 使える装備セットと敵の一覧
 const { loadGame } = require('./load.js');
 const R = loadGame();
@@ -22,6 +23,23 @@ if (arg('list', false)) {
   for (const [id, p] of Object.entries(R.DATA.loadouts.presets)) console.log(`  ${id.padEnd(18)} ${p.name}`);
   console.log('敵（--enc）:');
   for (const [id, e] of Object.entries(R.DATA.encounters)) console.log(`  ${id.padEnd(18)} ${e.name}`);
+  process.exit(0);
+}
+
+// 全職業の組み合わせ（初期装備）でダンジョンを回して比べる
+if (arg('combos', false)) {
+  const n = Number(arg('n', 100));
+  const jobs = Object.keys(R.DATA.jobs).filter(j => R.DATA.jobs[j].enabled);
+  const rows = [];
+  for (let a = 0; a < jobs.length; a++) for (let b = a + 1; b < jobs.length; b++) for (let c = b + 1; c < jobs.length; c++) {
+    const members = [jobs[a], jobs[b], jobs[c]].map(job => ({ job, gear: R.DATA.loadouts.starter[job] }));
+    const r = R.Sim.runDungeons({ members, n, seed: 1 });
+    const boss = R.Sim.runBattles({ members, enemies: R.DATA.encounters.boss_golem.enemies, n, seed: 1 });
+    rows.push({ 'パーティ': members.map(m => R.DATA.jobs[m.job].name).join('・'), 'ダンジョンクリア率': (r.clearRate * 100).toFixed(1) + '%', 'ボス平均ターン(満タンから)': boss.avgTurns.toFixed(1), 'ボス被ダメ': boss.avgDamageTaken.toFixed(1) });
+  }
+  rows.sort((x, y) => parseFloat(y['ダンジョンクリア率']) - parseFloat(x['ダンジョンクリア率']));
+  console.log(`初期装備・各${n}回`);
+  console.table(rows);
   process.exit(0);
 }
 

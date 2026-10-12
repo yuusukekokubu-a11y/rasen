@@ -89,9 +89,22 @@
     return true;
   }
 
+  // 持ち込みアイテム：HPが減っていたら回復、ボス戦の最初のターンは強化・攻撃アイテムを使う
+  function useItems(c) {
+    for (let i = c.items.length - 1; i >= 0; i--) {
+      if (c.result || c.pending) return;
+      const def = R.DATA.items[c.items[i].id];
+      if (!def) continue;
+      const heals = def.effects.some(e => e.t === 'heal');
+      const boss = c.enemies.some(e => e.boss && e.alive);
+      if (heals ? c.party.hp < c.party.maxHp * 0.4 : (boss && c.turn === 1)) c.useItem(i, c._firstAlive());
+    }
+  }
+
   // 1ターン分を自動で進めて、ターン終了まで行う
   function playTurn(c) {
     let guard = 0;
+    if (c.items && c.items.length) useItems(c);
     while (!c.result && guard++ < 60) {
       if (!step(c)) break;
     }

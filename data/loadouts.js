@@ -26,6 +26,24 @@
       head:      { base: 'flax_hat',     randomCard: 'robe_insight' },
       body:      { base: 'flax_robe',    randomCard: 'robe_ward' },
       accessory: { base: 'copper_ring',  randomCard: 'acc_quick', power: 'pw_as_stargaze' }
+    },
+    thief: {
+      weapon:    { base: 'copper_dagger', randomCard: 'dagger_prepare' },
+      head:      { base: 'cloth_hood',    randomCard: 'light_rush' },
+      body:      { base: 'cloth_tunic',   randomCard: 'light_step' },
+      accessory: { base: 'copper_ring',   randomCard: 'acc_throw', power: 'pw_th_shadow' }
+    },
+    archer: {
+      weapon:    { base: 'oak_bow',       randomCard: 'bow_quick' },
+      head:      { base: 'cloth_hood',    randomCard: 'light_step' },
+      body:      { base: 'cloth_tunic',   randomCard: 'light_dodge' },
+      accessory: { base: 'copper_ring',   randomCard: 'acc_charm', power: 'pw_ar_stance' }
+    },
+    priest: {
+      weapon:    { base: 'oak_scepter',   randomCard: 'scep_purge' },
+      head:      { base: 'flax_hat',      randomCard: 'robe_barrier' },
+      body:      { base: 'flax_robe',     randomCard: 'robe_ward' },
+      accessory: { base: 'copper_ring',   randomCard: 'acc_charm', power: 'pw_pr_ward' }
     }
   };
 
@@ -37,6 +55,22 @@
         { job: 'swordsman',  gear: starter.swordsman },
         { job: 'mage',       gear: starter.mage },
         { job: 'astrologer', gear: starter.astrologer }
+      ]
+    },
+    starter_b: {
+      name: '初期装備（盗賊・弓使い・僧侶）',
+      party: [
+        { job: 'thief',  gear: starter.thief },
+        { job: 'archer', gear: starter.archer },
+        { job: 'priest', gear: starter.priest }
+      ]
+    },
+    starter_c: {
+      name: '初期装備（剣士・弓使い・僧侶）',
+      party: [
+        { job: 'swordsman', gear: starter.swordsman },
+        { job: 'archer',    gear: starter.archer },
+        { job: 'priest',    gear: starter.priest }
       ]
     },
     rank2_plain: {

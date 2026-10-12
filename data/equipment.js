@@ -8,8 +8,12 @@
     sword:     { name: '剣',   slots: ['weapon'], stat: 'atk', craft: 'smith' },
     staff:     { name: '杖',   slots: ['weapon'], stat: 'mag', craft: 'carpenter' },
     starboard: { name: '星盤', slots: ['weapon'], stat: 'mag', craft: 'carpenter' },
+    dagger:    { name: '短剣', slots: ['weapon'], stat: 'atk', craft: 'smith' },
+    bow:       { name: '弓',   slots: ['weapon'], stat: 'atk', craft: 'carpenter' },
+    scepter:   { name: '錫杖', slots: ['weapon'], stat: 'mag', craft: 'carpenter' },
     heavy:     { name: '重装', slots: ['head', 'body'], craft: 'smith',  armorMod: { hp: 1.0, def: 1.5 } },
     robe:      { name: 'ローブ', slots: ['head', 'body'], craft: 'tailor', armorMod: { hp: 1.2, def: 0.7 } },
+    light:     { name: '軽装', slots: ['head', 'body'], craft: 'tailor', armorMod: { hp: 1.1, def: 1.0 } },
     accessory: { name: 'アクセサリー', slots: ['accessory'], craft: 'jeweler' }
   };
 
@@ -65,6 +69,25 @@
     flax_robe:      { name: '麻のローブ',   type: 'robe', slot: 'body', rank: 1, fixedCard: 'robe_ward',     mats: { flax: 3, slime_gel: 1 },          difficulty: 2 },
     silk_robe:      { name: '絹のローブ',   type: 'robe', slot: 'body', rank: 2, fixedCard: 'robe_barrier',  mats: { spider_silk: 3, flax: 1 },        difficulty: 7 },
     star_robe:      { name: '星絹のローブ', type: 'robe', slot: 'body', rank: 3, fixedCard: 'robe_mend',     mats: { spider_silk: 3, star_shard: 1 },  difficulty: 13 },
+    // --- 短剣（鍛冶） ---
+    copper_dagger:  { name: '銅の短剣',       type: 'dagger', slot: 'weapon', rank: 1, fixedCard: 'dagger_stab',    mats: { copper_ore: 2, oak: 1 },          difficulty: 1 },
+    iron_dagger:    { name: '鉄の短剣',       type: 'dagger', slot: 'weapon', rank: 2, fixedCard: 'dagger_shadow',  mats: { iron_ore: 2, bat_wing: 1 },       difficulty: 6 },
+    mithril_dagger: { name: 'ミスリルの短剣', type: 'dagger', slot: 'weapon', rank: 3, fixedCard: 'dagger_flurry',  mats: { mithril_ore: 2, golem_core: 1 },  difficulty: 12 },
+    // --- 弓（大工） ---
+    oak_bow:        { name: 'カシの弓',       type: 'bow', slot: 'weapon', rank: 1, fixedCard: 'bow_shot',         mats: { oak: 3, flax: 1 },                difficulty: 1 },
+    maple_bow:      { name: 'カエデの弓',     type: 'bow', slot: 'weapon', rank: 2, fixedCard: 'bow_aim',          mats: { maple: 3, spider_silk: 1 },       difficulty: 6 },
+    ancient_bow:    { name: '古木の弓',       type: 'bow', slot: 'weapon', rank: 3, fixedCard: 'bow_rain',         mats: { ancient_wood: 3, golem_core: 1 }, difficulty: 12 },
+    // --- 錫杖（大工） ---
+    oak_scepter:    { name: 'カシの錫杖',     type: 'scepter', slot: 'weapon', rank: 1, fixedCard: 'scep_smite',   mats: { oak: 2, quartz: 1 },              difficulty: 2 },
+    maple_scepter:  { name: 'カエデの錫杖',   type: 'scepter', slot: 'weapon', rank: 2, fixedCard: 'scep_prayer',  mats: { maple: 2, quartz: 1, glowcap: 1 }, difficulty: 7 },
+    ancient_scepter:{ name: '古木の錫杖',     type: 'scepter', slot: 'weapon', rank: 3, fixedCard: 'scep_judgement', mats: { ancient_wood: 2, star_shard: 1 }, difficulty: 12 },
+    // --- 軽装（裁縫） ---
+    cloth_hood:     { name: '布の頭巾',       type: 'light', slot: 'head', rank: 1, fixedCard: 'light_dodge',  mats: { flax: 1, bat_wing: 1 },          difficulty: 1 },
+    pelt_cap:       { name: '毛皮の帽子',     type: 'light', slot: 'head', rank: 2, fixedCard: 'light_scout',  mats: { wolf_pelt: 2 },                  difficulty: 5 },
+    shadow_hood:    { name: '影の頭巾',       type: 'light', slot: 'head', rank: 3, fixedCard: 'light_rush',   mats: { spider_silk: 2, star_shard: 1 }, difficulty: 11 },
+    cloth_tunic:    { name: '布の服',         type: 'light', slot: 'body', rank: 1, fixedCard: 'light_dodge',  mats: { flax: 2, slime_gel: 1 },         difficulty: 2 },
+    pelt_coat:      { name: '毛皮の服',       type: 'light', slot: 'body', rank: 2, fixedCard: 'light_evade',  mats: { wolf_pelt: 2, flax: 1 },         difficulty: 7 },
+    shadow_garb:    { name: '影の装束',       type: 'light', slot: 'body', rank: 3, fixedCard: 'light_step',   mats: { spider_silk: 3, golem_core: 1 }, difficulty: 13 },
     // --- アクセサリー（細工） パワーは作るときに選ぶ ---
     copper_ring:    { name: '銅の指輪',     type: 'accessory', slot: 'accessory', rank: 1, fixedCard: 'acc_charm', mats: { copper_ore: 1, quartz: 1 },  difficulty: 2 },
     silver_neck:    { name: '水晶の首飾り', type: 'accessory', slot: 'accessory', rank: 2, fixedCard: 'acc_throw', mats: { iron_ore: 1, quartz: 2 },    difficulty: 6 },
