@@ -166,7 +166,57 @@
           { amount: [3, 5], table: { star_shard: 2, elder_heart: 1, queen_scale: 1, dragon_scale: 1 } }
         ]
       }
-}
+    },
+
+    // 無限階層（エンドコンテンツ）：4階ごとにボス。倒すたびに「帰還／さらに潜る」を選ぶ。毎回1階から
+    spiral: {
+      name: '螺旋の塔', requires: ['cave', 'forest', 'marsh', 'ruins'],
+      recommend: '終わりのない塔。4階ごとにボスがいて、倒すたびに帰るか潜るかを選ぶ。深いほど敵が強く、上位素材が出やすい',
+      endless: {
+        segment: 4,              // 何階ごとにボス（＝帰還できる区切り）
+        battles: [1, 2],         // 1階あたりの通常の戦闘数（ボスの階はこの後にボス）
+        hpPerFloor: 0.08,        // 1階深くなるごとの敵HPの増え方
+        dmgPerFloor: 0.06,       // 1階深くなるごとの敵の攻撃力の増え方
+        // 何階から、どの敵の組み合わせが出るか
+        tiers: [
+          { from: 1,  encounters: { wolf_hornet: 1, treant_single: 1, toad_pair: 1, toad_wisp: 1, spider_hornet: 1, wolf_pair: 1 } },
+          { from: 5,  encounters: { treant_pair: 1, toad_trio: 1, gargoyle_single: 1, doll_pair: 1, phantom_single: 1, treant_wolf: 1 } },
+          { from: 9,  encounters: { gargoyle_phantom: 2, phantom_doll: 2, gargoyle_pair: 1, treant_pair: 1, toad_trio: 1 } }
+        ],
+        bosses: ['boss_golem', 'boss_elder', 'boss_queen', 'boss_dragon'], // 4階・8階・12階・16階…の順にくり返す
+        highDropPerFloor: 0.05,  // 1階深くなるごとの上位素材の確率（上限 highDropMax）
+        highDropMax: 0.9,
+        highDrops: { star_steel: 3, world_wood: 3, moon_silk: 3, dragon_scale: 1, gargoyle_stone: 1, phantom_cloth: 1, star_shard: 2 }
+      },
+      rewards: { weights: { mining: 3, logging: 3, gathering: 2, treasure: 3, rest: 3 }, restHealRatio: 0.35 },
+      // 採集の表は4階ごとにくり返す
+      gather: {
+        mining: [
+          { hardness: 6,  common: { iron_ore: 2, mithril_ore: 1 },   rare: { quartz: 1 } },
+          { hardness: 9,  common: { mithril_ore: 2 },                rare: { star_shard: 1 } },
+          { hardness: 12, common: { mithril_ore: 2, quartz: 1 },     rare: { star_steel: 1 } },
+          { hardness: 15, common: { mithril_ore: 1, star_steel: 1 }, rare: { star_steel: 1 } }
+        ],
+        logging: [
+          { hardness: 6,  common: { maple: 2, ancient_wood: 1 },      rare: { glowcap: 1 } },
+          { hardness: 9,  common: { ancient_wood: 2 },                rare: { star_shard: 1 } },
+          { hardness: 12, common: { ancient_wood: 2 },                rare: { world_wood: 1 } },
+          { hardness: 15, common: { ancient_wood: 1, world_wood: 1 }, rare: { world_wood: 1 } }
+        ],
+        gathering: [
+          { amount: [2, 3], table: { glowcap: 2, herb: 2, quartz: 1 } },
+          { amount: [2, 3], table: { glowcap: 2, quartz: 2, moon_silk: 1 } },
+          { amount: [2, 4], table: { quartz: 2, moon_silk: 1, star_shard: 1 } },
+          { amount: [2, 4], table: { moon_silk: 2, star_shard: 1, phantom_cloth: 1 } }
+        ],
+        treasure: [
+          { amount: [3, 4], table: { mithril_ore: 2, ancient_wood: 2, spider_silk: 2, quartz: 1 } },
+          { amount: [3, 4], table: { mithril_ore: 2, star_shard: 1, elder_heart: 1, queen_scale: 1 } },
+          { amount: [3, 4], table: { star_steel: 1, world_wood: 1, moon_silk: 1, star_shard: 1 } },
+          { amount: [3, 5], table: { star_steel: 2, world_wood: 2, moon_silk: 2, dragon_scale: 1 } }
+        ]
+      }
+    }
   };
 
   // 難易度段階（すべてのダンジョンをクリアすると、各ダンジョンに難易度2・3…が開く）

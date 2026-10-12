@@ -82,8 +82,9 @@
         const best = s.maxDifficulty[id] || 0;
         el.appendChild(h('div', { class: 'panel dungeon' },
           h('div', null, h('b', null, d.name),
-            h('span', { class: clears ? 'good' : 'muted' }, clears ? `　クリア ${clears}回` : '　未クリア'),
-            best > 1 ? h('span', { class: 'good' }, `・最高難易度${best}`) : null),
+            h('span', { class: clears ? 'good' : 'muted' }, clears ? `　${d.endless ? '帰還' : 'クリア'} ${clears}回` : (d.endless ? '' : '　未クリア')),
+            best > 1 ? h('span', { class: 'good' }, `・最高難易度${best}`) : null,
+            d.endless ? h('span', { class: 'good' }, `　最高到達 ${s.bestFloor[id] || 0}階`) : null),
           d.recommend ? h('div', { class: 'muted' }, d.recommend) : null,
           maxD > 1 ? h('div', { class: 'row' }, '難易度：',
             h('select', { id: 'diff-' + id, onchange: (e) => { chosenDiff[id] = Number(e.target.value); render(); } },
@@ -108,7 +109,10 @@
     const prog = h('div', { class: 'panel' },
       h('div', { class: 'row' },
         h('span', null, run.phase === 'cleared' || run.phase === 'wiped' ? '' : `${run.floor + 1}階　${run.index + 1} / ${run.plan[run.floor].length} 戦目`),
-        h('span', { class: 'muted' }, `（勝利 ${run.battlesWon} / 全${run.totalBattles()}戦）`)),
+        run.phase === 'cleared' || run.phase === 'wiped' ? null
+        : run.endless
+          ? h('span', { class: 'muted' }, `（勝利 ${run.battlesWon}・最高記録 ${G().state.bestFloor[run.dungeonId] || 0}階／次のボスは${Math.ceil((run.floor + 1) / run.def.endless.segment) * run.def.endless.segment}階）`)
+          : h('span', { class: 'muted' }, `（勝利 ${run.battlesWon} / 全${run.totalBattles()}戦）`)),
       h('div', null, 'パーティHP'), bar(run.hp, run.maxHp, 'hp'),
       h('div', null, '集めた素材：' + matText(run.bag)),
       run.items.length ? h('div', null, '持ち込み：' + run.items.map(i => R.DATA.items[i.id].name).join('、')) : null);
@@ -121,6 +125,15 @@
       area.appendChild(h('div', { class: 'panel' },
         h('div', null, `次の戦闘：${enc.name}`),
         h('button', { class: 'primary', onclick: () => startBattle(area) }, '戦う')));
+    } else if (run.phase === 'checkpoint') {
+      const nextBoss = run.floor + 1 + run.def.endless.segment;
+      area.appendChild(h('div', { class: 'panel' },
+        h('div', { class: 'result result-win' }, `${run.floor + 1}階のボスを倒した！`),
+        h('div', null, '帰還すると、集めた素材を持ち帰れます。さらに潜ると敵は強くなり、上位素材が出やすくなります。全滅すると集めた素材はすべて失います。'),
+        h('div', { class: 'muted' }, `上位素材が出る確率：今 ${Math.round(run.highDropChance() * 100)}%`),
+        h('div', { class: 'row' },
+          h('button', { class: 'primary', onclick: () => { run.checkpointChoice(false); G().saveRun(); R.UI.show(runScreen); } }, '帰還する'),
+          h('button', { class: 'danger', onclick: () => { run.checkpointChoice(true); G().saveRun(); R.UI.show(runScreen); } }, `さらに潜る（次のボスは${nextBoss}階）`))));
     } else if (run.phase === 'reward') {
       area.appendChild(h('h2', null, '報酬を1つ選んでください'));
       const desc = {
@@ -141,7 +154,8 @@
       const cleared = run.phase === 'cleared';
       const res = G().endRun();
       area.appendChild(h('div', { class: 'panel' },
-        h('div', { class: 'result ' + (cleared ? 'result-win' : 'result-lose') }, cleared ? 'ダンジョンクリア！' : '全滅してしまった…'),
+        h('div', { class: 'result ' + (cleared ? 'result-win' : 'result-lose') }, cleared ? (res.deepest ? '無事に帰還した！' : 'ダンジョンクリア！') : '全滅してしまった…'),
+        res.deepest ? h('div', { class: res.newRecord ? 'good' : '' }, `到達：${res.deepest}階` + (res.newRecord ? '（最高記録を更新！）' : '')) : null,
         cleared ? h('div', null, '持ち帰った素材：' + matText(res.bag)) : h('div', null, '失った素材：' + matText(res.lost)),
         cleared && res.newlyUnlocked.length ? h('div', { class: 'good' }, `新しいダンジョンが開いた：${res.newlyUnlocked.map(i => R.DATA.dungeons[i].name).join('・')}`) : null,
         cleared && res.allClearedNow ? h('div', { class: 'good' }, 'すべてのダンジョンをクリアした！ 各ダンジョンで難易度2に挑めるようになった') : null,

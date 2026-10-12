@@ -59,8 +59,9 @@ if (arg('dungeon', false)) {
   const did = arg('dungeon') === true ? 'cave' : arg('dungeon');
   if (!R.DATA.dungeons[did]) { console.error('不明なダンジョン: ' + did); process.exit(1); }
   const diff = Number(arg('diff', 1));
-  const r = R.Sim.runDungeons({ members, n, seed, dungeonId: did, difficulty: diff });
+  const r = R.Sim.runDungeons({ members, n, seed, dungeonId: did, difficulty: diff, targetFloor: Number(arg('target', 8)) });
   console.log(`${R.DATA.dungeons[did].name}（難易度${diff}） ${n}回: クリア率 ${pct(r.clearRate)}`);
+  if (R.DATA.dungeons[did].endless) console.log(`  平均到達 ${f1(r.avgDeepest)}階（HPが半分を切ったら帰還、--target ${arg('target', 8)}階で帰還）`);
   console.log(`  平均到達戦闘数 ${f1(r.avgBattles)} / 平均クリア時HP ${f1(r.avgHpLeftOnClear)}`);
   console.log('  全滅した場所:');
   for (const [k, v] of Object.entries(r.deathsAt)) console.log(`    ${k}: ${v}回`);

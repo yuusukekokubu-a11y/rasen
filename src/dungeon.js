@@ -1,7 +1,8 @@
 // ダンジョン1回分の進行（画面に依存しない）
 //
 //   phase: 'battle'（次は戦闘）/ 'reward'（報酬を選ぶ）/ 'gather'（採集ミニゲーム中）
-//          'cleared'（クリア）/ 'wiped'（全滅）
+//          'checkpoint'（無限階層：4階ごとのボスを倒して「帰還／続行」を選ぶ）
+//          'cleared'（クリア・帰還）/ 'wiped'（全滅）
 (function (R) {
   const REWARD_NAMES = { mining: '採掘', logging: '伐採', gathering: '採取', treasure: '宝箱', rest: '休憩' };
 
@@ -27,36 +28,69 @@
       this.rewardOptions = null;
       this.gatherNode = null;
       this.history = [];
-      this.plan = this._makePlan();
+      this.deepest = 0;
+      this.plan = [];
+      if (this.endless) this._addSegment(); else this.plan = this._makePlan();
     }
 
     get def() { return R.DATA.dungeons[this.dungeonId]; }
+    get endless() { return !!this.def.endless; }
 
-    _makePlan() {
-      return this.def.floors.map(f => {
-        const n = this.rng.int(f.battles[0], f.battles[1]);
-        const list = [];
-        for (let i = 0; i < n; i++) list.push(this.rng.weighted(f.encounters));
-        if (f.boss) list.push(f.boss);
-        return list;
-      });
+    // 階の設定（無限階層では階数から作る）
+    floorDef(i) {
+      const d = this.def;
+      if (!d.endless) return d.floors[i];
+      const E = d.endless;
+      const tier = E.tiers.filter(t => i + 1 >= t.from).pop();
+      const isBossFloor = (i + 1) % E.segment === 0;
+      return {
+        battles: E.battles, encounters: tier.encounters,
+        scale: { hp: 1 + E.hpPerFloor * i, dmg: 1 + E.dmgPerFloor * i },
+        boss: isBossFloor ? E.bosses[Math.floor(i / E.segment) % E.bosses.length] : null
+      };
+    }
+    // 採集の表（無限階層では4階ごとにくり返す）
+    gatherEntry(kind) {
+      const list = this.def.gather[kind];
+      return list[this.endless ? this.floor % list.length : this.floor];
+    }
+
+    _floorPlan(f) {
+      const n = this.rng.int(f.battles[0], f.battles[1]);
+      const list = [];
+      for (let i = 0; i < n; i++) list.push(this.rng.weighted(f.encounters));
+      if (f.boss) list.push(f.boss);
+      return list;
+    }
+    _makePlan() { return this.def.floors.map(f => this._floorPlan(f)); }
+    // 無限階層：次の4階分を作る
+    _addSegment() {
+      const start = this.plan.length;
+      for (let i = start; i < start + this.def.endless.segment; i++) this.plan.push(this._floorPlan(this.floorDef(i)));
     }
 
     // 敵の強さの倍率（階ごとの倍率 × 難易度の倍率）
     currentScale() {
-      const f = this.def.floors[this.floor].scale;
+      const f = this.floorDef(this.floor).scale;
       const D = R.DATA.difficulty;
       const lv = (this.difficulty || 1) - 1;
       return { hp: f.hp * (1 + D.hpPerLevel * lv), dmg: f.dmg * (1 + D.dmgPerLevel * lv) };
     }
 
-    // 難易度2以上：一定の確率で上位素材が追加で出る
-    _highDrop(bag) {
+    // 上位素材の出る確率（難易度2以上、無限階層は深いほど）
+    highDropChance() {
+      if (this.endless) {
+        const E = this.def.endless;
+        return Math.min(E.highDropMax, E.highDropPerFloor * (this.floor + 1));
+      }
       const D = R.DATA.difficulty;
-      const lv = (this.difficulty || 1) - 1;
-      const table = D.highDrops[this.dungeonId];
-      if (lv <= 0 || !table) return;
-      if (this.rng.chance(Math.min(D.highDropMax, D.highDropPerLevel * lv))) R.Gather.addMat(bag, this.rng.weighted(table), 1);
+      return Math.min(D.highDropMax, D.highDropPerLevel * ((this.difficulty || 1) - 1));
+    }
+    _highDrop(bag) {
+      const table = this.endless ? this.def.endless.highDrops : R.DATA.difficulty.highDrops[this.dungeonId];
+      const p = this.highDropChance();
+      if (p <= 0 || !table) return;
+      if (this.rng.chance(p)) R.Gather.addMat(bag, this.rng.weighted(table), 1);
     }
 
     totalBattles() { return this.plan.reduce((a, f) => a + f.length, 0); }
@@ -68,6 +102,7 @@
       if (this.phase !== 'battle') throw new Error('戦闘の順番ではありません');
       const party = R.Gear.buildParty(this.members);
       const enc = R.DATA.encounters[this.currentEncounterId()];
+      this.deepest = Math.max(this.deepest || 0, this.floor + 1);
       return new R.Combat({
         party, hp: this.hp, encounter: enc.enemies, rng: rng || this.rng,
         scale: this.currentScale(), items: this.items
@@ -94,6 +129,10 @@
       for (const [m, n] of Object.entries(drops)) R.Gather.addMat(this.bag, m, n);
       this.battlesWon++;
       this.history.push({ where: this.whereText(), result: '勝利', drops });
+      if (this.endless && this.isBossNext()) {
+        this.phase = 'checkpoint';
+        return { checkpoint: true, drops };
+      }
       const wasBoss = this.isBossNext() && this.floor === this.plan.length - 1;
       if (wasBoss) {
         this.phase = 'cleared';
@@ -102,6 +141,15 @@
       this.phase = 'reward';
       this.rewardOptions = this._rollRewards();
       return { drops };
+    }
+
+    // 無限階層：4階ごとのボスを倒したあと、帰還するか続けるか
+    checkpointChoice(goOn) {
+      if (this.phase !== 'checkpoint') return { ok: false, error: '選べません' };
+      if (!goOn) { this.phase = 'cleared'; return { ok: true, returned: true }; }
+      this._addSegment();
+      this._advance();
+      return { ok: true };
     }
 
     _rollRewards() {
@@ -118,7 +166,6 @@
     // 報酬を選ぶ。採掘・伐採はミニゲームへ（phase='gather'）、それ以外はその場で結果が出る
     chooseReward(kind) {
       if (this.phase !== 'reward' || !this.rewardOptions.includes(kind)) return { ok: false, error: '選べません' };
-      const g = this.def.gather;
       if (kind === 'rest') {
         const before = this.hp;
         this.hp = Math.min(this.maxHp, this.hp + Math.round(this.maxHp * this.def.rewards.restHealRatio));
@@ -126,14 +173,14 @@
         return { ok: true, kind, healed: this.hp - before };
       }
       if (kind === 'gathering' || kind === 'treasure') {
-        const bag = R.Gather.rollTable(g[kind][this.floor], this.rng);
+        const bag = R.Gather.rollTable(this.gatherEntry(kind), this.rng);
         this._highDrop(bag);
         for (const [m, n] of Object.entries(bag)) R.Gather.addMat(this.bag, m, n);
         this._advance();
         return { ok: true, kind, bag };
       }
       // 採掘・伐採
-      const node = g[kind][this.floor];
+      const node = this.gatherEntry(kind);
       const life = kind === 'mining' ? 'mining' : 'logging';
       const tool = kind === 'mining' ? this.tools.pick : this.tools.axe;
       const params = R.Gather.gatherParams(node, this.lives[life].lv, tool);
@@ -172,7 +219,7 @@
     // セーブ用（乱数と経験値の参照は保存しない）
     serialize() {
       const o = {};
-      for (const k of ['dungeonId', 'difficulty', 'members', 'maxHp', 'hp', 'items', 'bag', 'floor', 'index', 'battlesWon', 'phase', 'rewardOptions', 'gatherNode', 'history', 'plan']) {
+      for (const k of ['dungeonId', 'difficulty', 'members', 'maxHp', 'hp', 'items', 'bag', 'floor', 'index', 'battlesWon', 'phase', 'rewardOptions', 'gatherNode', 'history', 'plan', 'deepest']) {
         o[k] = JSON.parse(JSON.stringify(this[k] === undefined ? null : this[k]));
       }
       return o;
@@ -184,7 +231,7 @@
   function runDungeons(opts) {
     const n = opts.n || 100;
     const rng = R.createRng(opts.seed === undefined ? 12345 : opts.seed);
-    let clears = 0, battles = 0, hpOnClear = 0;
+    let clears = 0, battles = 0, hpOnClear = 0, deepest = 0;
     const deathsAt = {};
     for (let i = 0; i < n; i++) {
       const run = new DungeonRun({
@@ -194,7 +241,12 @@
         tools: opts.tools || { pick: 1, axe: 1 }, items: opts.items
       });
       let guard = 0;
-      while (run.phase !== 'cleared' && run.phase !== 'wiped' && guard++ < 100) {
+      while (run.phase !== 'cleared' && run.phase !== 'wiped' && guard++ < 400) {
+        if (run.phase === 'checkpoint') {
+          // 無限階層：HPが半分を切ったか、目標の階に着いたら帰る
+          run.checkpointChoice(run.hp >= run.maxHp * 0.5 && run.deepest < (opts.targetFloor || 8));
+          continue;
+        }
         if (run.phase === 'battle') {
           const c = run.createCombat();
           R.AI.playCombat(c);
@@ -211,13 +263,14 @@
         }
       }
       battles += run.battlesWon;
+      deepest += run.deepest;
       if (run.phase === 'cleared') { clears++; hpOnClear += run.hp; }
       else {
         const where = run.history.length ? run.history[run.history.length - 1].where.replace(/ .*/, '') + (run.isBossNext() ? '（ボス）' : '') : '?';
         deathsAt[where] = (deathsAt[where] || 0) + 1;
       }
     }
-    return { n, clearRate: clears / n, avgBattles: battles / n, avgHpLeftOnClear: clears ? hpOnClear / clears : 0, deathsAt };
+    return { n, clearRate: clears / n, avgBattles: battles / n, avgHpLeftOnClear: clears ? hpOnClear / clears : 0, avgDeepest: deepest / n, deathsAt };
   }
 
   R.DungeonRun = DungeonRun;

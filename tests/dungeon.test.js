@@ -171,9 +171,11 @@ test('複数ダンジョン：前のダンジョンをクリアすると次が�
 
 test('すべてのダンジョンのデータが正しい（敵・素材・解禁条件）', () => {
   for (const [id, d] of Object.entries(R.DATA.dungeons)) {
-    assert.strictEqual(d.floors.length, 4, id);
     for (const r of d.requires || []) assert.ok(R.DATA.dungeons[r], `${id} の解禁条件 ${r}`);
-    for (const f of d.floors) {
+    const floors = d.endless ? d.endless.tiers : d.floors;
+    if (!d.endless) assert.strictEqual(d.floors.length, 4, id);
+    else for (const b of d.endless.bosses) assert.ok(R.DATA.encounters[b].boss, `${id} のボス ${b}`);
+    for (const f of floors) {
       for (const e of Object.keys(f.encounters)) assert.ok(R.DATA.encounters[e], `${id} の ${e}`);
       if (f.boss) assert.ok(R.DATA.encounters[f.boss].boss, `${id} のボス`);
     }
@@ -209,4 +211,39 @@ test('難易度段階：全クリア後に開き、1つずつ上がる・敵が�
   assert.ok(high > 50);
   const bag1 = {}; for (let i = 0; i < 50; i++) r1._highDrop(bag1);
   assert.deepStrictEqual(bag1, {});
+});
+
+test('無限階層：4階ごとにボス→帰還か続行を選ぶ・深いほど強い・毎回1階から・到達階を記録', () => {
+  const G = R.Game;
+  G.newState();
+  const clear = (id) => { const run = G.startRun(id); run.phase = 'cleared'; return G.endRun(); };
+  assert.ok(!G.isUnlocked('spiral'));
+  ['cave', 'forest', 'marsh', 'ruins'].forEach(clear);
+  assert.ok(G.isUnlocked('spiral'));
+  assert.strictEqual(G.maxUnlockedDifficulty('spiral'), 1, '塔に難易度段階はない');
+  const run = G.startRun('spiral');
+  assert.strictEqual(run.plan.length, 4);
+  assert.ok(run.floorDef(5).scale.hp > run.floorDef(0).scale.hp);
+  const win = () => { const c = run.createCombat(); for (const e of c.enemies) { e.hp = 0; e.alive = false; } c._checkEnd(); return run.finishCombat(c); };
+  let guard = 0;
+  while (run.phase !== 'checkpoint' && guard++ < 50) {
+    if (run.phase === 'battle') win();
+    else if (run.phase === 'reward') run.chooseReward(run.rewardOptions.find(k => k !== 'mining' && k !== 'logging') || run.rewardOptions[0]);
+    else if (run.phase === 'gather') run.finishGather();
+  }
+  assert.strictEqual(run.phase, 'checkpoint');
+  assert.strictEqual(run.deepest, 4);
+  run.checkpointChoice(true);
+  assert.strictEqual(run.plan.length, 8);
+  assert.strictEqual(run.floor, 4);
+  assert.strictEqual(run.phase, 'battle');
+  // 5階で全滅
+  const c = run.createCombat(); c.party.hp = 0; c._checkEnd(); run.finishCombat(c);
+  const res = G.endRun();
+  assert.strictEqual(res.cleared, false);
+  assert.strictEqual(res.deepest, 5);
+  assert.strictEqual(G.state.bestFloor.spiral, 5);
+  // 次はまた1階から
+  const run2 = G.startRun('spiral');
+  assert.strictEqual(run2.floor, 0);
 });

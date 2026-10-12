@@ -22,6 +22,7 @@
         life: R.Life.newLives(),
         clears: {},            // { ダンジョンID: クリア回数 }
         maxDifficulty: {},     // { ダンジョンID: クリアした一番高い難易度 }
+        bestFloor: {},         // { 無限階層のID: 到達した一番深い階 }
         runs: 0,
         run: null              // 進行中のダンジョン
       };
@@ -50,6 +51,7 @@
       }
       for (const k of Object.keys(R.Life.LIVES)) if (!s.life[k]) s.life[k] = { lv: 1, exp: 0 };
       if (!s.maxDifficulty) s.maxDifficulty = {};
+      if (!s.bestFloor) s.bestFloor = {};
       for (const [id, n] of Object.entries(s.clears)) if (n > 0 && !s.maxDifficulty[id]) s.maxDifficulty[id] = 1;
       s.party = s.party.filter(j => R.DATA.jobs[j] && R.DATA.jobs[j].enabled);
     },
@@ -149,12 +151,12 @@
     },
     unlockedDungeons() { return Object.keys(R.DATA.dungeons).filter(id => this.isUnlocked(id)); },
     // すべてのダンジョンをクリアしたか（やり込み要素の解禁条件）
-    allCleared() { return Object.keys(R.DATA.dungeons).every(id => (this.state.clears[id] || 0) > 0); },
+    allCleared() { return Object.keys(R.DATA.dungeons).filter(id => !R.DATA.dungeons[id].endless).every(id => (this.state.clears[id] || 0) > 0); },
 
     // 難易度段階：すべてクリア後に開く。難易度Nは同じダンジョンの難易度N−1クリアで開く
     maxUnlockedDifficulty(id) {
       if (!this.isUnlocked(id)) return 0;
-      if (!this.allCleared()) return 1;
+      if (!this.allCleared() || R.DATA.dungeons[id].endless) return 1;
       return Math.min(R.DATA.difficulty.max, (this.state.maxDifficulty[id] || 0) + 1);
     },
 
@@ -191,6 +193,11 @@
       const s = this.state;
       const run = this.run;
       let result = null;
+      let newRecord = false;
+      if (run.endless) {
+        newRecord = (run.deepest || 0) > (s.bestFloor[run.dungeonId] || 0);
+        s.bestFloor[run.dungeonId] = Math.max(s.bestFloor[run.dungeonId] || 0, run.deepest || 0);
+      }
       if (run.phase === 'cleared') {
         const before = this.unlockedDungeons();
         const wasAll = this.allCleared();
@@ -206,6 +213,7 @@
       } else {
         result = { cleared: false, lost: run.lostBag || {} };
       }
+      if (run.endless) Object.assign(result, { deepest: run.deepest, newRecord });
       this.run = null;
       s.run = null;
       this.save();

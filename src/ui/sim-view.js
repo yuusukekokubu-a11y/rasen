@@ -68,6 +68,7 @@
       const r = R.Sim.runDungeons({ members: members(), n, seed: Date.now() % 100000, dungeonId, difficulty });
       results = h('div', { class: 'panel' },
         h('div', null, `${R.DATA.dungeons[dungeonId].name}（難易度${difficulty}） ${n}回：クリア率 ${(r.clearRate * 100).toFixed(1)}%`),
+        r.avgDeepest && R.DATA.dungeons[dungeonId].endless ? h('div', null, `平均到達 ${r.avgDeepest.toFixed(1)}階（自動操作はHPが半分を切ったら帰還、8階で帰還）`) : null,
         h('div', null, `平均到達戦闘数 ${r.avgBattles.toFixed(1)} ／ クリア時の平均HP ${r.avgHpLeftOnClear.toFixed(1)}`),
         h('table', null,
           h('tr', null, h('th', null, '全滅した場所'), h('th', null, '回数')),
