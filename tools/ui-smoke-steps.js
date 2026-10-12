@@ -51,3 +51,28 @@ module.exports.push(
     await page.click('text=もどる');
   } }
 );
+module.exports.push(
+  { name: '生産：銅の剣を作って比較・装備', run: async (page) => {
+    await page.click('text=生産');
+    await page.click('tr:has-text("銅の剣") button:has-text("作る")');
+    for (let i = 0; i < 40 && !(await page.locator('text=生産画面に戻る').count()); i++) {
+      if (await page.locator('.minigame button:not([disabled])').count()) await page.click('.minigame button');
+      else await page.waitForTimeout(100);
+    }
+    await page.waitForSelector('text=デッキに入るカード');
+    await page.click('button:has-text("剣士に装備する")');
+    await page.click('text=細工');
+    await page.click('text=もどる');
+  } },
+  { name: '装備画面で付け替え', run: async (page) => {
+    await page.click('.menu-item:has-text("装備")');
+    await page.click('button:has-text("武器：")');
+    const n = await page.locator('h2:has-text("付け替え候補") + * button, .row button:has-text("銅の剣")').count();
+    if (n) {
+      await page.click('.row button:has-text("銅の剣") >> nth=-1');
+      await page.waitForSelector('text=デッキから外れるカード');
+      await page.click('button:has-text("装備する")');
+    }
+    await page.click('text=もどる');
+  } }
+);
