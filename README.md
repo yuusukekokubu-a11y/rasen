@@ -23,11 +23,11 @@
 
 1. 戦闘（6職・行動予告・パワー・付与効果18種）
 2. 自動対戦シミュレーター
-3. ダンジョン1つの周回（4階・報酬3択・HP持ち越し・全滅で全喪失・採集ミニゲーム）
+3. ダンジョンの周回（4つのダンジョンと解禁の流れ・4階・報酬3択・HP持ち越し・全滅で全喪失・採集ミニゲーム）
 4. 生産（4つの生産ライフ・ランダム2枠・品質ミニゲーム・装備比較画面）
 5. 残り3職（盗賊・弓使い・僧侶）・持ち込みアイテム・パワー解禁
 
-作っていないもの：複数ダンジョン・難易度段階・無限階層（今回の範囲外）、生産の固有スキル（仕様で検討中）
+作っていないもの：難易度段階・無限階層（作業中）、生産の固有スキル（仕様で検討中）
 
 ## 数値の調整
 
@@ -57,7 +57,7 @@ npm test                                    # ルールのテスト
 npm run sim                                 # 自動対戦シミュレーター（初期装備で全部の敵と）
 node tools/simulate.js --list               # 使える装備セットと敵の一覧
 node tools/simulate.js --preset rank2_plain --enc boss_golem --n 1000
-node tools/simulate.js --dungeon            # ダンジョンを通しで自動周回してクリア率を見る
+node tools/simulate.js --dungeon forest     # ダンジョンを通しで自動周回してクリア率を見る（cave/forest/marsh/ruins）
 node tools/simulate.js --combos             # 全20通りのパーティを比べる
 node tools/ui-smoke.js                      # 画面の動作確認（Playwright がある環境のみ）
 ```

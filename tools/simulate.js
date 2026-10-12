@@ -5,7 +5,7 @@
 //   node tools/simulate.js --preset rank2_plain    … 装備セットを指定（data/loadouts.js の presets）
 //   node tools/simulate.js --enc boss_golem --n 1000
 //   node tools/simulate.js --hp 0.5                … HP半分から開始
-//   node tools/simulate.js --dungeon               … ダンジョンを最初から最後まで自動で通す
+//   node tools/simulate.js --dungeon               … ダンジョンを最初から最後まで自動で通す（--dungeon forest でダンジョン指定）
 //   node tools/simulate.js --combos                … 全職業の組み合わせ（初期装備）でダンジョンを比べる
 //   node tools/simulate.js --list                  … 使える装備セットと敵の一覧
 const { loadGame } = require('./load.js');
@@ -21,6 +21,8 @@ function arg(name, def) {
 if (arg('list', false)) {
   console.log('装備セット（--preset）:');
   for (const [id, p] of Object.entries(R.DATA.loadouts.presets)) console.log(`  ${id.padEnd(18)} ${p.name}`);
+  console.log('ダンジョン（--dungeon）:');
+  for (const [id, d] of Object.entries(R.DATA.dungeons)) console.log(`  ${id.padEnd(18)} ${d.name}`);
   console.log('敵（--enc）:');
   for (const [id, e] of Object.entries(R.DATA.encounters)) console.log(`  ${id.padEnd(18)} ${e.name}`);
   process.exit(0);
@@ -54,8 +56,10 @@ console.log(`装備セット: ${R.DATA.loadouts.presets[presetId].name}`);
 
 if (arg('dungeon', false)) {
   if (!R.Sim.runDungeons) { console.log('ダンジョンのシミュレーションはまだありません'); process.exit(1); }
-  const r = R.Sim.runDungeons({ members, n, seed });
-  console.log(`ダンジョン ${n}回: クリア率 ${pct(r.clearRate)}`);
+  const did = arg('dungeon') === true ? 'cave' : arg('dungeon');
+  if (!R.DATA.dungeons[did]) { console.error('不明なダンジョン: ' + did); process.exit(1); }
+  const r = R.Sim.runDungeons({ members, n, seed, dungeonId: did });
+  console.log(`${R.DATA.dungeons[did].name} ${n}回: クリア率 ${pct(r.clearRate)}`);
   console.log(`  平均到達戦闘数 ${f1(r.avgBattles)} / 平均クリア時HP ${f1(r.avgHpLeftOnClear)}`);
   console.log('  全滅した場所:');
   for (const [k, v] of Object.entries(r.deathsAt)) console.log(`    ${k}: ${v}回`);

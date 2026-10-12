@@ -138,8 +138,19 @@
       return best || 0.5;
     },
 
+    // ===== ダンジョンの解禁 =====
+    // 先にクリアが必要なダンジョンをすべてクリアしていれば開いている
+    isUnlocked(id) {
+      const d = R.DATA.dungeons[id];
+      return !!d && (d.requires || []).every(r => (this.state.clears[r] || 0) > 0);
+    },
+    unlockedDungeons() { return Object.keys(R.DATA.dungeons).filter(id => this.isUnlocked(id)); },
+    // すべてのダンジョンをクリアしたか（やり込み要素の解禁条件）
+    allCleared() { return Object.keys(R.DATA.dungeons).every(id => (this.state.clears[id] || 0) > 0); },
+
     // ===== ダンジョン =====
     startRun(dungeonId) {
+      if (!this.isUnlocked(dungeonId)) throw new Error('まだ開いていないダンジョンです');
       const s = this.state;
       const bring = s.bring.map(uid => s.consumables.find(c => c.uid === uid)).filter(Boolean).slice(0, R.DATA.config.combat.itemSlots);
       // 持ち込んだアイテムは手元から消える（クリアすれば残りが戻る）
@@ -169,10 +180,16 @@
       const run = this.run;
       let result = null;
       if (run.phase === 'cleared') {
+        const before = this.unlockedDungeons();
+        const wasAll = this.allCleared();
         this.addMaterials(run.bag);
         for (const it of run.items) s.consumables.push(it);
         s.clears[run.dungeonId] = (s.clears[run.dungeonId] || 0) + 1;
-        result = { cleared: true, bag: run.bag, items: run.items };
+        result = {
+          cleared: true, bag: run.bag, items: run.items,
+          newlyUnlocked: this.unlockedDungeons().filter(id => !before.includes(id)),
+          allClearedNow: !wasAll && this.allCleared()
+        };
       } else {
         result = { cleared: false, lost: run.lostBag || {} };
       }

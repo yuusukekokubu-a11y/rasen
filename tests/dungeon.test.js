@@ -150,3 +150,39 @@ test('ダンジョンのシミュレーションが動く', () => {
   assert.strictEqual(r.n, 5);
   assert.ok(r.clearRate >= 0 && r.clearRate <= 1);
 });
+
+test('複数ダンジョン：前のダンジョンをクリアすると次が開く（2つ同時に開き、両方クリアで先へ）', () => {
+  const G = R.Game;
+  G.newState();
+  assert.deepStrictEqual(G.unlockedDungeons(), ['cave']);
+  assert.throws(() => G.startRun('forest'));
+  const clear = (id) => { const run = G.startRun(id); run.phase = 'cleared'; return G.endRun(); };
+  const r1 = clear('cave');
+  assert.deepStrictEqual(r1.newlyUnlocked.sort(), ['forest', 'marsh']);
+  const r2 = clear('forest');
+  assert.deepStrictEqual(r2.newlyUnlocked, []);
+  assert.ok(!G.isUnlocked('ruins'));
+  const r3 = clear('marsh');
+  assert.deepStrictEqual(r3.newlyUnlocked, ['ruins']);
+  assert.ok(!G.allCleared());
+  const r4 = clear('ruins');
+  assert.ok(r4.allClearedNow && G.allCleared());
+});
+
+test('すべてのダンジョンのデータが正しい（敵・素材・解禁条件）', () => {
+  for (const [id, d] of Object.entries(R.DATA.dungeons)) {
+    assert.strictEqual(d.floors.length, 4, id);
+    for (const r of d.requires || []) assert.ok(R.DATA.dungeons[r], `${id} の解禁条件 ${r}`);
+    for (const f of d.floors) {
+      for (const e of Object.keys(f.encounters)) assert.ok(R.DATA.encounters[e], `${id} の ${e}`);
+      if (f.boss) assert.ok(R.DATA.encounters[f.boss].boss, `${id} のボス`);
+    }
+    for (const k of ['mining', 'logging', 'gathering', 'treasure']) {
+      assert.strictEqual(d.gather[k].length, 4, `${id} ${k}`);
+      for (const t of d.gather[k]) for (const m of Object.keys(t.common || t.table).concat(Object.keys(t.rare || {}))) assert.ok(R.DATA.materials[m], `${id} の素材 ${m}`);
+    }
+    const run = new R.DungeonRun({ dungeonId: id, members: R.Sim.presetMembers('starter'), rng: R.createRng(1) });
+    assert.ok(run.plan[3].length >= 2);
+  }
+  for (const e of Object.values(R.DATA.enemies)) for (const m of Object.keys(e.drops || {})) assert.ok(R.DATA.materials[m], `${e.name} の ${m}`);
+});

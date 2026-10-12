@@ -46,18 +46,18 @@
     // --- 剣（鍛冶） ---
     copper_sword:   { name: '銅の剣',       type: 'sword', slot: 'weapon', rank: 1, fixedCard: 'sword_slash',   mats: { copper_ore: 3 },                 difficulty: 1 },
     iron_sword:     { name: '鉄の剣',       type: 'sword', slot: 'weapon', rank: 2, fixedCard: 'sword_parry',   mats: { iron_ore: 3, wolf_pelt: 1 },     difficulty: 6 },
-    mithril_sword:  { name: 'ミスリルの剣', type: 'sword', slot: 'weapon', rank: 3, fixedCard: 'sword_heavy',   mats: { mithril_ore: 3, golem_core: 1 }, difficulty: 12 },
+    mithril_sword:  { name: 'ミスリルの剣', type: 'sword', slot: 'weapon', rank: 3, fixedCard: 'sword_heavy',   mats: { mithril_ore: 3, elder_heart: 1 }, difficulty: 12 },
     // --- 重装（鍛冶） ---
     copper_helm:    { name: '銅の兜',       type: 'heavy', slot: 'head', rank: 1, fixedCard: 'heavy_defend',   mats: { copper_ore: 2 },                 difficulty: 1 },
     iron_helm:      { name: '鉄の兜',       type: 'heavy', slot: 'head', rank: 2, fixedCard: 'heavy_taunt',    mats: { iron_ore: 2, wolf_pelt: 1 },     difficulty: 5 },
     mithril_helm:   { name: 'ミスリルの兜', type: 'heavy', slot: 'head', rank: 3, fixedCard: 'heavy_endure',   mats: { mithril_ore: 2, golem_core: 1 }, difficulty: 11 },
     copper_armor:   { name: '銅の鎧',       type: 'heavy', slot: 'body', rank: 1, fixedCard: 'heavy_defend',   mats: { copper_ore: 4 },                 difficulty: 2 },
     iron_armor:     { name: '鉄の鎧',       type: 'heavy', slot: 'body', rank: 2, fixedCard: 'heavy_ironwall', mats: { iron_ore: 4, wolf_pelt: 2 },     difficulty: 7 },
-    mithril_armor:  { name: 'ミスリルの鎧', type: 'heavy', slot: 'body', rank: 3, fixedCard: 'heavy_bash',     mats: { mithril_ore: 4, golem_core: 1 }, difficulty: 13 },
+    mithril_armor:  { name: 'ミスリルの鎧', type: 'heavy', slot: 'body', rank: 3, fixedCard: 'heavy_bash',     mats: { mithril_ore: 4, queen_scale: 1 }, difficulty: 13 },
     // --- 杖（大工） ---
     oak_staff:      { name: 'カシの杖',     type: 'staff', slot: 'weapon', rank: 1, fixedCard: 'staff_fire',    mats: { oak: 3 },                        difficulty: 1 },
     maple_staff:    { name: 'カエデの杖',   type: 'staff', slot: 'weapon', rank: 2, fixedCard: 'staff_ice',     mats: { maple: 3, bat_wing: 1 },         difficulty: 6 },
-    ancient_staff:  { name: '古木の杖',     type: 'staff', slot: 'weapon', rank: 3, fixedCard: 'staff_thunder', mats: { ancient_wood: 3, golem_core: 1 },difficulty: 12 },
+    ancient_staff:  { name: '古木の杖',     type: 'staff', slot: 'weapon', rank: 3, fixedCard: 'staff_thunder', mats: { ancient_wood: 3, wisp_flame: 2 }, difficulty: 12 },
     // --- 星盤（大工） ---
     oak_board:      { name: 'カシの星盤',   type: 'starboard', slot: 'weapon', rank: 1, fixedCard: 'star_beam', mats: { oak: 2, quartz: 1 },             difficulty: 2 },
     maple_board:    { name: 'カエデの星盤', type: 'starboard', slot: 'weapon', rank: 2, fixedCard: 'star_read', mats: { maple: 2, quartz: 1, bat_wing: 1 }, difficulty: 7 },
@@ -68,15 +68,15 @@
     star_hat:       { name: '星絹の帽子',   type: 'robe', slot: 'head', rank: 3, fixedCard: 'robe_meditate', mats: { spider_silk: 2, star_shard: 1 },  difficulty: 11 },
     flax_robe:      { name: '麻のローブ',   type: 'robe', slot: 'body', rank: 1, fixedCard: 'robe_ward',     mats: { flax: 3, slime_gel: 1 },          difficulty: 2 },
     silk_robe:      { name: '絹のローブ',   type: 'robe', slot: 'body', rank: 2, fixedCard: 'robe_barrier',  mats: { spider_silk: 3, flax: 1 },        difficulty: 7 },
-    star_robe:      { name: '星絹のローブ', type: 'robe', slot: 'body', rank: 3, fixedCard: 'robe_mend',     mats: { spider_silk: 3, star_shard: 1 },  difficulty: 13 },
+    star_robe:      { name: '星絹のローブ', type: 'robe', slot: 'body', rank: 3, fixedCard: 'robe_mend',     mats: { spider_silk: 3, queen_scale: 1 }, difficulty: 13 },
     // --- 短剣（鍛冶） ---
     copper_dagger:  { name: '銅の短剣',       type: 'dagger', slot: 'weapon', rank: 1, fixedCard: 'dagger_stab',    mats: { copper_ore: 2, oak: 1 },          difficulty: 1 },
     iron_dagger:    { name: '鉄の短剣',       type: 'dagger', slot: 'weapon', rank: 2, fixedCard: 'dagger_shadow',  mats: { iron_ore: 2, bat_wing: 1 },       difficulty: 6 },
-    mithril_dagger: { name: 'ミスリルの短剣', type: 'dagger', slot: 'weapon', rank: 3, fixedCard: 'dagger_flurry',  mats: { mithril_ore: 2, golem_core: 1 },  difficulty: 12 },
+    mithril_dagger: { name: 'ミスリルの短剣', type: 'dagger', slot: 'weapon', rank: 3, fixedCard: 'dagger_flurry',  mats: { mithril_ore: 2, hornet_sting: 2 }, difficulty: 12 },
     // --- 弓（大工） ---
     oak_bow:        { name: 'カシの弓',       type: 'bow', slot: 'weapon', rank: 1, fixedCard: 'bow_shot',         mats: { oak: 3, flax: 1 },                difficulty: 1 },
     maple_bow:      { name: 'カエデの弓',     type: 'bow', slot: 'weapon', rank: 2, fixedCard: 'bow_aim',          mats: { maple: 3, spider_silk: 1 },       difficulty: 6 },
-    ancient_bow:    { name: '古木の弓',       type: 'bow', slot: 'weapon', rank: 3, fixedCard: 'bow_rain',         mats: { ancient_wood: 3, golem_core: 1 }, difficulty: 12 },
+    ancient_bow:    { name: '古木の弓',       type: 'bow', slot: 'weapon', rank: 3, fixedCard: 'bow_rain',         mats: { ancient_wood: 3, elder_heart: 1 }, difficulty: 12 },
     // --- 錫杖（大工） ---
     oak_scepter:    { name: 'カシの錫杖',     type: 'scepter', slot: 'weapon', rank: 1, fixedCard: 'scep_smite',   mats: { oak: 2, quartz: 1 },              difficulty: 2 },
     maple_scepter:  { name: 'カエデの錫杖',   type: 'scepter', slot: 'weapon', rank: 2, fixedCard: 'scep_prayer',  mats: { maple: 2, quartz: 1, glowcap: 1 }, difficulty: 7 },
@@ -87,7 +87,7 @@
     shadow_hood:    { name: '影の頭巾',       type: 'light', slot: 'head', rank: 3, fixedCard: 'light_rush',   mats: { spider_silk: 2, star_shard: 1 }, difficulty: 11 },
     cloth_tunic:    { name: '布の服',         type: 'light', slot: 'body', rank: 1, fixedCard: 'light_dodge',  mats: { flax: 2, slime_gel: 1 },         difficulty: 2 },
     pelt_coat:      { name: '毛皮の服',       type: 'light', slot: 'body', rank: 2, fixedCard: 'light_evade',  mats: { wolf_pelt: 2, flax: 1 },         difficulty: 7 },
-    shadow_garb:    { name: '影の装束',       type: 'light', slot: 'body', rank: 3, fixedCard: 'light_step',   mats: { spider_silk: 3, golem_core: 1 }, difficulty: 13 },
+    shadow_garb:    { name: '影の装束',       type: 'light', slot: 'body', rank: 3, fixedCard: 'light_step',   mats: { toad_skin: 2, spider_silk: 2 }, difficulty: 13 },
     // --- アクセサリー（細工） パワーは作るときに選ぶ ---
     copper_ring:    { name: '銅の指輪',     type: 'accessory', slot: 'accessory', rank: 1, fixedCard: 'acc_charm', mats: { copper_ore: 1, quartz: 1 },  difficulty: 2 },
     silver_neck:    { name: '水晶の首飾り', type: 'accessory', slot: 'accessory', rank: 2, fixedCard: 'acc_throw', mats: { iron_ore: 1, quartz: 2 },    difficulty: 6 },

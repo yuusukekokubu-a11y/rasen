@@ -57,10 +57,19 @@
       }
 
       el.appendChild(h('h2', null, 'ダンジョン'));
+      el.appendChild(h('div', { class: 'muted' }, '全滅すると、集めた素材と持ち込みアイテムをすべて失います。途中で帰ることはできません。'));
       for (const [id, d] of Object.entries(R.DATA.dungeons)) {
-        el.appendChild(h('div', { class: 'panel' },
-          h('div', null, h('b', null, d.name), `　（4階層・4階にボス／クリア ${s.clears[id] || 0}回）`),
-          h('div', { class: 'muted' }, '全滅すると、集めた素材と持ち込みアイテムをすべて失います。途中で帰ることはできません。'),
+        const open = G().isUnlocked(id);
+        const clears = s.clears[id] || 0;
+        if (!open) {
+          const need = (d.requires || []).filter(r => !(s.clears[r] > 0)).map(r => R.DATA.dungeons[r].name);
+          el.appendChild(h('div', { class: 'panel dungeon locked' },
+            h('div', null, h('b', null, '？？？'), h('span', { class: 'muted' }, `　${need.join('と')}をクリアすると開く`))));
+          continue;
+        }
+        el.appendChild(h('div', { class: 'panel dungeon' },
+          h('div', null, h('b', null, d.name), h('span', { class: clears ? 'good' : 'muted' }, clears ? `　クリア ${clears}回` : '　未クリア')),
+          d.recommend ? h('div', { class: 'muted' }, d.recommend) : null,
           h('button', { class: 'primary', disabled: s.party.length !== 3, onclick: () => { G().startRun(id); R.UI.show(runScreen); } },
             s.party.length === 3 ? '出発する' : 'パーティを3人選んでください')));
       }
@@ -114,6 +123,8 @@
       area.appendChild(h('div', { class: 'panel' },
         h('div', { class: 'result ' + (cleared ? 'result-win' : 'result-lose') }, cleared ? 'ダンジョンクリア！' : '全滅してしまった…'),
         cleared ? h('div', null, '持ち帰った素材：' + matText(res.bag)) : h('div', null, '失った素材：' + matText(res.lost)),
+        cleared && res.newlyUnlocked.length ? h('div', { class: 'good' }, `新しいダンジョンが開いた：${res.newlyUnlocked.map(i => R.DATA.dungeons[i].name).join('・')}`) : null,
+        cleared && res.allClearedNow ? h('div', { class: 'good' }, 'すべてのダンジョンをクリアした！') : null,
         h('button', { class: 'primary', onclick: () => R.UI.show(R.UI.homeScreen) }, '拠点へ戻る')));
     }
   }

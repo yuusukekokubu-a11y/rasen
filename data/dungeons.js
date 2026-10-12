@@ -1,4 +1,6 @@
 // ダンジョン
+//   requires : 開くために先にクリアが必要なダンジョン（すべてクリアで開く）
+//   recommend: 出発画面に出す目安（推奨ランク・敵の傾向）
 //   floors   : 4階層。battles=[最少, 最多] の戦闘数（最後の階はこの後にボス）
 //              encounters は data/enemies.js の encounters の重み付き抽選
 //              scale は敵のHP・攻撃力の倍率
@@ -10,7 +12,8 @@
   R.DATA = R.DATA || {};
   R.DATA.dungeons = {
     cave: {
-      name: '岩窟の洞',
+      name: '岩窟の洞', requires: [],
+      recommend: 'ランク1〜2の装備向け。打たれ強い敵が多く、ボスは力を溜めて大技を撃つ',
       floors: [
         { battles: [2, 3], encounters: { slime_pair: 3, bat_trio: 2, wolf_single: 2 }, scale: { hp: 1.0, dmg: 1.0 } },
         { battles: [2, 3], encounters: { wolf_slime: 2, spider_bat: 2, wolf_single: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
@@ -49,7 +52,121 @@
           { amount: [3, 4], table: { mithril_ore: 2, ancient_wood: 2, star_shard: 1, quartz: 2 } }
         ]
       }
-    }
+    },
+
+    forest: {
+      name: '囁きの森', requires: ['cave'],
+      recommend: 'ランク2の装備向け。手数の多い虫と、回復する樹木。炎が弱点の敵が多い',
+      floors: [
+        { battles: [2, 3], encounters: { hornet_trio: 2, wolf_hornet: 2, treant_single: 2 }, scale: { hp: 1.0, dmg: 1.0 } },
+        { battles: [2, 3], encounters: { treant_wolf: 2, spider_hornet: 2, wolf_hornet: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
+        { battles: [2, 3], encounters: { treant_pair: 2, spider_hornet: 2, treant_wolf: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
+        { battles: [1, 2], encounters: { treant_pair: 1, treant_wolf: 1 }, scale: { hp: 1.05, dmg: 1.05 }, boss: 'boss_elder' }
+      ],
+      rewards: { weights: { mining: 2, logging: 4, gathering: 3, treasure: 2, rest: 2 }, restHealRatio: 0.35 },
+      gather: {
+        mining: [
+          { hardness: 4,  common: { copper_ore: 1, iron_ore: 1 }, rare: { quartz: 1 } },
+          { hardness: 6,  common: { iron_ore: 2 },                rare: { quartz: 1 } },
+          { hardness: 8,  common: { iron_ore: 2, mithril_ore: 1 }, rare: { mithril_ore: 1 } },
+          { hardness: 10, common: { iron_ore: 1, mithril_ore: 1 }, rare: { star_shard: 1 } }
+        ],
+        logging: [
+          { hardness: 4,  common: { oak: 1, maple: 2 },          rare: { glowcap: 1 } },
+          { hardness: 6,  common: { maple: 2, ancient_wood: 1 }, rare: { ancient_wood: 1 } },
+          { hardness: 8,  common: { maple: 1, ancient_wood: 2 }, rare: { treant_bark: 1 } },
+          { hardness: 10, common: { ancient_wood: 2 },           rare: { star_shard: 1 } }
+        ],
+        gathering: [
+          { amount: [2, 3], table: { herb: 3, flax: 2, glowcap: 1 } },
+          { amount: [2, 3], table: { herb: 2, glowcap: 2, flax: 1 } },
+          { amount: [2, 4], table: { herb: 2, glowcap: 2, hornet_sting: 1 } },
+          { amount: [2, 4], table: { glowcap: 2, herb: 1, star_shard: 1 } }
+        ],
+        treasure: [
+          { amount: [2, 3], table: { maple: 2, iron_ore: 2, wolf_pelt: 1, quartz: 1 } },
+          { amount: [2, 3], table: { maple: 2, ancient_wood: 1, spider_silk: 1, quartz: 2 } },
+          { amount: [3, 4], table: { ancient_wood: 2, mithril_ore: 1, treant_bark: 1, quartz: 1 } },
+          { amount: [3, 4], table: { ancient_wood: 2, mithril_ore: 1, star_shard: 1, elder_heart: 1 } }
+        ]
+      }
+    },
+
+    marsh: {
+      name: '霧の沼', requires: ['cave'],
+      recommend: 'ランク2の装備向け。脱力・弱体をばらまく敵が多い。雷が弱点の敵が多い',
+      floors: [
+        { battles: [2, 3], encounters: { toad_pair: 2, slime_toad: 2, wisp_trio: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
+        { battles: [2, 3], encounters: { toad_wisp: 2, wisp_trio: 2, slime_toad: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
+        { battles: [2, 3], encounters: { toad_trio: 2, toad_wisp: 2 }, scale: { hp: 1.05, dmg: 1.05 } },
+        { battles: [1, 2], encounters: { toad_trio: 1, toad_wisp: 1 }, scale: { hp: 1.05, dmg: 1.05 }, boss: 'boss_queen' }
+      ],
+      rewards: { weights: { mining: 2, logging: 2, gathering: 4, treasure: 2, rest: 2 }, restHealRatio: 0.35 },
+      gather: {
+        mining: [
+          { hardness: 4,  common: { iron_ore: 1, copper_ore: 1 }, rare: { quartz: 1 } },
+          { hardness: 6,  common: { iron_ore: 2 },                rare: { quartz: 1 } },
+          { hardness: 8,  common: { iron_ore: 1, mithril_ore: 1 }, rare: { mithril_ore: 1 } },
+          { hardness: 10, common: { mithril_ore: 2 },             rare: { star_shard: 1 } }
+        ],
+        logging: [
+          { hardness: 4,  common: { oak: 1, maple: 1 },  rare: { glowcap: 1 } },
+          { hardness: 6,  common: { maple: 2 },          rare: { glowcap: 1 } },
+          { hardness: 8,  common: { maple: 1, ancient_wood: 1 }, rare: { ancient_wood: 1 } },
+          { hardness: 10, common: { ancient_wood: 2 },   rare: { star_shard: 1 } }
+        ],
+        gathering: [
+          { amount: [2, 4], table: { herb: 2, flax: 2, glowcap: 2 } },
+          { amount: [2, 4], table: { herb: 2, glowcap: 2, toad_skin: 1 } },
+          { amount: [3, 4], table: { glowcap: 3, herb: 1, wisp_flame: 1 } },
+          { amount: [3, 4], table: { glowcap: 2, wisp_flame: 1, star_shard: 1 } }
+        ],
+        treasure: [
+          { amount: [2, 3], table: { iron_ore: 2, flax: 2, spider_silk: 1, quartz: 1 } },
+          { amount: [2, 3], table: { iron_ore: 2, spider_silk: 2, quartz: 2 } },
+          { amount: [3, 4], table: { mithril_ore: 1, spider_silk: 2, wisp_flame: 1, quartz: 1 } },
+          { amount: [3, 4], table: { mithril_ore: 2, spider_silk: 1, star_shard: 1, queen_scale: 1 } }
+        ]
+      }
+    },
+
+    ruins: {
+      name: '星降る遺跡', requires: ['forest', 'marsh'],
+      recommend: 'ランク3の装備向け。硬い石像と呪いを使う亡霊。最奥には星喰いの竜',
+      floors: [
+        { battles: [2, 3], encounters: { gargoyle_single: 2, doll_pair: 2, phantom_single: 2 }, scale: { hp: 1.0, dmg: 1.0 } },
+        { battles: [2, 3], encounters: { gargoyle_phantom: 2, phantom_doll: 2, doll_pair: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
+        { battles: [2, 3], encounters: { gargoyle_pair: 2, gargoyle_phantom: 2, phantom_doll: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
+        { battles: [1, 2], encounters: { gargoyle_pair: 1, gargoyle_phantom: 1 }, scale: { hp: 1.05, dmg: 1.05 }, boss: 'boss_dragon' }
+      ],
+      rewards: { weights: { mining: 4, logging: 2, gathering: 2, treasure: 3, rest: 2 }, restHealRatio: 0.35 },
+      gather: {
+        mining: [
+          { hardness: 8,  common: { iron_ore: 1, mithril_ore: 1 }, rare: { star_shard: 1 } },
+          { hardness: 10, common: { mithril_ore: 2 },              rare: { star_shard: 1 } },
+          { hardness: 12, common: { mithril_ore: 2, quartz: 1 },   rare: { star_shard: 1 } },
+          { hardness: 14, common: { mithril_ore: 2 },              rare: { gargoyle_stone: 1 } }
+        ],
+        logging: [
+          { hardness: 8,  common: { ancient_wood: 1, maple: 1 }, rare: { ancient_wood: 1 } },
+          { hardness: 10, common: { ancient_wood: 2 },           rare: { star_shard: 1 } },
+          { hardness: 12, common: { ancient_wood: 2 },           rare: { star_shard: 1 } },
+          { hardness: 14, common: { ancient_wood: 2 },           rare: { elder_heart: 1 } }
+        ],
+        gathering: [
+          { amount: [2, 3], table: { glowcap: 2, quartz: 2, herb: 1 } },
+          { amount: [2, 3], table: { glowcap: 2, quartz: 2, star_shard: 1 } },
+          { amount: [2, 4], table: { quartz: 2, star_shard: 1, phantom_cloth: 1 } },
+          { amount: [2, 4], table: { quartz: 2, star_shard: 2, phantom_cloth: 1 } }
+        ],
+        treasure: [
+          { amount: [3, 4], table: { mithril_ore: 2, ancient_wood: 2, quartz: 2, star_shard: 1 } },
+          { amount: [3, 4], table: { mithril_ore: 2, star_shard: 1, elder_heart: 1, queen_scale: 1 } },
+          { amount: [3, 4], table: { mithril_ore: 2, star_shard: 2, gargoyle_stone: 1, phantom_cloth: 1 } },
+          { amount: [3, 5], table: { star_shard: 2, elder_heart: 1, queen_scale: 1, dragon_scale: 1 } }
+        ]
+      }
+}
   };
 
   // 採集ミニゲーム「鉱脈探し」の設定
