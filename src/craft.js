@@ -22,42 +22,47 @@
     return out.sort((a, b) => a.difficulty - b.difficulty);
   }
 
-  // ===== 品質ミニゲーム =====
+  // ===== 品質ミニゲーム「鍛造」 =====
   function gameParams(lv, difficulty) {
     const g = C().game;
     const diff = lv - difficulty;
     const lvMult = Math.max(g.lvMultMin, Math.min(g.lvMultMax, 1 + diff * g.lvDiffRate));
-    const widen = diff * g.widthPerLv;
-    return {
-      perHit: (100 / g.baseHits) * lvMult,
-      goodWidth: Math.max(8, Math.min(70, g.goodWidth + widen)),
-      greatWidth: Math.max(3, Math.min(25, g.greatWidth + widen / 3)),
-      lvMult
-    };
+    const heatMult = Math.max(g.heatMultMin, Math.min(g.heatMultMax, 1 - diff * g.heatLvRate));
+    return { perHit: (100 / g.baseHits) * lvMult, heatMult, lvMult };
   }
-  function progressOf(hits, params) {
-    const zm = C().game.zoneMult;
-    return hits.reduce((p, h) => p + params.perHit * (zm[h] || 0), 0);
-  }
-  // 終わるまでにかかった回数 → 品質
-  function qualityFromHits(n) {
-    const q = C().game.qualityHits;
-    if (n <= q.best) return 'best';
-    if (n <= q.fine) return 'fine';
-    return 'normal';
-  }
-  // 当たり方の列から、ゲージが埋まるまでの回数と品質を出す（シミュレーター・テスト用）
-  function resolveHits(hits, params) {
-    const zm = C().game.zoneMult;
-    let p = 0;
-    let n = 0;
-    for (const h of hits) {
-      n++;
-      p += params.perHit * (zm[h] || 0);
-      if (p >= 100) break;
+  function forgeStart() { return { progress: 0, heat: 0, turns: 0, overheats: 0, done: false }; }
+  function rand(rng, [a, b]) { return a + (b - a) * rng.next(); }
+
+  // 1回作業する。action: 'strong' / 'careful' / 'cool'
+  function forgeAct(st, action, params, rng) {
+    const g = C().game;
+    const a = g.actions[action];
+    if (!a || st.done) return null;
+    st.turns++;
+    const gain = Math.round(params.perHit * rand(rng, a.progress));
+    let heat = rand(rng, a.heat);
+    heat = Math.round(heat > 0 ? heat * params.heatMult : heat);
+    st.progress = Math.min(100, st.progress + gain);
+    st.heat = Math.max(0, st.heat + heat);
+    let overheated = false;
+    if (st.heat > g.heatLimit) {
+      overheated = true;
+      st.overheats++;
+      st.heat = g.heatAfterOverheat;
     }
-    return { count: n, done: p >= 100, quality: qualityFromHits(n) };
+    if (st.progress >= 100) st.done = true;
+    return { gain, heat, overheated };
   }
+
+  const QUALITY_ORDER = ['normal', 'fine', 'best'];
+  // 回数 → 品質（過熱した回数だけ下がる）
+  function qualityFromHits(n, overheats) {
+    const q = C().game.qualityHits;
+    let i = n <= q.best ? 2 : n <= q.fine ? 1 : 0;
+    i = Math.max(0, i - (overheats || 0));
+    return QUALITY_ORDER[i];
+  }
+  function forgeQuality(st) { return qualityFromHits(st.turns, st.overheats); }
 
   // ===== パワー解禁（細工Lv） =====
   function unlockedPowerCount(jewelerLv) {
@@ -140,7 +145,7 @@
   }
 
   R.Craft = {
-    recipesFor, gameParams, progressOf, qualityFromHits, resolveHits,
+    recipesFor, gameParams, forgeStart, forgeAct, forgeQuality, qualityFromHits,
     unlockedPowerCount, unlockedPowers, rollGrade, gradeChances, enchantCandidates, rollSlots, makeEquipment, expFor
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

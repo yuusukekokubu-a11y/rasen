@@ -31,7 +31,8 @@ async function playDungeon(page) {
     if (await has('button:has-text("次へ")')) { await page.click('button:has-text("次へ")'); continue; }
     if (await has('button:has-text("自動で1ターン")')) { await page.click('button:has-text("自動で1ターン")'); continue; }
     if (await has('button:has-text("戦う")')) { await page.click('button:has-text("戦う")'); continue; }
-    if (await has('.minigame button:not([disabled])')) { await page.click('.minigame button'); continue; }
+    if (await has('button:has-text("結果を見る")')) { await page.click('button:has-text("結果を見る")'); continue; }
+    if (await has('.vein-cell.closed:not([disabled])')) { await page.click('.vein-cell.closed:not([disabled]) >> nth=0'); continue; }
     if (await has('.menu-item')) { await page.click('.menu-item >> nth=0'); continue; }
     await page.waitForTimeout(100);
   }
@@ -55,9 +56,9 @@ module.exports.push(
   { name: '生産：銅の剣を作って比較・装備', run: async (page) => {
     await page.click('text=生産');
     await page.click('tr:has-text("銅の剣") button:has-text("作る")');
-    for (let i = 0; i < 40 && !(await page.locator('text=生産画面に戻る').count()); i++) {
-      if (await page.locator('.minigame button:not([disabled])').count()) await page.click('.minigame button');
-      else await page.waitForTimeout(100);
+    for (let i = 0; i < 60 && !(await page.locator('text=生産画面に戻る').count()); i++) {
+      if (await page.locator('button:has-text("完成品を見る")').count()) await page.click('button:has-text("完成品を見る")');
+      else await page.click('.forge-actions button >> nth=0');
     }
     await page.waitForSelector('text=デッキに入るカード');
     await page.click('button:has-text("剣士に装備する")');

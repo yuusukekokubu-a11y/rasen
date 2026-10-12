@@ -77,29 +77,53 @@
           [{ label: 'OK', primary: true, onClick: render }]);
         return;
       }
-      // 品質ミニゲーム
+      // 品質ミニゲーム「鍛造」
       const lv = s.life[life].lv;
       const params = R.Craft.gameParams(lv, rc.difficulty);
-      const qh = R.DATA.crafting.game.qualityHits;
-      const zm = R.DATA.crafting.game.zoneMult;
-      let progress = 0;
-      let hitCount = 0;
-      clear(el);
-      el.appendChild(R.UI.header(`生産：${rc.name}`));
-      el.appendChild(h('div', { class: 'muted' }, `早く仕上げるほど品質が上がります：${qh.best}回以内＝最高（固定カードが強化版）／${qh.fine}回以内＝上質／それ以上＝ふつう`));
-      const box = h('div');
-      el.appendChild(box);
-      R.UI.mountTimingGame(box, {
-        title: `${rc.name}（難易度${rc.difficulty}・${R.Life.LIVES[life]}Lv${lv}）`,
-        goodWidth: params.goodWidth, greatWidth: params.greatWidth, actionLabel: '作業する',
-        onHit: (kind, count) => {
-          hitCount = count;
-          progress = Math.min(100, progress + params.perHit * zm[kind]);
-          const q = R.DATA.config.quality[R.Craft.qualityFromHits(count)].name;
-          return { progress, done: progress >= 100, text: progress >= 100 ? `完成！（${count}回・${q}）` : `${count}回目（今終われば${q}）` };
-        },
-        onDone: () => complete(rc, R.Craft.qualityFromHits(hitCount), lv)
-      });
+      const g = R.DATA.crafting.game;
+      const st = R.Craft.forgeStart();
+      const rng = R.createRng();
+      let last = '';
+
+      function renderForge() {
+        clear(el);
+        el.appendChild(R.UI.header(`生産：${rc.name}`));
+        el.appendChild(h('div', { class: 'muted' },
+          `少ない回数で仕上げるほど高品質：${g.qualityHits.best}回以内＝最高（固定カードが強化版）／${g.qualityHits.fine}回以内＝上質／それ以上＝ふつう。` +
+          `熱が${g.heatLimit}を超える（過熱）と品質が1段下がります。`));
+        const q = R.Craft.forgeQuality(st);
+        const nextQ = R.Craft.qualityFromHits(st.turns + 1, st.overheats);
+        const heatPct = Math.min(100, st.heat / g.heatLimit * 100);
+        const actRange = (a) => {
+          const p0 = Math.round(params.perHit * a.progress[0]), p1 = Math.round(params.perHit * a.progress[1]);
+          const h0 = a.heat[0] > 0 ? Math.round(a.heat[0] * params.heatMult) : a.heat[0];
+          const h1 = a.heat[1] > 0 ? Math.round(a.heat[1] * params.heatMult) : a.heat[1];
+          const heatText = h1 < 0 ? `熱${h0}〜${h1}` : `熱+${h0}〜${h1}`;
+          return (p1 > 0 ? `進み+${p0}〜${p1}・` : '') + heatText;
+        };
+        el.appendChild(h('div', { class: 'panel forge' },
+          h('div', null, h('b', null, `${rc.name}`), h('span', { class: 'muted' }, `（難易度${rc.difficulty}・${R.Life.LIVES[life]}Lv${lv}）`)),
+          h('div', { class: 'forge-label' }, `進み具合 ${st.progress} / 100`),
+          h('div', { class: 'meter' }, h('div', { class: 'meter-fill progress-fill', style: { width: st.progress + '%' } })),
+          h('div', { class: 'forge-label' }, `熱 ${st.heat} / ${g.heatLimit}`),
+          h('div', { class: 'meter' }, h('div', { class: 'meter-fill heat-fill' + (heatPct >= 70 ? ' hot' : ''), style: { width: heatPct + '%' } })),
+          h('div', { class: 'row' },
+            h('span', null, `${st.turns}回作業`),
+            st.overheats ? h('span', { class: 'bad' }, `過熱${st.overheats}回`) : null,
+            h('span', null, st.done ? `完成：${R.DATA.config.quality[q].name}` : `次で仕上がれば：${R.DATA.config.quality[nextQ].name}`)),
+          last ? h('div', { class: 'forge-last' }, last) : null,
+          st.done
+            ? h('button', { class: 'primary', onclick: () => complete(rc, R.Craft.forgeQuality(st), lv) }, '完成品を見る')
+            : h('div', { class: 'forge-actions' }, Object.entries(g.actions).map(([id, a]) =>
+              h('button', { class: id === 'strong' ? 'primary' : '', onclick: () => {
+                const r = R.Craft.forgeAct(st, id, params, rng);
+                last = `${a.name}：` + (r.gain ? `進み+${r.gain}　` : '') + `熱${r.heat >= 0 ? '+' : ''}${r.heat}` + (r.overheated ? '　過熱した！（品質が1段下がる）' : '');
+                renderForge();
+              } },
+                h('div', { class: 'menu-label' }, a.name),
+                h('div', { class: 'menu-desc' }, `${a.desc}（${actRange(a)}）`))))));
+      }
+      renderForge();
     }
 
     function complete(rc, quality, lv) {

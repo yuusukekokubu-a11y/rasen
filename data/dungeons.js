@@ -52,21 +52,22 @@
     }
   };
 
-  // 採集ミニゲームの設定
+  // 採集ミニゲーム「鉱脈探し」の設定
+  // 4×4のマスに鉱脈が隠れている。1回振るごとに1マス掘る。
+  // 外れのマスには「まわり8マスにある鉱脈の数」が出るので、それを手がかりに探す
   R.DATA.gatherGame = {
-    swings: 6,               // 振れる回数
-    swingsToBreak: 4,        // 道具1.0・レベル差なし・「ふつう」の当たりで何回で壊れるか
-    basePower: 1.0,          // 1回あたりの基本の削り量（道具の強さ×これ）
-    zoneMult: { great: 2.0, good: 1.0, miss: 0.4 }, // 当たり方ごとの削り量の倍率
-    // 採掘Lv（伐採Lv）と硬さの差1につき削り量が何%変わるか
-    lvDiffRate: 0.08,
-    lvMultMin: 0.4, lvMultMax: 2.0,
-    // 当たり判定の幅（%）。レベル差で広がる/狭まる
-    goodWidth: 30, greatWidth: 8, widthPerLv: 1.5,
-    // 結果：壊せたら baseYield 個＋余った回数ごとに +1。壊せなければ failYield 個
-    baseYield: 2, failYield: 1,
-    // レア素材の確率：rareBase ＋ 「最高」1回ごとに rarePerGreat ＋ 余った回数ごとに rarePerLeft
-    rareBase: 0.05, rarePerGreat: 0.08, rarePerLeft: 0.05,
-    exp: 8                   // もらえる経験値（壊せなければ半分）
+    size: 4,                 // マス目の大きさ（4なら4×4）
+    veins: 4,                // 鉱脈の数（レア鉱脈を含む）
+    rareVeins: 1,            // そのうちレア鉱脈の数（掘るとレア素材）
+    baseSwings: 6,           // 振れる回数の基本
+    swingsPerLv: 0.25,       // 採掘Lv（伐採Lv）−硬さ 1につき増える回数
+    swingsPerTool: 2,        // 道具の強さが1上がるごとに増える回数
+    minSwings: 3, maxSwings: 10,
+    hintsPerLv: 0.2,         // Lv−硬さ 1につき、最初から開いている外れマスの数
+    maxHints: 4,
+    perVein: 1,              // 鉱脈1つで手に入る数
+    allFoundBonus: 1,        // 全部見つけたとき、余った回数1回ごとにおまけ
+    failYield: 1,            // 1つも見つからなかったときの拾い物
+    exp: 8                   // もらえる経験値（1つも見つからなければ半分）
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

@@ -143,34 +143,45 @@
     R.UI.modal(h('div', null, text), [{ label: 'OK', primary: true, onClick: () => R.UI.show(runScreen) }]);
   }
 
+  // 採集ミニゲーム「鉱脈探し」
   function startGather(area) {
     const run = G().run;
     const gn = run.gatherNode;
-    const hits = [];
-    let progress = 0;
-    const zm = R.DATA.gatherGame.zoneMult;
-    const box = h('div');
-    area.appendChild(box);
-    R.UI.mountTimingGame(box, {
-      title: `${R.Dungeon.REWARD_NAMES[gn.kind]}（硬さ${gn.node.hardness}・${R.Life.LIVES[gn.life]}Lv${run.lives[gn.life].lv}）`,
-      goodWidth: gn.params.goodWidth, greatWidth: gn.params.greatWidth, swings: gn.params.swings,
-      actionLabel: gn.kind === 'mining' ? 'ツルハシを振る' : 'オノを振る',
-      onHit: (kind) => {
-        hits.push(kind);
-        progress = Math.min(100, progress + gn.params.perSwing * zm[kind]);
-        return { progress, done: progress >= 100, text: progress >= 100 ? '壊れた！' : '' };
-      },
-      onDone: () => {
-        const res = run.finishGather(hits);
+    const board = gn.board;
+    const G2 = R.DATA.gatherGame;
+    const total = board.cells.filter(c => c.vein).length;
+    const word = gn.kind === 'mining' ? { tool: 'ツルハシ', vein: '鉱脈', target: '岩' } : { tool: 'オノ', vein: '良い木目', target: '木' };
+    const rareFound = board.found.filter(v => v === 'rare').length;
+
+    area.appendChild(h('div', { class: 'panel gather' },
+      h('div', null, h('b', null, `${R.Dungeon.REWARD_NAMES[gn.kind]}`),
+        h('span', { class: 'muted' }, `（${word.target}の硬さ${gn.node.hardness}・${R.Life.LIVES[gn.life]}Lv${run.lives[gn.life].lv}）`)),
+      h('div', { class: 'muted' }, `マスを選んで${word.tool}を振ります。${word.vein}が${total}つ（うち★レア${G2.rareVeins}つ）隠れています。外れのマスの数字は、まわり8マスにある${word.vein}の数です。`),
+      h('div', { class: 'row' },
+        h('span', { class: 'energy' }, `残り ${board.swingsLeft} / ${board.swings} 回`),
+        h('span', null, `見つけた ${board.found.length} / ${total}`),
+        rareFound ? h('span', { class: 'good' }, `★レア ${rareFound}`) : null),
+      h('div', { class: 'vein-grid', style: { gridTemplateColumns: `repeat(${G2.size}, 1fr)` } }, board.cells.map((c, i) => {
+        if (!c.open) {
+          return h('button', { class: 'vein-cell closed', disabled: board.done, 'aria-label': `マス${i + 1}を掘る`, onclick: () => {
+            run.gatherStrike(i);
+            G().saveRun();
+            R.UI.show(runScreen);
+          } }, '');
+        }
+        if (c.vein) return h('div', { class: 'vein-cell found' + (c.vein === 'rare' ? ' rare' : '') }, c.vein === 'rare' ? '★' : '◆');
+        return h('div', { class: 'vein-cell empty hint-' + c.hint }, c.hint ? String(c.hint) : '');
+      })),
+      board.done ? h('button', { class: 'primary', onclick: () => {
+        const res = run.finishGather();
         G().saveRun();
         const lines = [
-          h('div', null, res.broken ? `${gn.kind === 'mining' ? '岩' : '木'}を壊した！（${res.left}回残し）` : '壊しきれなかった…'),
+          h('div', null, res.allFound ? `${word.vein}を全部見つけた！（${res.left}回残し・おまけ付き）` : res.found ? `${word.vein}を${res.found}つ見つけた` : `${word.vein}は見つからなかった…（拾い物だけ）`),
           h('div', null, '手に入れた素材：' + matText(res.bag)),
           res.levelUps ? h('div', { class: 'good' }, `${R.Life.LIVES[res.life]}Lvが上がった！（Lv${run.lives[res.life].lv}）`) : null
         ];
         R.UI.modal(h('div', null, lines), [{ label: 'OK', primary: true, onClick: () => R.UI.show(runScreen) }]);
-      }
-    });
+      } }, '結果を見る') : null));
   }
 
   R.UI.extraMenu = R.UI.extraMenu || [];

@@ -10,16 +10,25 @@
       jeweler:   { name: '細工', types: ['accessory'], items: true }
     },
 
-    // ===== 品質ミニゲーム =====
-    // ゲージ100を埋める。1回の作業で進む量 = 100 / baseHits × Lv補正 × 当たり方の倍率
+    // ===== 品質ミニゲーム「鍛造」 =====
+    // 毎回「強く叩く／丁寧に叩く／冷ます」から選ぶ。叩くと進み具合と一緒に熱がたまり、
+    // 熱が限界を超える（過熱）と品質が1段下がる。少ない回数で仕上げるほど高品質
     game: {
-      baseHits: 5,                  // レベル差なし・「ふつう」の当たりで何回で終わるか
-      zoneMult: { great: 1.6, good: 1.0, miss: 0.4 },
+      baseHits: 5,                  // 1回の基本の進み量 = 100 / baseHits × Lv補正
       lvDiffRate: 0.06,             // 生産Lvと難易度の差1につき、進む量が何%変わるか
       lvMultMin: 0.5, lvMultMax: 2.0,
-      goodWidth: 30, greatWidth: 8, widthPerLv: 1.2,
-      // 何回以内に終わればどの品質か（早くクリアするほど高品質）
-      qualityHits: { best: 4, fine: 6 }
+      heatLvRate: 0.03,             // 生産Lvと難易度の差1につき、熱のたまり方が何%減るか
+      heatMultMin: 0.5, heatMultMax: 1.5,
+      // progress: 基本の進み量に対する倍率の範囲 / heat: たまる熱の範囲（マイナスは下がる）
+      actions: {
+        strong:  { name: '強く叩く',   desc: '大きく進むが熱が多くたまる', progress: [1.0, 1.8], heat: [22, 36] },
+        careful: { name: '丁寧に叩く', desc: '少しだけ進む・熱は少し',     progress: [0.4, 0.7], heat: [5, 12] },
+        cool:    { name: '冷ます',     desc: '進まないが熱が下がる',       progress: [0, 0],     heat: [-45, -35] }
+      },
+      heatLimit: 100,               // これを超えると過熱
+      heatAfterOverheat: 60,        // 過熱したあとの熱
+      // 何回以内に仕上げればどの品質か（過熱1回ごとに1段下がる）
+      qualityHits: { best: 4, fine: 7 }
     },
 
     // ===== ランダム2枠 =====

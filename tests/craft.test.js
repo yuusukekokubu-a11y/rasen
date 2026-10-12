@@ -3,11 +3,13 @@ const test = require('node:test');
 const assert = require('node:assert');
 const R = require('../tools/load.js').loadGame();
 
-test('品質：早く終わるほど高品質', () => {
+test('品質：少ない回数で仕上げるほど高品質・過熱すると1段下がる', () => {
   const q = R.DATA.crafting.game.qualityHits;
-  assert.strictEqual(R.Craft.qualityFromHits(q.best), 'best');
-  assert.strictEqual(R.Craft.qualityFromHits(q.best + 1), 'fine');
-  assert.strictEqual(R.Craft.qualityFromHits(q.fine + 1), 'normal');
+  assert.strictEqual(R.Craft.qualityFromHits(q.best, 0), 'best');
+  assert.strictEqual(R.Craft.qualityFromHits(q.best + 1, 0), 'fine');
+  assert.strictEqual(R.Craft.qualityFromHits(q.fine + 1, 0), 'normal');
+  assert.strictEqual(R.Craft.qualityFromHits(q.best, 1), 'fine');
+  assert.strictEqual(R.Craft.qualityFromHits(q.best, 5), 'normal');
 });
 
 test('品質：最高は固定ステータス×1.2＋固定カードが強化版', () => {
@@ -18,11 +20,35 @@ test('品質：最高は固定ステータス×1.2＋固定カードが強化版
   assert.strictEqual(R.Gear.itemCards(normal)[0].upgraded, false);
 });
 
-test('生産Lvが高いとミニゲームが進みやすい', () => {
-  assert.ok(R.Craft.gameParams(15, 5).perHit > R.Craft.gameParams(1, 5).perHit);
+test('鍛造：強く叩くと大きく進み熱がたまる・冷ますと熱が下がる・限界を超えると過熱', () => {
+  const g = R.DATA.crafting.game;
   const p = R.Craft.gameParams(1, 1);
-  const r = R.Craft.resolveHits(['good', 'good', 'good', 'good', 'good', 'good', 'good'], p);
-  assert.ok(r.done);
+  const rng = R.createRng(3);
+  const st = R.Craft.forgeStart();
+  const r1 = R.Craft.forgeAct(st, 'strong', p, rng);
+  assert.ok(r1.gain >= Math.round(p.perHit * g.actions.strong.progress[0]) && r1.heat > 0);
+  const heat = st.heat;
+  R.Craft.forgeAct(st, 'cool', p, rng);
+  assert.ok(st.heat < heat || st.heat === 0);
+  const st2 = R.Craft.forgeStart();
+  st2.heat = g.heatLimit;
+  const r2 = R.Craft.forgeAct(st2, 'careful', p, rng);
+  assert.ok(r2.overheated);
+  assert.strictEqual(st2.overheats, 1);
+  assert.strictEqual(st2.heat, g.heatAfterOverheat);
+});
+
+test('鍛造：いつかは必ず完成する', () => {
+  const p = R.Craft.gameParams(1, 13);
+  const rng = R.createRng(1);
+  const st = R.Craft.forgeStart();
+  for (let i = 0; i < 100 && !st.done; i++) R.Craft.forgeAct(st, 'careful', p, rng);
+  assert.ok(st.done);
+});
+
+test('生産Lvが高いと進みやすく、熱がたまりにくい', () => {
+  assert.ok(R.Craft.gameParams(15, 5).perHit > R.Craft.gameParams(1, 5).perHit);
+  assert.ok(R.Craft.gameParams(15, 5).heatMult < R.Craft.gameParams(1, 5).heatMult);
 });
 
 test('ランダム2枠：必ず2枠・付与効果は付けられるカードにだけ・危険な組み合わせは同時に付かない', () => {

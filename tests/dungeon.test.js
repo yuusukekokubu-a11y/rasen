@@ -26,7 +26,7 @@ test('戦闘間でHPは回復しない（持ち越し）', () => {
   run.finishCombat(c);
   assert.strictEqual(run.hp, run.maxHp - 30);
   run.chooseReward(run.rewardOptions.find(k => k !== 'rest' && k !== 'mining' && k !== 'logging') || run.rewardOptions[0]);
-  if (run.phase === 'gather') run.finishGather(['good']);
+  if (run.phase === 'gather') run.finishGather();
   const c2 = run.createCombat();
   assert.ok(c2.party.hp <= run.maxHp - 30 + Math.round(run.maxHp * 0.35));
 });
@@ -59,27 +59,62 @@ test('最後まで進めるとクリアになる', () => {
   while (run.phase !== 'cleared' && guard++ < 50) {
     if (run.phase === 'battle') { const c = run.createCombat(); winCombat(c); run.finishCombat(c); }
     else if (run.phase === 'reward') run.chooseReward(run.rewardOptions[0]);
-    else if (run.phase === 'gather') run.finishGather(['good', 'good', 'good', 'good']);
+    else if (run.phase === 'gather') run.finishGather();
   }
   assert.strictEqual(run.phase, 'cleared');
   assert.strictEqual(run.battlesWon, run.totalBattles());
 });
 
-test('採集：上手いほど量とレアの確率が上がる', () => {
+test('鉱脈探し：マス目・数字の手がかり・振る回数', () => {
+  const G = R.DATA.gatherGame;
   const node = R.DATA.dungeons.cave.gather.mining[0];
   const params = R.Gather.gatherParams(node, 1, 1);
-  const good = R.Gather.resolveMinigame(node, params, ['great', 'great', 'great', 'great', 'great', 'great'], R.createRng(1));
-  const bad = R.Gather.resolveMinigame(node, params, ['miss', 'miss', 'miss', 'miss', 'miss', 'miss'], R.createRng(1));
-  const count = (b) => Object.values(b).reduce((a, n) => a + n, 0);
-  assert.ok(good.broken && !bad.broken);
-  assert.ok(count(good.bag) > count(bad.bag));
-  assert.ok(good.rareChance > bad.rareChance);
+  const board = R.Gather.newBoard(node, params, R.createRng(1));
+  assert.strictEqual(board.cells.length, G.size * G.size);
+  assert.strictEqual(board.cells.filter(c => c.vein).length, G.veins);
+  assert.strictEqual(board.cells.filter(c => c.vein === 'rare').length, G.rareVeins);
+  board.cells.forEach((c, i) => assert.strictEqual(c.hint, R.Gather.neighbors(i).filter(j => board.cells[j].vein).length));
+  // 振ると回数が減り、使い切ると終わる
+  let n = 0;
+  while (!board.done) { const i = board.cells.findIndex(c => !c.open); R.Gather.strike(board, i); n++; }
+  assert.ok(n <= params.swings);
 });
 
-test('採集：Lvが高いほど1回で多く削れる', () => {
+test('鉱脈探し：たくさん見つけるほど量が増え、レア鉱脈でレア素材', () => {
+  const node = R.DATA.dungeons.cave.gather.mining[0];
+  const params = R.Gather.gatherParams(node, 1, 1);
+  const count = (b) => Object.values(b).reduce((a, n) => a + n, 0);
+  const good = R.Gather.newBoard(node, params, R.createRng(2));
+  for (let i = 0; i < good.cells.length && !good.done; i++) if (good.cells[i].vein) R.Gather.strike(good, i);
+  const bad = R.Gather.newBoard(node, params, R.createRng(2));
+  for (let i = 0; i < bad.cells.length && !bad.done; i++) if (!bad.cells[i].vein && !bad.cells[i].open) R.Gather.strike(bad, i);
+  const rg = R.Gather.boardResult(node, good, R.createRng(1));
+  const rb = R.Gather.boardResult(node, bad, R.createRng(1));
+  assert.ok(rg.allFound && rg.rares === 1);
+  assert.strictEqual(rb.found, 0);
+  assert.ok(count(rg.bag) > count(rb.bag));
+  assert.ok(Object.keys(rg.bag).some(m => Object.keys(node.rare).includes(m)));
+});
+
+test('鉱脈探し：Lvと道具で振れる回数と手がかりが増える', () => {
   const node = R.DATA.dungeons.cave.gather.mining[2];
-  assert.ok(R.Gather.gatherParams(node, 15, 1).perSwing > R.Gather.gatherParams(node, 1, 1).perSwing);
-  assert.ok(R.Gather.gatherParams(node, 1, 2).perSwing > R.Gather.gatherParams(node, 1, 1).perSwing);
+  assert.ok(R.Gather.gatherParams(node, 20, 1).swings > R.Gather.gatherParams(node, 1, 1).swings);
+  assert.ok(R.Gather.gatherParams(node, 1, 2).swings > R.Gather.gatherParams(node, 1, 1).swings);
+  assert.ok(R.Gather.gatherParams(node, 25, 1).hints > R.Gather.gatherParams(node, 1, 1).hints);
+});
+
+test('鉱脈探し：自動操作は数字の手がかりを使うので、でたらめより多く見つける', () => {
+  const node = R.DATA.dungeons.cave.gather.mining[1];
+  const params = R.Gather.gatherParams(node, 6, 1);
+  let smart = 0, random = 0;
+  for (let s = 0; s < 300; s++) {
+    smart += R.Gather.autoPlay(node, params, R.createRng(s)).found.length;
+    const rng = R.createRng(s);
+    const b = R.Gather.newBoard(node, params, rng);
+    while (!b.done) { const closed = b.cells.map((c, i) => i).filter(i => !b.cells[i].open); R.Gather.strike(b, rng.pick(closed)); }
+    random += b.found.length;
+  }
+  assert.ok(smart > random, `${smart} > ${random}`);
 });
 
 test('ライフの経験値でレベルが上がる', () => {

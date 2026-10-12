@@ -116,16 +116,24 @@
       const node = g[kind][this.floor];
       const life = kind === 'mining' ? 'mining' : 'logging';
       const tool = kind === 'mining' ? this.tools.pick : this.tools.axe;
-      this.gatherNode = { kind, life, node, params: R.Gather.gatherParams(node, this.lives[life].lv, tool) };
+      const params = R.Gather.gatherParams(node, this.lives[life].lv, tool);
+      this.gatherNode = { kind, life, node, params, board: R.Gather.newBoard(node, params, this.rng) };
       this.phase = 'gather';
       return { ok: true, kind, gather: this.gatherNode };
     }
 
-    // ミニゲームの結果（当たり方の列）を渡す
-    finishGather(hits) {
+    // 鉱脈探し：1マス掘る
+    gatherStrike(index) {
+      if (this.phase !== 'gather') return null;
+      return R.Gather.strike(this.gatherNode.board, index);
+    }
+
+    // 鉱脈探しを終える（振る回数を使い切るか、全部見つけたら終わり）
+    finishGather() {
       if (this.phase !== 'gather') return { ok: false, error: '採集中ではありません' };
       const gn = this.gatherNode;
-      const res = R.Gather.resolveMinigame(gn.node, gn.params, hits, this.rng);
+      gn.board.done = true;
+      const res = R.Gather.boardResult(gn.node, gn.board, this.rng);
       for (const [m, n] of Object.entries(res.bag)) R.Gather.addMat(this.bag, m, n);
       const ups = R.Life.addExp(this.lives[gn.life], res.exp);
       this.gatherNode = null;
@@ -176,7 +184,9 @@
             : ['mining', 'logging', 'treasure', 'gathering', 'rest'].find(k => o.includes(k));
           run.chooseReward(pick);
         } else if (run.phase === 'gather') {
-          run.finishGather(R.Gather.autoHits(run.gatherNode.params, 0.5, run.rng));
+          const board = run.gatherNode.board;
+          while (!board.done) run.gatherStrike(R.Gather.autoPick(board, run.rng));
+          run.finishGather();
         }
       }
       battles += run.battlesWon;
