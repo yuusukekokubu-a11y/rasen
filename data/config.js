@@ -26,8 +26,8 @@
     life: {
       maxLv: 30,
       // 次のLvまでの経験値 = base + perLv * 現在Lv
-      expBase: 20,
-      expPerLv: 12,
+      expBase: 10,
+      expPerLv: 6,
       // 細工Lvがこの値に達するごとに全職業のパワーが1つずつ解禁（初期は各職1つ）
       powerUnlockLvs: [1, 5, 10, 15]
     }

@@ -23,16 +23,16 @@
       },
       gather: {
         mining: [
-          { hardness: 3,  common: { copper_ore: 1 },               rare: { quartz: 1 } },
-          { hardness: 6,  common: { copper_ore: 1, iron_ore: 2 },  rare: { quartz: 1 } },
-          { hardness: 10, common: { iron_ore: 2, mithril_ore: 1 }, rare: { quartz: 1, mithril_ore: 1 } },
-          { hardness: 13, common: { iron_ore: 1, mithril_ore: 2 }, rare: { star_shard: 1 } }
+          { hardness: 1,  common: { copper_ore: 1 },               rare: { quartz: 1 } },
+          { hardness: 4,  common: { copper_ore: 1, iron_ore: 2 },  rare: { quartz: 1 } },
+          { hardness: 8,  common: { iron_ore: 2, mithril_ore: 1 }, rare: { quartz: 1, mithril_ore: 1 } },
+          { hardness: 12, common: { iron_ore: 1, mithril_ore: 2 }, rare: { star_shard: 1 } }
         ],
         logging: [
-          { hardness: 3,  common: { oak: 1 },                    rare: { maple: 1 } },
-          { hardness: 6,  common: { oak: 1, maple: 2 },          rare: { glowcap: 1 } },
-          { hardness: 10, common: { maple: 2, ancient_wood: 1 }, rare: { ancient_wood: 1 } },
-          { hardness: 13, common: { maple: 1, ancient_wood: 2 }, rare: { star_shard: 1 } }
+          { hardness: 1,  common: { oak: 1 },                    rare: { maple: 1 } },
+          { hardness: 4,  common: { oak: 1, maple: 2 },          rare: { glowcap: 1 } },
+          { hardness: 8,  common: { maple: 2, ancient_wood: 1 }, rare: { ancient_wood: 1 } },
+          { hardness: 12, common: { maple: 1, ancient_wood: 2 }, rare: { star_shard: 1 } }
         ],
         // 採取（ミニゲームなし）：amount 個をランダムに拾う
         gathering: [
@@ -60,14 +60,15 @@
     veins: 4,                // 鉱脈の数（レア鉱脈を含む）
     rareVeins: 1,            // そのうちレア鉱脈の数（掘るとレア素材）
     baseSwings: 6,           // 振れる回数の基本
-    swingsPerLv: 0.25,       // 採掘Lv（伐採Lv）−硬さ 1につき増える回数
+    swingsPerLv: 0.5,        // 採掘Lv（伐採Lv）−硬さ 1につき増える回数（2Lvで1回）
     swingsPerTool: 2,        // 道具の強さが1上がるごとに増える回数
     minSwings: 3, maxSwings: 10,
-    hintsPerLv: 0.2,         // Lv−硬さ 1につき、最初から開いている外れマスの数
-    maxHints: 4,
+    hintsPerLv: 0.34,        // Lv−硬さ 1につき、最初から開いている外れマスの数（3Lvで1マス）
+    maxHints: 5,
     perVein: 1,              // 鉱脈1つで手に入る数
     allFoundBonus: 1,        // 全部見つけたとき、余った回数1回ごとにおまけ
     failYield: 1,            // 1つも見つからなかったときの拾い物
-    exp: 8                   // もらえる経験値（1つも見つからなければ半分）
+    exp: 12,                 // もらえる経験値（1つも見つからなければ半分）
+    expPerVein: 3            // 見つけた鉱脈1つごとの追加経験値
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

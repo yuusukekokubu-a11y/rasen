@@ -11,6 +11,17 @@
     });
   }
 
+  // 倍率を「+12%」「−10%」のように表示
+  function pct(m) {
+    const v = Math.round((m - 1) * 100);
+    return v > 0 ? `+${v}%` : v < 0 ? `−${-v}%` : '±0%';
+  }
+  // レベルの恩恵の表示（レベル差がプラスなら緑、マイナスなら赤）
+  function lvBonusLine(diff, parts) {
+    return h('div', { class: 'lv-bonus ' + (diff > 0 ? 'good' : diff < 0 ? 'bad' : 'muted') },
+      `レベル差 ${diff > 0 ? '+' : ''}${diff}：` + parts.join('・'));
+  }
+
   function craftScreen(el) {
     let life = 'smith';
     let accJob = G().state.party[0];
@@ -103,6 +114,10 @@
         };
         el.appendChild(h('div', { class: 'panel forge' },
           h('div', null, h('b', null, `${rc.name}`), h('span', { class: 'muted' }, `（難易度${rc.difficulty}・${R.Life.LIVES[life]}Lv${lv}）`)),
+          lvBonusLine(lv - rc.difficulty, [
+            `1回の進み ${pct(params.lvMult)}`,
+            `熱のたまり方 ${pct(params.heatMult)}`
+          ]),
           h('div', { class: 'forge-label' }, `進み具合 ${st.progress} / 100`),
           h('div', { class: 'meter' }, h('div', { class: 'meter-fill progress-fill', style: { width: st.progress + '%' } })),
           h('div', { class: 'forge-label' }, `熱 ${st.heat} / ${g.heatLimit}`),

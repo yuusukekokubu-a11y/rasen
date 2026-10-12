@@ -15,9 +15,9 @@
     // 熱が限界を超える（過熱）と品質が1段下がる。少ない回数で仕上げるほど高品質
     game: {
       baseHits: 5,                  // 1回の基本の進み量 = 100 / baseHits × Lv補正
-      lvDiffRate: 0.06,             // 生産Lvと難易度の差1につき、進む量が何%変わるか
+      lvDiffRate: 0.04,             // 生産Lvと難易度の差1につき、進む量が何%変わるか
       lvMultMin: 0.5, lvMultMax: 2.0,
-      heatLvRate: 0.03,             // 生産Lvと難易度の差1につき、熱のたまり方が何%減るか
+      heatLvRate: 0.035,            // 生産Lvと難易度の差1につき、熱のたまり方が何%減るか
       heatMultMin: 0.5, heatMultMax: 1.5,
       // progress: 基本の進み量に対する倍率の範囲 / heat: たまる熱の範囲（マイナスは下がる）
       actions: {
@@ -49,6 +49,6 @@
     statChoices: ['hp', 'atk', 'def', 'mag'],
 
     // ===== 経験値 =====
-    exp: { base: 10, perDifficulty: 2, quality: { normal: 1.0, fine: 1.2, best: 1.5 }, tool: 8 }
+    exp: { base: 14, perDifficulty: 2, quality: { normal: 1.0, fine: 1.2, best: 1.5 }, tool: 8 }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

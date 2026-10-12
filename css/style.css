@@ -124,6 +124,9 @@ th { color: var(--muted); font-weight: normal; }
 .modal { background: var(--panel); border-radius: 10px; padding: 16px; max-width: 520px; width: 100%; }
 .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
 
+/* レベルの恩恵の表示 */
+.lv-bonus { font-size: .9em; font-weight: bold; }
+
 /* 生産ミニゲーム「鍛造」 */
 .forge { display: flex; flex-direction: column; gap: 6px; }
 .forge-label { font-size: .9em; color: var(--muted); font-variant-numeric: tabular-nums; }

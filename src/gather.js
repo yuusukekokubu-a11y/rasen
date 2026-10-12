@@ -64,7 +64,7 @@
     if (!board.found.length) commons = G.failYield;
     for (let i = 0; i < commons; i++) addMat(bag, rng.weighted(node.common), 1);
     for (let i = 0; i < rares; i++) addMat(bag, rng.weighted(node.rare), 1);
-    return { bag, found: board.found.length, rares, allFound, left: board.swingsLeft, exp: board.found.length ? G.exp : Math.round(G.exp / 2) };
+    return { bag, found: board.found.length, rares, allFound, left: board.swingsLeft, exp: board.found.length ? G.exp + board.found.length * (G.expPerVein || 0) : Math.round(G.exp / 2) };
   }
 
   // 自動操作用：数字の手がかりから、鉱脈がありそうなマスを選ぶ

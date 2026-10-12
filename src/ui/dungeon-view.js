@@ -95,8 +95,8 @@
     } else if (run.phase === 'reward') {
       area.appendChild(h('h2', null, '報酬を1つ選んでください'));
       const desc = {
-        mining: `採掘ミニゲーム（採掘Lv${G().state.life.mining.lv}／岩の硬さ${run.def.gather.mining[run.floor].hardness}）`,
-        logging: `伐採ミニゲーム（伐採Lv${G().state.life.logging.lv}／木の硬さ${run.def.gather.logging[run.floor].hardness}）`,
+        mining: `鉱脈探し（採掘Lv${G().state.life.mining.lv}／岩の硬さ${run.def.gather.mining[run.floor].hardness}／${R.Gather.gatherParams(run.def.gather.mining[run.floor], G().state.life.mining.lv, run.tools.pick).swings}回振れる）`,
+        logging: `鉱脈探し（伐採Lv${G().state.life.logging.lv}／木の硬さ${run.def.gather.logging[run.floor].hardness}／${R.Gather.gatherParams(run.def.gather.logging[run.floor], G().state.life.logging.lv, run.tools.axe).swings}回振れる）`,
         gathering: '素材をいくつか拾う',
         treasure: '宝箱を開ける',
         rest: `HPを${Math.round(run.def.rewards.restHealRatio * 100)}%回復`
@@ -156,6 +156,18 @@
     area.appendChild(h('div', { class: 'panel gather' },
       h('div', null, h('b', null, `${R.Dungeon.REWARD_NAMES[gn.kind]}`),
         h('span', { class: 'muted' }, `（${word.target}の硬さ${gn.node.hardness}・${R.Life.LIVES[gn.life]}Lv${run.lives[gn.life].lv}）`)),
+      (() => {
+        const lv = run.lives[gn.life].lv;
+        const diff = lv - gn.node.hardness;
+        const base = R.Gather.gatherParams(gn.node, gn.node.hardness, 1);
+        const noTool = R.Gather.gatherParams(gn.node, lv, 1);
+        const lvSw = noTool.swings - base.swings;
+        const toolSw = gn.params.swings - noTool.swings;
+        const sign = (n) => (n > 0 ? '+' : n < 0 ? '−' : '±') + Math.abs(n);
+        return h('div', { class: 'lv-bonus ' + (diff > 0 ? 'good' : diff < 0 ? 'bad' : 'muted') },
+          `レベル差 ${diff > 0 ? '+' : ''}${diff}：振れる回数 ${sign(lvSw)}・最初から開いているマス ${gn.params.hints}` +
+          `　／道具：振れる回数 ${sign(toolSw)}`);
+      })(),
       h('div', { class: 'muted' }, `マスを選んで${word.tool}を振ります。${word.vein}が${total}つ（うち★レア${G2.rareVeins}つ）隠れています。外れのマスの数字は、まわり8マスにある${word.vein}の数です。`),
       h('div', { class: 'row' },
         h('span', { class: 'energy' }, `残り ${board.swingsLeft} / ${board.swings} 回`),
