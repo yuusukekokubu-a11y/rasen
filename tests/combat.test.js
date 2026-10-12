@@ -60,7 +60,7 @@ test('ブロックが敵の攻撃を防ぎ、次のターン開始で消える',
   c.party.block = 5;
   const hp = c.party.hp;
   c.endTurn();
-  assert.strictEqual(hp - c.party.hp, 7 - 5);
+  assert.strictEqual(hp - c.party.hp, R.DATA.enemies.slime.moves.tackle.dmg - 5);
   assert.strictEqual(c.party.block, 0);
 });
 

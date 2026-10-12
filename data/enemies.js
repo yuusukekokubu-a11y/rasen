@@ -18,55 +18,55 @@
   R.DATA = R.DATA || {};
   R.DATA.enemies = {
     slime: {
-      name: 'スライム', hp: [24, 30],
+      name: 'スライム', hp: [40, 46],
       moves: {
-        tackle: { name: '体当たり', dmg: 7 },
-        ooze:   { name: '粘液', dmg: 4, debuff: { s: 'weak', v: 1 } },
-        harden: { name: '硬化', block: 7 }
+        tackle: { name: '体当たり', dmg: 11 },
+        ooze:   { name: '粘液', dmg: 7, debuff: { s: 'weak', v: 1 } },
+        harden: { name: '硬化', block: 10 }
       },
       pattern: { type: 'random', weights: { tackle: 3, ooze: 2, harden: 1 }, maxRepeat: 2 },
       elementMult: { fire: 1.5, ice: 0.75 },
       drops: { slime_gel: 1 }
     },
     bat: {
-      name: '洞窟コウモリ', hp: [16, 20],
+      name: '洞窟コウモリ', hp: [22, 26],
       moves: {
-        bite:  { name: 'かみつき', dmg: 3, hits: 2 },
-        screech: { name: '超音波', debuff: { s: 'vulnerable', v: 1 }, dmg: 2 }
+        bite:  { name: 'かみつき', dmg: 5, hits: 2 },
+        screech: { name: '超音波', debuff: { s: 'vulnerable', v: 1 }, dmg: 4 }
       },
       pattern: { type: 'random', weights: { bite: 3, screech: 1 }, maxRepeat: 2 },
       elementMult: { thunder: 1.5 },
       drops: { bat_wing: 1 }
     },
     wolf: {
-      name: '魔狼', hp: [34, 40],
+      name: '魔狼', hp: [56, 62],
       moves: {
-        claw:  { name: '引っかき', dmg: 9 },
-        howl:  { name: '遠吠え', str: 2, block: 4 },
-        rend:  { name: '噛み裂き', dmg: 5, hits: 2 }
+        claw:  { name: '引っかき', dmg: 14 },
+        howl:  { name: '遠吠え', str: 3, block: 8 },
+        rend:  { name: '噛み裂き', dmg: 8, hits: 2 }
       },
       pattern: { type: 'cycle', seq: ['claw', 'rend', 'howl'] },
       elementMult: { fire: 1.25 },
       drops: { wolf_pelt: 1 }
     },
     spider: {
-      name: '大蜘蛛', hp: [38, 44],
+      name: '大蜘蛛', hp: [60, 66],
       moves: {
-        web:   { name: '糸を吐く', dmg: 5, debuff: { s: 'weak', v: 2 } },
-        fang:  { name: '毒牙', dmg: 11 },
-        guard: { name: '巣ごもり', block: 10 }
+        web:   { name: '糸を吐く', dmg: 8, debuff: { s: 'weak', v: 2 } },
+        fang:  { name: '毒牙', dmg: 16 },
+        guard: { name: '巣ごもり', block: 14 }
       },
       pattern: { type: 'random', weights: { web: 2, fang: 3, guard: 1 }, maxRepeat: 1 },
       elementMult: { fire: 1.5, thunder: 0.75 },
       drops: { spider_silk: 1 }
     },
     golem: {
-      name: '岩窟の主', hp: [190, 190], boss: true,
+      name: '岩窟の主', hp: [340, 340], boss: true,
       moves: {
-        smash:   { name: '岩砕き', dmg: 18 },
-        quake:   { name: '地響き', dmg: 6, hits: 2, debuff: { s: 'vulnerable', v: 1 } },
-        fortify: { name: '岩の鎧', block: 18, str: 2 },
-        charge:  { name: '力を溜める', str: 4 }
+        smash:   { name: '岩砕き', dmg: 26 },
+        quake:   { name: '地響き', dmg: 10, hits: 2, debuff: { s: 'vulnerable', v: 1 } },
+        fortify: { name: '岩の鎧', block: 25, str: 3 },
+        charge:  { name: '力を溜める', str: 5 }
       },
       pattern: { type: 'cycle', opening: 'fortify', seq: ['smash', 'quake', 'charge', 'smash', 'fortify'] },
       elementMult: { thunder: 1.5, fire: 0.75 },

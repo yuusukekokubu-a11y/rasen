@@ -56,7 +56,7 @@
     el.appendChild(header('拠点'));
     const menu = [
       { label: '練習戦闘', desc: '初期装備で敵と戦う', fn: () => show(practiceScreen) }
-    ].concat(R.UI.extraMenu || []);
+    ].concat((R.UI.extraMenu || []).slice().sort((x, y) => (x.order || 50) - (y.order || 50)));
     el.appendChild(h('div', { class: 'menu' }, menu.map(m =>
       h('button', { class: 'menu-item', onclick: m.fn ? m.fn : () => show(m.screen) },
         h('div', { class: 'menu-label' }, m.label),

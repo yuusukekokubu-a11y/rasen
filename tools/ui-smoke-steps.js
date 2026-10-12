@@ -12,3 +12,13 @@ module.exports = [
     await page.click('text=もどる');
   } }
 ];
+module.exports.push(
+  { name: 'シミュレーターを実行', run: async (page) => {
+    await page.click('text=シミュレーター');
+    await page.fill('input[type=number] >> nth=0', '10');
+    await page.press('input[type=number] >> nth=0', 'Tab');
+    await page.click('text=実行');
+    await page.waitForSelector('table');
+    await page.click('text=もどる');
+  } }
+);
