@@ -24,8 +24,6 @@
 
   function craftScreen(el) {
     let life = 'smith';
-    let accJob = G().state.party[0];
-    let accPower = null;
 
     function render() {
       const s = G().state;
@@ -35,23 +33,6 @@
         h('div', { class: 'life-tabs' }, Object.entries(R.DATA.crafting.lives).map(([k, L]) =>
           h('button', { class: k === life ? 'primary' : '', onclick: () => { life = k; render(); } }, L.name, h('small', null, `Lv${s.life[k].lv}`))))));
       const L = R.DATA.crafting.lives[life];
-      
-
-      // アクセサリー：乗せるパワーを選ぶ
-      if (life === 'jeweler') {
-        const jobs = Object.keys(R.DATA.jobs).filter(j => R.DATA.jobs[j].enabled);
-        if (!jobs.includes(accJob)) accJob = jobs[0];
-        const powers = R.Craft.unlockedPowers(accJob, s.life.jeweler.lv);
-        if (!powers.includes(accPower)) accPower = powers[0];
-        const nextLv = R.DATA.config.life.powerUnlockLvs.find(lv => lv > s.life.jeweler.lv);
-        el.appendChild(h('div', { class: 'panel' },
-          h('div', null, 'パワー（職業専用）'),
-          h('div', { class: 'row' }, '職業：', h('select', { onchange: (e) => { accJob = e.target.value; accPower = null; render(); } },
-            jobs.map(j => h('option', { value: j, selected: j === accJob }, R.DATA.jobs[j].name)))),
-          h('div', { class: 'row' }, 'パワー：', h('select', { onchange: (e) => { accPower = e.target.value; render(); } },
-            powers.map(p => h('option', { value: p, selected: p === accPower }, `${R.DATA.cards[p].name}：${R.DATA.powers[R.DATA.cards[p].effects[0].id].desc}`)))),
-          h('div', { class: 'muted' }, `解禁 ${powers.length}/${R.DATA.jobs[accJob].powers.length}` + (nextLv ? `・次は細工Lv${nextLv}` : ''))));
-      }
 
       const lv = s.life[life].lv;
       const rows = R.Craft.recipesFor(life).map(rc => {
@@ -168,7 +149,8 @@
       G().removeMaterials(rc.mats);
       let made;
       if (rc.kind === 'equip') {
-        const item = R.Craft.makeEquipment(rc.id, { lv, quality, power: rc.base.slot === 'accessory' ? accPower : undefined });
+        // アクセサリーのパワーはランダム（付いたパワーの職業だけが装備できる）
+        const item = R.Craft.makeEquipment(rc.id, { lv, quality });
         made = G().addItem(item);
       } else {
         made = { uid: s.nextUid++, id: rc.id, quality };

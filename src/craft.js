@@ -191,6 +191,12 @@
   function unlockedPowers(job, jewelerLv) {
     return R.DATA.jobs[job].powers.slice(0, Math.max(1, unlockedPowerCount(jewelerLv)));
   }
+  // アクセサリーに付くパワーをランダムに決める。先に職業を等しい確率で選び、その職業の解禁済みパワーから1つ
+  //   付いたパワーの職業だけが、そのアクセサリーを装備できる（R.Gear.canEquip）
+  function rollAccessoryPower(jewelerLv, rng) {
+    const jobs = Object.keys(R.DATA.jobs).filter(j => R.DATA.jobs[j].enabled && R.DATA.jobs[j].powers.length);
+    return rng.pick(unlockedPowers(rng.pick(jobs), jewelerLv));
+  }
 
   // ===== ランダム枠 =====
   function rollGrade(lv, difficulty, rng) {
@@ -242,19 +248,20 @@
   }
 
   // 装備を1つ作る（ミニゲームの結果の品質を受け取る）
-  //   opts: { lv, quality, power（アクセのみ）, rng }
+  //   opts: { lv, quality, power（アクセのみ。省略するとランダム）, rng }
   function makeEquipment(baseId, opts) {
     const base = R.DATA.equipment.bases[baseId];
     const rng = opts.rng || R.createRng();
     const pool = Object.keys(R.DATA.cards).filter(id => R.DATA.cards[id].pool === base.type);
     const randomCard = rng.pick(pool);
     const isAcc = base.slot === 'accessory';
-    const enchantTarget = isAcc ? opts.power : base.fixedCard;
+    const power = isAcc ? (opts.power || rollAccessoryPower(opts.lv || 1, rng)) : undefined;
+    const enchantTarget = isAcc ? power : base.fixedCard;
     const item = {
       base: baseId, quality: opts.quality || 'normal', randomCard,
       slots: rollSlots(base, enchantTarget, opts.lv, rng)
     };
-    if (isAcc) item.power = opts.power;
+    if (isAcc) item.power = power;
     return item;
   }
 
@@ -266,6 +273,6 @@
 
   R.Craft = {
     recipesFor, pieceCells, puzzleParams, blueprintFor, puzzleStart, puzzleSelect, placement, puzzlePlace, puzzleRotate, puzzleDiscard, puzzleQuality, canPlaceAnywhere, puzzleAutoStep,
-    unlockedPowerCount, unlockedPowers, rollGrade, gradeChances, enchantCandidates, rollSlots, makeEquipment, expFor
+    unlockedPowerCount, unlockedPowers, rollAccessoryPower, rollGrade, gradeChances, enchantCandidates, rollSlots, makeEquipment, expFor
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

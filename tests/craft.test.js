@@ -127,6 +127,22 @@ test('パワー解禁：細工Lvが上がるごとに1つずつ', () => {
   assert.strictEqual(R.Craft.unlockedPowers('mage', 99).length, R.DATA.jobs.mage.powers.length);
 });
 
+test('アクセサリー：パワーはランダムで、付いたパワーの職業だけが装備できる', () => {
+  const rng = R.createRng(7);
+  const jobsSeen = new Set();
+  for (let i = 0; i < 200; i++) {
+    const acc = R.Craft.makeEquipment('copper_ring', { lv: 1, quality: 'normal', rng });
+    const owner = Object.keys(R.DATA.jobs).find(j => R.DATA.jobs[j].powers.includes(acc.power));
+    assert.ok(owner, acc.power);
+    // 細工Lv1では各職業の最初のパワーだけ
+    assert.ok(R.Craft.unlockedPowers(owner, 1).includes(acc.power), acc.power);
+    jobsSeen.add(owner);
+    for (const j of Object.keys(R.DATA.jobs)) assert.strictEqual(R.Gear.canEquip(j, acc), j === owner, `${acc.power} を ${j}`);
+  }
+  const enabled = Object.keys(R.DATA.jobs).filter(j => R.DATA.jobs[j].enabled);
+  assert.strictEqual(jobsSeen.size, enabled.length);
+});
+
 test('装備：職業に合わない物は装備できない・入れ替え', () => {
   const G = R.Game;
   G.newState();
