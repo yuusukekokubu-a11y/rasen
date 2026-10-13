@@ -542,3 +542,28 @@ button.primary .menu-desc { color: #4a3610; }
 @keyframes dig-found { 0% { transform: scale(.5); filter: brightness(3); } 50% { transform: scale(1.2); } 100% { transform: none; } }
 /* 明るい背景（天空の庭など）でも名前とHPが読めるよう、敵の足元を少し暗くする */
 .battle-stage .enemies { background: linear-gradient(transparent, #0a0c1488 45%, #0a0c14bb); padding-top: 8px; }
+
+/* ===== 出発（パズドラ式）：一覧・ステージ・パーティ ===== */
+.center { text-align: center; }
+.tabs { display: flex; gap: 6px; margin: 4px 0 12px; }
+.tab { flex: 1; min-height: 40px; }
+.tab.on { background: linear-gradient(#f4d98a, #c9a24a); color: #2b1c04; text-shadow: none; }
+.dungeon-card.pick { display: block; width: 100%; text-align: left; padding: 0; margin: 0 0 12px; cursor: pointer; color: inherit; font: inherit; }
+.dungeon-card.pick:active { transform: translateY(1px); }
+.dungeon-card .dc-text { min-width: 0; }
+.dungeon-foot { display: flex; align-items: center; gap: 8px; padding: 8px 14px 10px; }
+.dc-stars { display: flex; gap: 4px; }
+.dc-stars i { width: 12px; height: 12px; transform: rotate(45deg); border: 2px solid var(--gold-lo); background: #1a1c28; }
+.dc-stars i.on { background: var(--gold-hi); border-color: var(--gold); box-shadow: 0 0 4px #e2bd6688; }
+.dc-best { color: var(--gold-hi); font-weight: 800; }
+.dc-go { margin-left: auto; color: var(--gold); font-size: 14px; }
+.badge-new { position: absolute; top: 6px; right: 8px; z-index: 3; padding: 1px 8px; border-radius: 3px; font-size: 11px; font-weight: 900; letter-spacing: .1em;
+  color: #fff; background: linear-gradient(#ff6a5a, #c8302a); border: 2px solid var(--void); text-shadow: 0 1px 0 #0008; animation: bob 1.2s ease-in-out infinite; }
+.stage-head { height: 96px; margin-bottom: 12px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; }
+.stage-row { position: relative; display: flex; align-items: center; gap: 10px; width: 100%; min-height: 58px; margin: 0 0 8px; padding: 8px 12px; text-align: left; }
+.stage-name { font-size: var(--fs-l); font-weight: 900; letter-spacing: .1em; color: var(--gold-hi); text-shadow: var(--outline); min-width: 4.2em; }
+.stage-chips { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; }
+.stage-chips .chip { font-size: 11px; padding: 1px 6px; border-radius: 3px; background: #0e1018; border: 1px solid var(--win-line); color: var(--text); }
+.stage-chips .chip.rare { color: var(--gold-hi); }
+.stage-row .badge-new { position: static; }
+.stage-clear { font-size: 11px; font-weight: 900; letter-spacing: .1em; color: var(--good); border: 2px solid var(--good); border-radius: 3px; padding: 0 6px; transform: rotate(-6deg); }

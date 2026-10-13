@@ -43,7 +43,7 @@ module.exports.push(
 async function playDungeon(page) {
   for (let i = 0; i < 600; i++) {
     const has = async (sel) => (await page.locator(sel).count()) > 0;
-    if (await has('text=拠点へ戻る')) { await page.click('text=拠点へ戻る'); return; }
+    if (await has('button:has-text("拠点へ")')) { await page.click('button:has-text("拠点へ")'); return; }
     if (await has('.modal button')) { await page.click('.modal button'); continue; }
     if (await has('button:has-text("次へ")')) { await page.click('button:has-text("次へ")'); continue; }
     if (await has('button:has-text("おまかせ")')) { await page.click('button:has-text("おまかせ")'); continue; }
@@ -60,7 +60,9 @@ module.exports.solvePuzzle = solvePuzzle;
 module.exports.push(
   { name: 'ダンジョンを最後まで進める', run: async (page) => {
     await page.click('text=ダンジョンへ出発');
-    await page.click('text=出発する');
+    await page.click('.dungeon-card.pick >> nth=0');
+    await page.click('.stage-row >> nth=0');
+    await page.click('button:has-text("出発")');
     await playDungeon(page);
     await page.waitForSelector('text=拠点');
   } },

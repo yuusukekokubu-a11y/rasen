@@ -4,6 +4,14 @@
 //          'checkpoint'（無限階層：4階ごとのボスを倒して「帰還／続行」を選ぶ）
 //          'cleared'（クリア・帰還）/ 'wiped'（全滅）
 (function (R) {
+  // 上位素材の表：難易度に応じて、from が難易度以下のうち一番高い段の表を使う
+  function highDropTable(dungeonId, difficulty) {
+    const list = R.DATA.difficulty.highDrops[dungeonId] || [];
+    let table = null;
+    for (const t of list) if (difficulty >= t.from) table = t.table;
+    return table;
+  }
+
   const REWARD_NAMES = { mining: '採掘', logging: '伐採', gathering: '採取', treasure: '宝箱', rest: '休憩' };
 
   class DungeonRun {
@@ -87,7 +95,7 @@
       return Math.min(D.highDropMax, D.highDropPerLevel * ((this.difficulty || 1) - 1));
     }
     _highDrop(bag) {
-      const table = this.endless ? this.def.endless.highDrops : R.DATA.difficulty.highDrops[this.dungeonId];
+      const table = this.endless ? this.def.endless.highDrops : highDropTable(this.dungeonId, this.difficulty || 1);
       const p = this.highDropChance();
       if (p <= 0 || !table) return;
       if (this.rng.chance(p)) R.Gather.addMat(bag, this.rng.weighted(table), 1);

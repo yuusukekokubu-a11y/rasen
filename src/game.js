@@ -167,10 +167,10 @@
     // すべてのダンジョンをクリアしたか（やり込み要素の解禁条件）
     allCleared() { return Object.keys(R.DATA.dungeons).filter(id => !R.DATA.dungeons[id].endless).every(id => (this.state.clears[id] || 0) > 0); },
 
-    // 難易度段階：すべてクリア後に開く。難易度Nは同じダンジョンの難易度N−1クリアで開く
+    // ステージ（難易度段階：初級・中級…）：同じダンジョンの1つ前の段をクリアすると次が開く（パズドラ式）
     maxUnlockedDifficulty(id) {
       if (!this.isUnlocked(id)) return 0;
-      if (!this.allCleared() || R.DATA.dungeons[id].endless) return 1;
+      if (R.DATA.dungeons[id].endless) return 1;
       return Math.min(R.DATA.difficulty.max, (this.state.maxDifficulty[id] || 0) + 1);
     },
 

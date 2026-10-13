@@ -195,18 +195,20 @@ test('すべてのダンジョンのデータが正しい（敵・素材・解�
   for (const e of Object.values(R.DATA.enemies)) for (const m of Object.keys(e.drops || {})) assert.ok(R.DATA.materials[m], `${e.name} の ${m}`);
 });
 
-test('難易度段階：全クリア後に開き、1つずつ上がる・敵が強くなり上位素材が出る', () => {
+test('ステージ：前の段をクリアすると次の段が開く（ダンジョンごと）・敵が強くなり上位素材が出る', () => {
   const G = R.Game;
   G.newState();
   const clear = (id, d) => { const run = G.startRun(id, d); run.phase = 'cleared'; return G.endRun(); };
-  clear('cave');
-  assert.strictEqual(G.maxUnlockedDifficulty('cave'), 1, '全クリア前は難易度1だけ');
+  assert.strictEqual(G.maxUnlockedDifficulty('cave'), 1, '最初は初級だけ');
   assert.throws(() => G.startRun('cave', 2));
-  ['forest', 'marsh', 'ruins', 'volcano', 'glacier', 'skygarden', 'abyss'].forEach(id => clear(id));
-  assert.strictEqual(G.maxUnlockedDifficulty('cave'), 2);
+  clear('cave');
+  assert.strictEqual(G.maxUnlockedDifficulty('cave'), 2, '初級クリアで中級が開く');
+  assert.strictEqual(G.maxUnlockedDifficulty('forest'), 1, 'ほかのダンジョンは初級から');
+  assert.throws(() => G.startRun('cave', 3));
   clear('cave', 2);
   assert.strictEqual(G.maxUnlockedDifficulty('cave'), 3);
-  assert.strictEqual(G.maxUnlockedDifficulty('forest'), 2);
+  for (let d = 3; d <= R.DATA.difficulty.max; d++) clear('cave', d);
+  assert.strictEqual(G.maxUnlockedDifficulty('cave'), R.DATA.difficulty.max, '上限で止まる');
   // 敵の強さ
   const r1 = new R.DungeonRun({ dungeonId: 'cave', difficulty: 1, members: R.Sim.presetMembers('starter'), rng: R.createRng(1) });
   const r3 = new R.DungeonRun({ dungeonId: 'cave', difficulty: 3, members: R.Sim.presetMembers('starter'), rng: R.createRng(1) });
@@ -217,6 +219,20 @@ test('難易度段階：全クリア後に開き、1つずつ上がる・敵が�
   assert.ok(high > 50);
   const bag1 = {}; for (let i = 0; i < 50; i++) r1._highDrop(bag1);
   assert.deepStrictEqual(bag1, {});
+  // 上位素材は「そのダンジョンの1つ上のランク」まで（洞窟の中級でランク4素材は出ない）
+  const r2 = new R.DungeonRun({ dungeonId: 'cave', difficulty: 2, members: R.Sim.presetMembers('starter'), rng: R.createRng(2) });
+  const bag2 = {}; for (let i = 0; i < 300; i++) r2._highDrop(bag2);
+  for (const m of Object.keys(bag2)) assert.ok(R.DATA.materials[m].rank <= 2, m);
+});
+
+test('上位素材の表：全ダンジョンにあり、素材がデータにある', () => {
+  for (const [id, d] of Object.entries(R.DATA.dungeons)) {
+    if (d.endless) continue;
+    const list = R.DATA.difficulty.highDrops[id];
+    assert.ok(list && list.length && list[0].from === 2, id);
+    for (const t of list) for (const m of Object.keys(t.table)) assert.ok(R.DATA.materials[m], `${id} の ${m}`);
+  }
+  assert.strictEqual(R.DATA.difficulty.stageNames.length, R.DATA.difficulty.max);
 });
 
 test('無限階層：4階ごとにボス→帰還か続行を選ぶ・深いほど強い・毎回1階から・到達階を記録', () => {

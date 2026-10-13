@@ -1,6 +1,7 @@
 // ダンジョン
 //   requires : 開くために先にクリアが必要なダンジョン（すべてクリアで開く）
-//   recommend: 出発画面に出す目安（推奨ランク・敵の傾向）
+//   rank     : そのダンジョンの基準になる装備ランク（ステージの推奨ランクの目安）
+//   recommend: 一覧に出す目安（推奨ランク・有効な属性）
 //   floors   : 4階層。battles=[最少, 最多] の戦闘数（最後の階はこの後にボス）
 //              encounters は data/enemies.js の encounters の重み付き抽選
 //              scale は敵のHP・攻撃力の倍率
@@ -12,6 +13,7 @@
   R.DATA = R.DATA || {};
   R.DATA.dungeons = {
     cave: {
+      rank: 1,
       name: '岩窟の洞', requires: [],
       recommend: '推奨ランク1〜2・雷が有効',
       floors: [
@@ -55,6 +57,7 @@
     },
 
     forest: {
+      rank: 2,
       name: '囁きの森', requires: ['cave'],
       recommend: '推奨ランク2・炎が有効',
       floors: [
@@ -93,6 +96,7 @@
     },
 
     marsh: {
+      rank: 2,
       name: '霧の沼', requires: ['cave'],
       recommend: '推奨ランク2・雷が有効',
       floors: [
@@ -131,6 +135,7 @@
     },
 
     ruins: {
+      rank: 3,
       name: '星降る遺跡', requires: ['forest', 'marsh'],
       recommend: '推奨ランク3・雷が有効',
       floors: [
@@ -170,6 +175,7 @@
 
     // 無限階層（エンドコンテンツ）：4階ごとにボス。倒すたびに「帰還／さらに潜る」を選ぶ。毎回1階から
     volcano: {
+      rank: 4,
       name: '灼熱の火山', requires: ['ruins'],
       recommend: '推奨ランク4・氷が有効',
       floors: [
@@ -208,6 +214,7 @@
     },
 
     glacier: {
+      rank: 4,
       name: '氷晶の洞', requires: ['ruins'],
       recommend: '推奨ランク4・炎が有効',
       floors: [
@@ -246,6 +253,7 @@
     },
 
     skygarden: {
+      rank: 5,
       name: '天空の庭', requires: ['volcano', 'glacier'],
       recommend: '推奨ランク4〜5・雷が有効',
       floors: [
@@ -284,6 +292,7 @@
     },
 
     abyss: {
+      rank: 6,
       name: '深淵の城', requires: ['skygarden'],
       recommend: '推奨ランク5〜6・炎と雷が有効',
       floors: [
@@ -374,25 +383,50 @@
     }
   };
 
-  // 難易度段階（すべてのダンジョンをクリアすると、各ダンジョンに難易度2・3…が開く）
-  //   難易度Nは、同じダンジョンの難易度N−1をクリアすると開く
+  // ステージ（難易度段階）：初級＝難易度1。同じダンジョンの1つ前の段をクリアすると次が開く
   R.DATA.difficulty = {
     max: 5,
-    hpPerLevel: 0.3,           // 難易度が1上がるごとの敵HPの増え方（難易度2で×1.3）
-    dmgPerLevel: 0.2,          // 難易度が1上がるごとの敵の攻撃力・ブロックの増え方
+    stageNames: ['初級', '中級', '上級', '超級', '地獄級'],
+    hpPerLevel: 0.3,           // 1段上がるごとの敵HPの増え方（中級で×1.3）
+    dmgPerLevel: 0.2,          // 1段上がるごとの敵の攻撃力・ブロックの増え方
     // 上位素材：戦闘勝利・採集・宝箱のたびに、この確率で上位素材が1つ追加で出る
-    highDropPerLevel: 0.3,     // 難易度が1上がるごとの確率（難易度2で30%、上限90%）
+    highDropPerLevel: 0.3,     // 1段上がるごとの確率（中級で30%、上限90%）
     highDropMax: 0.9,
-    // ダンジョンごとの上位素材の出やすさ
+    // ダンジョンごとの上位素材。そのダンジョンの1つ上のランクの素材が出る（超級からはさらに良い物も）
+    //   from：この段以上で使う表
     highDrops: {
-      cave:   { star_steel: 3, world_wood: 1, moon_silk: 1 },
-      forest: { world_wood: 3, star_steel: 1, moon_silk: 1 },
-      marsh:  { moon_silk: 3, world_wood: 1, star_steel: 1 },
-      ruins:  { star_steel: 2, world_wood: 2, moon_silk: 2, dragon_scale: 1, gargoyle_stone: 1, phantom_cloth: 1 },
-      volcano:   { orichalcum: 3, sky_wood: 1, cloud_silk: 1, flame_heart: 1 },
-      glacier:   { cloud_silk: 3, orichalcum: 1, sky_wood: 1, ice_heart: 1 },
-      skygarden: { adamant: 2, ebony: 2, void_silk: 2, storm_horn: 1 },
-      abyss:     { adamant: 2, ebony: 2, void_silk: 2, abyss_heart: 1, blood_gem: 1 }
+      cave: [
+        { from: 2, table: { iron_ore: 3, maple: 2, wolf_pelt: 1, spider_silk: 1 } },
+        { from: 4, table: { mithril_ore: 2, ancient_wood: 1, star_shard: 1, golem_core: 1 } }
+      ],
+      forest: [
+        { from: 2, table: { ancient_wood: 3, mithril_ore: 1, star_shard: 1, treant_bark: 1 } },
+        { from: 4, table: { ancient_wood: 2, elder_heart: 1, star_shard: 1, world_wood: 1 } }
+      ],
+      marsh: [
+        { from: 2, table: { mithril_ore: 2, ancient_wood: 1, spider_silk: 2, toad_skin: 1 } },
+        { from: 4, table: { mithril_ore: 2, queen_scale: 1, star_shard: 1, moon_silk: 1 } }
+      ],
+      ruins: [
+        { from: 2, table: { star_steel: 2, world_wood: 2, moon_silk: 2, gargoyle_stone: 1, phantom_cloth: 1 } },
+        { from: 4, table: { star_steel: 2, world_wood: 2, moon_silk: 2, dragon_scale: 1, orichalcum: 1 } }
+      ],
+      volcano: [
+        { from: 2, table: { orichalcum: 2, sky_wood: 1, fire_scale: 1, magma_core: 1 } },
+        { from: 4, table: { orichalcum: 2, sky_wood: 1, cloud_silk: 1, flame_heart: 1 } }
+      ],
+      glacier: [
+        { from: 2, table: { cloud_silk: 2, orichalcum: 1, ice_fang: 1, frost_crystal: 1 } },
+        { from: 4, table: { cloud_silk: 2, sky_wood: 1, orichalcum: 1, ice_heart: 1 } }
+      ],
+      skygarden: [
+        { from: 2, table: { adamant: 2, ebony: 2, void_silk: 2, harpy_feather: 1 } },
+        { from: 4, table: { adamant: 2, ebony: 2, void_silk: 2, storm_horn: 1 } }
+      ],
+      abyss: [
+        { from: 2, table: { adamant: 2, ebony: 2, void_silk: 2, blood_gem: 1 } },
+        { from: 4, table: { adamant: 2, ebony: 2, void_silk: 2, abyss_heart: 1 } }
+      ]
     }
   };
 

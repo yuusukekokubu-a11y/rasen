@@ -21,13 +21,13 @@
           R.UI.statLine(c.stats, ['hp', 'atk', 'def', 'mag']))))));
   }
 
-  // ===== 出発準備 =====
-  // 難易度の説明（敵の強さ・上位素材の出やすさ）
-  function difficultyText(d) {
+  // ===== 出発（パズドラ式）：①ダンジョン一覧 → ②ステージ一覧 → ③パーティを確認して出発 =====
+  const stageName = (d) => R.DATA.difficulty.stageNames[d - 1] || `難易度${d}`;
+  // ステージの中身（敵の強さ・上位素材の出やすさ）
+  function stageInfo(d) {
     const D = R.DATA.difficulty;
-    if (d <= 1) return '難易度1（通常）';
     const lv = d - 1;
-    return `難易度${d}：敵HP×${(1 + D.hpPerLevel * lv).toFixed(2)}・攻撃×${(1 + D.dmgPerLevel * lv).toFixed(2)}・上位素材${Math.round(Math.min(D.highDropMax, D.highDropPerLevel * lv) * 100)}%`;
+    return { hp: 1 + D.hpPerLevel * lv, high: Math.round(Math.min(D.highDropMax, D.highDropPerLevel * lv) * 100) };
   }
 
   // ダンジョンの顔になるドット絵（最後のボス）
@@ -37,15 +37,80 @@
     return last.boss ? R.DATA.encounters[last.boss].enemies[0] : 'icon_dungeon';
   }
 
+  // ①ダンジョン一覧：開いているものだけを、新しく開いた順（下にあるほど先に開いたもの）に並べる
+  let listTab = 'normal';
   function departScreen(el) {
-    const s = G().state;
-    const chosenDiff = {};
     if (G().run) { R.UI.show(runScreen); return; }
-    const jobs = Object.keys(R.DATA.jobs).filter(j => R.DATA.jobs[j].enabled);
-
+    const s = G().state;
     function render() {
       clear(el);
-      el.appendChild(R.UI.header('ダンジョンへ出発', () => R.UI.show(R.UI.homeScreen)));
+      el.appendChild(R.UI.header('ダンジョン', () => R.UI.show(R.UI.homeScreen)));
+      el.appendChild(h('div', { class: 'tabs' }, [['normal', 'ノーマル'], ['special', 'スペシャル']].map(([k, label]) =>
+        h('button', { class: 'tab' + (listTab === k ? ' on' : ''), onclick: () => { listTab = k; render(); } }, label))));
+      const ids = Object.keys(R.DATA.dungeons)
+        .filter(id => !!R.DATA.dungeons[id].endless === (listTab === 'special') && G().isUnlocked(id))
+        .reverse();
+      if (!ids.length) {
+        el.appendChild(h('div', { class: 'panel dungeon-card locked' },
+          R.UI.stage(listTab === 'special' ? 'spiral' : 'cave', '', h('div', { class: 'locked-label' }, '？？？')),
+          h('div', { class: 'dungeon-body muted' }, 'ノーマルをすべてクリアすると開く')));
+        return;
+      }
+      for (const id of ids) {
+        const d = R.DATA.dungeons[id];
+        const cleared = (s.clears[id] || 0) > 0;
+        const done = s.maxDifficulty[id] || 0;
+        const progress = d.endless
+          ? h('span', { class: 'dc-best' }, `最高 ${s.bestFloor[id] || 0}階`)
+          : h('span', { class: 'dc-stars', 'aria-label': `${done}段クリア` },
+            [...Array(R.DATA.difficulty.max).keys()].map(i => h('i', { class: i < done ? 'on' : '' })));
+        el.appendChild(h('button', {
+          class: 'panel dungeon-card pick', 'data-id': id,
+          onclick: () => R.UI.show(d.endless ? (e2) => partyScreen(e2, id, 1) : (e2) => stageScreen(e2, id))
+        },
+          R.UI.stage(id, '',
+            R.UI.sprite(dungeonSprite(d), 64, { extraClass: 'boss' }),
+            h('div', { class: 'dc-text' },
+              h('div', { class: 'dungeon-name' }, d.name),
+              h('div', { class: 'dungeon-meta' }, d.recommend)),
+            !cleared && !d.endless ? h('span', { class: 'badge-new' }, 'NEW') : null),
+          h('div', { class: 'dungeon-foot' }, progress, h('span', { class: 'dc-go' }, '▶'))));
+      }
+    }
+    render();
+  }
+
+  // ②ステージ一覧：初級・中級…（前の段をクリアすると次が開く）
+  function stageScreen(el, id) {
+    const s = G().state;
+    const d = R.DATA.dungeons[id];
+    clear(el);
+    el.appendChild(R.UI.header(d.name, () => R.UI.show(departScreen), d.recommend));
+    el.appendChild(R.UI.stage(id, 'stage-head', R.UI.sprite(dungeonSprite(d), 72, { extraClass: 'boss' })));
+    const max = G().maxUnlockedDifficulty(id);
+    const done = s.maxDifficulty[id] || 0;
+    for (let lv = max; lv >= 1; lv--) {
+      const info = stageInfo(lv);
+      const rank = Math.min(R.DATA.equipment.rankStats.weapon.main.length, (d.rank || 1) + lv - 1);
+      el.appendChild(h('button', { class: 'stage-row' + (lv <= done ? ' cleared' : ''), 'data-lv': lv, onclick: () => R.UI.show((e2) => partyScreen(e2, id, lv)) },
+        h('span', { class: 'stage-name' }, stageName(lv)),
+        h('span', { class: 'stage-chips' },
+          h('span', { class: 'chip' }, `推奨R${rank}`),
+          lv > 1 ? h('span', { class: 'chip' }, `敵×${info.hp.toFixed(1)}`) : null,
+          lv > 1 ? h('span', { class: 'chip rare' }, `上位素材${info.high}%`) : null),
+        lv <= done ? h('span', { class: 'stage-clear' }, 'CLEAR') : h('span', { class: 'badge-new' }, 'NEW')));
+    }
+  }
+
+  // ③パーティを確認して出発
+  function partyScreen(el, id, lv) {
+    const s = G().state;
+    const d = R.DATA.dungeons[id];
+    const jobs = Object.keys(R.DATA.jobs).filter(j => R.DATA.jobs[j].enabled);
+    const back = () => R.UI.show(d.endless ? departScreen : (e2) => stageScreen(e2, id));
+    function render() {
+      clear(el);
+      el.appendChild(R.UI.header(d.name, back, d.endless ? `最高 ${s.bestFloor[id] || 0}階` : stageName(lv)));
       el.appendChild(h('h2', null, 'パーティ（3人）'));
       el.appendChild(R.UI.jobPicker(jobs, s.party, (j, on) => {
         if (on) { if (s.party.length < 3) s.party.push(j); }
@@ -61,51 +126,20 @@
         el.appendChild(h('h2', null, `持ち込みアイテム（${s.bring.length}/${slots}）`));
         if (!s.consumables.length) el.appendChild(h('div', { class: 'muted' }, 'なし'));
         el.appendChild(h('div', { class: 'items-pick' }, s.consumables.map(c => {
-          const d = R.DATA.items[c.id];
+          const it = R.DATA.items[c.id];
           const on = s.bring.includes(c.uid);
           return h('label', null,
             h('input', { type: 'checkbox', checked: on, disabled: !on && s.bring.length >= slots, onchange: (ev) => {
               if (ev.target.checked) s.bring.push(c.uid); else s.bring = s.bring.filter(u => u !== c.uid);
               render();
             } }),
-            `${d.name}（${R.DATA.config.quality[c.quality || 'normal'].name}）：${d.desc}`);
+            `${it.name}（${R.DATA.config.quality[c.quality || 'normal'].name}）：${it.desc}`);
         })));
       }
-
-      el.appendChild(h('h2', null, 'ダンジョン'));
-      el.appendChild(h('div', { class: 'muted' }, '全滅すると素材と持ち込みを失う'));
-      for (const [id, d] of Object.entries(R.DATA.dungeons)) {
-        const open = G().isUnlocked(id);
-        const clears = s.clears[id] || 0;
-        if (!open) {
-          const need = (d.requires || []).filter(r => !(s.clears[r] > 0)).map(r => R.DATA.dungeons[r].name);
-          el.appendChild(h('div', { class: 'panel dungeon-card locked' },
-            R.UI.stage(id, '', h('div', { class: 'locked-label' }, '？？？')),
-            h('div', { class: 'dungeon-body' }, h('div', { class: 'muted' }, `${need.join('と')}をクリアすると開く`))));
-          continue;
-        }
-        const maxD = G().maxUnlockedDifficulty(id);
-        if (!chosenDiff[id] || chosenDiff[id] > maxD) chosenDiff[id] = maxD > 1 ? (s.maxDifficulty[id] || 1) : 1;
-        const best = s.maxDifficulty[id] || 0;
-        const meta = [
-          clears ? `${d.endless ? '帰還' : 'クリア'} ${clears}回` : (d.endless ? '' : '未クリア'),
-          best > 1 ? `最高難易度${best}` : '',
-          d.endless ? `最高到達 ${s.bestFloor[id] || 0}階` : ''
-        ].filter(Boolean).join('・');
-        el.appendChild(h('div', { class: 'panel dungeon-card' },
-          R.UI.stage(id, '',
-            R.UI.sprite(dungeonSprite(d), 64, { extraClass: 'boss' }),
-            h('div', null,
-              h('div', { class: 'dungeon-name' }, d.name),
-              h('div', { class: 'dungeon-meta' }, [d.recommend, meta].filter(Boolean).join('　')))),
-          h('div', { class: 'dungeon-body' },
-            maxD > 1 ? h('div', { class: 'row' }, '難易度',
-              h('select', { id: 'diff-' + id, onchange: (e) => { chosenDiff[id] = Number(e.target.value); render(); } },
-                [...Array(maxD).keys()].map(i => h('option', { value: i + 1, selected: i + 1 === chosenDiff[id] }, String(i + 1)))),
-              h('span', { class: 'muted' }, difficultyText(chosenDiff[id]))) : null,
-            h('button', { class: 'primary', disabled: s.party.length !== 3, onclick: () => { G().startRun(id, chosenDiff[id]); R.UI.show(runScreen); } },
-              s.party.length === 3 ? '出発する' : 'パーティを3人選んでください'))));
-      }
+      el.appendChild(h('div', { class: 'action-bar' },
+        h('div', { class: 'muted center' }, '全滅すると素材と持ち込みを失う'),
+        h('button', { class: 'primary', disabled: s.party.length !== 3, onclick: () => { G().startRun(id, lv); R.UI.show(runScreen); } },
+          s.party.length === 3 ? '出発' : 'パーティを3人選んでください')));
     }
     render();
   }
@@ -174,14 +208,18 @@
     } else {
       // クリア・全滅
       const cleared = run.phase === 'cleared';
+      const prevMax = G().maxUnlockedDifficulty(run.dungeonId);
       const res = G().endRun();
+      const nowMax = G().maxUnlockedDifficulty(run.dungeonId);
       area.appendChild(h('div', { class: 'panel' },
         h('div', { class: 'result ' + (cleared ? 'result-win' : 'result-lose') }, cleared ? (res.deepest ? '無事に帰還した！' : 'ダンジョンクリア！') : '全滅してしまった…'),
         res.deepest ? h('div', { class: res.newRecord ? 'good' : '' }, `到達：${res.deepest}階` + (res.newRecord ? '（最高記録を更新！）' : '')) : null,
         cleared ? h('div', null, '持ち帰った素材：' + matText(res.bag)) : h('div', null, '失った素材：' + matText(res.lost)),
-        cleared && res.newlyUnlocked.length ? h('div', { class: 'good' }, `新しいダンジョンが開いた：${res.newlyUnlocked.map(i => R.DATA.dungeons[i].name).join('・')}`) : null,
-        cleared && res.allClearedNow ? h('div', { class: 'good' }, 'すべてのダンジョンをクリアした！ 各ダンジョンで難易度2に挑めるようになった') : null,
-        h('button', { class: 'primary', onclick: () => R.UI.show(R.UI.homeScreen) }, '拠点へ戻る')));
+        cleared && nowMax > prevMax ? h('div', { class: 'good' }, `「${stageName(nowMax)}」が開いた`) : null,
+        cleared && res.newlyUnlocked.length ? h('div', { class: 'good' }, `新しいダンジョン：${res.newlyUnlocked.map(i => R.DATA.dungeons[i].name).join('・')}`) : null,
+        h('div', { class: 'row' },
+          h('button', { class: 'primary', onclick: () => R.UI.show(departScreen) }, 'ダンジョン一覧へ'),
+          h('button', { onclick: () => R.UI.show(R.UI.homeScreen) }, '拠点へ'))));
     }
   }
 
