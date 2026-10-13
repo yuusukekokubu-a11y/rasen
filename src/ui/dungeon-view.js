@@ -70,7 +70,7 @@
           onclick: () => R.UI.show(d.endless ? (e2) => partyScreen(e2, id, 1) : (e2) => stageScreen(e2, id))
         },
           R.UI.stage(id, '',
-            R.UI.sprite(dungeonSprite(d), 64, { extraClass: 'boss' }),
+            R.UI.enemyFigure(dungeonSprite(d), 64, { extraClass: 'boss', embers: false }),
             h('div', { class: 'dc-text' },
               h('div', { class: 'dungeon-name' }, d.name),
               h('div', { class: 'dungeon-meta' }, d.recommend)),
@@ -87,7 +87,7 @@
     const d = R.DATA.dungeons[id];
     clear(el);
     el.appendChild(R.UI.header(d.name, () => R.UI.show(departScreen)));
-    el.appendChild(R.UI.stage(id, 'stage-head', R.UI.sprite(dungeonSprite(d), 72, { extraClass: 'boss' })));
+    el.appendChild(R.UI.stage(id, 'stage-head', R.UI.enemyFigure(dungeonSprite(d), 84, { extraClass: 'boss' })));
     const max = G().maxUnlockedDifficulty(id);
     const done = s.maxDifficulty[id] || 0;
     for (let lv = max; lv >= 1; lv--) {
@@ -197,7 +197,7 @@
     if (run.phase === 'battle') {
       const enc = R.DATA.encounters[run.currentEncounterId()];
       area.appendChild(h('div', { class: 'panel next-battle' + (enc.boss ? ' boss' : '') },
-        h('div', { class: 'next-foes' }, enc.enemies.map(e => R.UI.sprite(e, enc.boss ? 72 : 56))),
+        h('div', { class: 'next-foes' }, enc.enemies.map(e => R.UI.enemyFigure(e, enc.boss ? 80 : 60, { embers: false }))),
         h('div', { class: 'next-name' }, enc.boss ? `ボス：${enc.name}` : enc.name),
         h('button', { class: 'primary', onclick: () => startBattle(el) }, '戦う')));
     } else if (run.phase === 'checkpoint') {

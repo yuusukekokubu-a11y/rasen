@@ -229,7 +229,13 @@ test('ドット絵のデータが正しい（16×16か32×32・使っている�
     if (sp.small) { check(id + '(small)', sp.small); assert.strictEqual(sp.small.rows.length, 16, id); }
   }
   for (const id of Object.keys(R.DATA.jobs)) assert.ok(R.DATA.sprites[id], id);
-  for (const id of Object.keys(R.DATA.enemies)) assert.ok(R.DATA.sprites[id], id);
+  for (const [id, e] of Object.entries(R.DATA.enemies)) if (!e.variantOf) assert.ok(R.DATA.sprites[id], id);
+  // 影絵：すべての敵に形があり、形のデータがそろっている
+  for (const id of Object.keys(R.DATA.enemies)) {
+    const a = R.DATA.enemyArt[id];
+    assert.ok(a && R.DATA.silhouettes[a.shape] && a.rim && a.eye, 'art ' + id);
+  }
+  for (const [k, sh] of Object.entries(R.DATA.silhouettes)) assert.ok(sh.vb && sh.body.length && sh.eyes.length, k);
 });
 
 test('全カード（強化版も）：自動で戦わせてもエラーにならず、戦闘が終わる', () => {
@@ -243,4 +249,13 @@ test('全カード（強化版も）：自動で戦わせてもエラーにな�
       assert.ok(c.result, `${id}${upgraded ? '+' : ''} の戦闘が終わらない`);
     }
   }
+});
+
+test('強化版の敵：もとの敵の行動を使い、数値が上がっている', () => {
+  const w = R.DATA.enemies.wolf, s = R.DATA.enemies.wolf_s;
+  assert.strictEqual(s.name, '強・魔狼');
+  assert.ok(s.hp[0] > w.hp[0] && s.moves.claw.dmg > w.moves.claw.dmg);
+  assert.deepStrictEqual(Object.keys(s.moves), Object.keys(w.moves));
+  assert.strictEqual(w.moves.claw.dmg, 14); // もとの敵は変わらない
+  for (const enc of Object.values(R.DATA.encounters)) for (const id of enc.enemies) assert.ok(R.DATA.enemies[id], id);
 });

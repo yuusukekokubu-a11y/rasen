@@ -428,7 +428,7 @@ button.primary .menu-desc { color: #4a3610; }
 .hand-grid .card { min-height: 112px; font-size: 10.5px; }
 .hand-grid .card-type { display: none; }
 .combat > .battle-stage { height: 196px; }
-.battle-stage .enemy.boss .enemy-sprite { width: 84px !important; height: 84px !important; }
+.battle-stage .enemy.boss .enemy-sprite { width: 116px !important; height: 116px !important; }
 .hand-grid .card-art { height: 36px; }
 .hand-grid .card-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hand-grid .choice-card .card { height: 100%; }
@@ -473,8 +473,8 @@ button.primary .menu-desc { color: #4a3610; }
   .topbar h1 { font-size: var(--fs); }
   .back-btn { width: 30px; height: 30px; }
   .combat > .battle-stage { min-height: 150px; }
-  .battle-stage .enemy-sprite { width: 60px !important; height: 60px !important; }
-  .battle-stage .enemy.boss .enemy-sprite { width: 80px !important; height: 80px !important; }
+  .battle-stage .enemy-sprite { width: 72px !important; height: 72px !important; }
+  .battle-stage .enemy.boss .enemy-sprite { width: 104px !important; height: 104px !important; }
   .hand-grid .card { min-height: 108px; }
   .party .chips .chip { padding-top: 0; padding-bottom: 0; }
   .party .char { padding: 1px 4px; }
@@ -516,7 +516,7 @@ button.primary .menu-desc { color: #4a3610; }
 .enemy-sprite { animation: idle 1.3s steps(2, jump-none) infinite alternate; transform-origin: 50% 100%; }
 .enemy:nth-child(2) .enemy-sprite { animation-delay: -.45s; }
 .enemy:nth-child(3) .enemy-sprite { animation-delay: -.9s; }
-.e-bat .enemy-sprite, .e-hornet .enemy-sprite, .e-wisp .enemy-sprite, .e-phantom .enemy-sprite, .e-gargoyle .enemy-sprite { animation: fly .9s ease-in-out infinite alternate; }
+.e-bat .enemy-sprite, .e-hornet .enemy-sprite, .e-wisp .enemy-sprite, .e-phantom .enemy-sprite, .e-gargoyle .enemy-sprite, .e-moth .enemy-sprite, .e-fairy .enemy-sprite, .e-harpy .enemy-sprite, .e-cloud .enemy-sprite { animation: fly .9s ease-in-out infinite alternate; }
 .e-slime .enemy-sprite, .e-toad .enemy-sprite { animation: squish .8s steps(2, jump-none) infinite alternate; }
 .enemy.boss .enemy-sprite { animation: breathe 1.6s steps(3, jump-none) infinite alternate; }
 .enemy.hit .enemy-sprite { animation: hit .35s; }
@@ -595,3 +595,13 @@ button.primary .menu-desc { color: #4a3610; }
 .unique-name { color: var(--gold-hi); text-shadow: 0 0 6px #e2bd6688, var(--outline); }
 /* 当たった・前に出る演出は、待機の揺れの時計（animation-delay）に合わせない */
 .enemy.hit .enemy-sprite, .enemy.lunge .enemy-sprite { animation-delay: 0s !important; }
+
+/* 敵の影絵：火の粉がゆっくり舞い上がる */
+.enemy-art .ember { animation: ember-rise 4s ease-in-out infinite; }
+@keyframes ember-rise { 0% { transform: translateY(6px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-22px); opacity: 0; } }
+
+/* 影絵の敵：なめらかに動かす（ドット絵用の2コマ切り替えにしない） */
+.enemy .enemy-art.enemy-sprite { filter: none; animation-timing-function: ease-in-out; }
+.enemy.hit .enemy-art.enemy-sprite { animation-timing-function: ease; }
+.enemy.lunge .enemy-art.enemy-sprite { animation-timing-function: ease; }
+.enemy-art { display: block; flex-shrink: 0; }

@@ -633,6 +633,54 @@
     mimic_gold:        { name: 'ミミック＋黄金スライム', enemies: ['mimic', 'gold_slime'] },
     mimic_pair:        { name: 'ミミック×2', enemies: ['mimic', 'mimic'] },
     boss_mimic:        { name: '【ボス】大ミミック', enemies: ['mimic_king'], boss: true },
-    boss_chimera:      { name: '【ボス】キメラ', enemies: ['chimera'], boss: true }
+    boss_chimera:      { name: '【ボス】キメラ', enemies: ['chimera'], boss: true },
+    // 強化版（螺旋の塔の深い階）
+    s_wolf_pair:       { name: '強・魔狼×2', enemies: ['wolf_s', 'wolf_s'] },
+    s_spider_wolf:     { name: '強・大蜘蛛＋強・魔狼', enemies: ['spider_s', 'wolf_s'] },
+    s_gargoyle_phantom:{ name: '強・ガーゴイル＋強・亡霊騎士', enemies: ['gargoyle_s', 'phantom_s'] },
+    s_salamander_pair: { name: '強・火蜥蜴×2', enemies: ['salamander_s', 'salamander_s'] },
+    s_yeti_single:     { name: '強・雪男', enemies: ['yeti_s'] },
+    s_griffin_single:  { name: '強・グリフォン', enemies: ['griffin_s'] },
+    s_vampire_single:  { name: '強・吸血鬼', enemies: ['vampire_s'] },
+    x_wolf_pair:       { name: '極・魔狼×2', enemies: ['wolf_x', 'wolf_x'] },
+    x_knight_phantom:  { name: '極・死の騎士＋極・亡霊騎士', enemies: ['death_knight_x', 'phantom_x'] },
+    x_vampire_mage:    { name: '極・吸血鬼＋極・闇の魔導士', enemies: ['vampire_x', 'dark_mage_x'] },
+    x_sky_knight_pair: { name: '極・天空騎士×2', enemies: ['sky_knight_x', 'sky_knight_x'] },
+    x_golem_single:    { name: '極・溶岩巨人', enemies: ['lava_golem_x'] }
   };
+
+  // 強化版の敵：もとの敵の姿と行動を使い回し、数値だけ上げる（名前は「強・魔狼」のように頭に付く）
+  //   hp : HP（と回復）の倍率   dmg : 攻撃・ブロック・攻撃力アップの倍率
+  //   rim / eye : 影絵の縁の光と目の色（data/silhouettes.js で使う）
+  R.DATA.enemyVariants = {
+    wolf_s:         { base: 'wolf',         rank: '強', hp: 2.35, dmg: 1.8, rim: '#ff3a5a', eye: '#ffffff' },
+    spider_s:       { base: 'spider',       rank: '強', hp: 2.95, dmg: 2.15, rim: '#c84aff', eye: '#ffe07a' },
+    gargoyle_s:     { base: 'gargoyle',     rank: '強', hp: 1.8, dmg: 1.5, rim: '#ff7a3a', eye: '#fff27a' },
+    phantom_s:      { base: 'phantom',      rank: '強', hp: 1.8, dmg: 1.5, rim: '#ff5a8a', eye: '#ffffff' },
+    salamander_s:   { base: 'salamander',   rank: '強', hp: 1.45, dmg: 1.25, rim: '#5ad8ff', eye: '#ffffff' },
+    yeti_s:         { base: 'yeti',         rank: '強', hp: 1.8, dmg: 1.45, rim: '#ff8a5a', eye: '#ff3a2a' },
+    griffin_s:      { base: 'griffin',      rank: '強', hp: 1.6, dmg: 1.35, rim: '#7affc8', eye: '#ffffff' },
+    vampire_s:      { base: 'vampire',      rank: '強', hp: 2.35, dmg: 1.8, rim: '#ffd04a', eye: '#ff2a3a' },
+    wolf_x:         { base: 'wolf',         rank: '極', hp: 2.5, dmg: 1.9, rim: '#ffe07a', eye: '#ff2a2a' },
+    phantom_x:      { base: 'phantom',      rank: '極', hp: 1.95, dmg: 1.55, rim: '#ff3a3a', eye: '#ffe07a' },
+    death_knight_x: { base: 'death_knight', rank: '極', hp: 1.55, dmg: 1.35, rim: '#ffa82a', eye: '#ffffff' },
+    vampire_x:      { base: 'vampire',      rank: '極', hp: 2.55, dmg: 1.95, rim: '#e8e0ff', eye: '#ff2a3a' },
+    dark_mage_x:    { base: 'dark_mage',    rank: '極', hp: 1.3, dmg: 1.2, rim: '#5aff8a', eye: '#ffffff' },
+    sky_knight_x:   { base: 'sky_knight',   rank: '極', hp: 1.85, dmg: 1.5, rim: '#ff5aff', eye: '#ffffff' },
+    lava_golem_x:   { base: 'lava_golem',   rank: '極', hp: 2.2, dmg: 1.7, rim: '#ffffff', eye: '#ff3a2a' }
+  };
+  for (const [id, v] of Object.entries(R.DATA.enemyVariants)) {
+    const b = R.DATA.enemies[v.base];
+    const up = (n, k) => Math.round(n * k);
+    const moves = {};
+    for (const [mk, m] of Object.entries(b.moves)) {
+      const c = Object.assign({}, m);
+      for (const key of ['dmg', 'block', 'str', 'allyBlock']) if (c[key]) c[key] = up(c[key], v.dmg);
+      if (c.heal) c.heal = up(c.heal, v.hp);
+      moves[mk] = c;
+    }
+    R.DATA.enemies[id] = Object.assign({}, b, {
+      name: `${v.rank}・${b.name}`, hp: b.hp.map(n => up(n, v.hp)), moves, variantOf: v.base, soul: undefined
+    });
+  }
 })(globalThis.RASEN = globalThis.RASEN || {});

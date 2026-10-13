@@ -172,13 +172,13 @@
       const enemies = h('div', { class: 'enemies', style: { gridTemplateColumns: `repeat(${combat.enemies.length}, minmax(0, 1fr))` } }, combat.enemies.map(e => {
         const info = e.alive ? combat.intentInfo(e) : null;
         const el = h('button', {
-          class: 'enemy e-' + e.id + (e.alive ? '' : ' dead') + (e.index === target && e.alive ? ' targeted' : '') + (e.boss ? ' boss' : ''),
+          class: 'enemy e-' + e.id + (R.DATA.enemyArt[e.id] ? ' e-' + R.DATA.enemyArt[e.id].shape : '') + (e.alive ? '' : ' dead') + (e.index === target && e.alive ? ' targeted' : '') + (e.boss ? ' boss' : ''),
           disabled: !e.alive, 'aria-label': `${e.name}を狙う`,
           onclick: () => { if (e.alive) { target = e.index; render(); } }
         },
           info ? h('div', { class: 'intent ' + info.kinds.map(k => 'in-' + k).join(' '), title: info.name }, info.text) : h('div', { class: 'intent' }, '撃破'),
           h('div', { class: 'target-mark' }, '▼'),
-          steady(R.UI.sprite(e.id, e.boss ? 104 : (combat.enemies.length >= 3 ? 64 : 76), { extraClass: 'enemy-sprite' }), e.index * 450),
+          steady(R.UI.enemyFigure(e.id, e.boss ? 120 : (combat.enemies.length >= 3 ? 76 : 92), { extraClass: 'enemy-sprite' }), e.index * 450),
           h('div', { class: 'enemy-shadow' }),
           h('div', { class: 'enemy-name' }, e.name),
           bar(e.hp, e.maxHp, 'hp'),

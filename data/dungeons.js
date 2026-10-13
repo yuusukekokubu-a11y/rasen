@@ -345,7 +345,9 @@
           { from: 9,  encounters: { gargoyle_phantom: 2, phantom_doll: 2, gargoyle_pair: 1, treant_pair: 1, toad_trio: 1 } },
           { from: 13, encounters: { salamander_imp: 2, golem_imp: 1, ice_wolf_fairy: 2, crystal_fairy: 1, yeti_single: 1 } },
           { from: 17, encounters: { griffin_harpy: 2, knight_cloud: 2, harpy_trio: 1, yeti_crystal: 1 } },
-          { from: 21, encounters: { knight_mage: 2, vampire_mage: 2, shadow_trio: 1, knight_pair: 1 } }
+          { from: 21, encounters: { knight_mage: 2, vampire_mage: 2, shadow_trio: 1, knight_pair: 1 } },
+          { from: 25, encounters: { s_wolf_pair: 2, s_spider_wolf: 2, s_gargoyle_phantom: 2, s_salamander_pair: 1, s_yeti_single: 1, s_griffin_single: 1, s_vampire_single: 1, knight_mage: 1 } },
+          { from: 33, encounters: { x_wolf_pair: 1, x_knight_phantom: 2, x_vampire_mage: 2, x_sky_knight_pair: 1, x_golem_single: 1, s_gargoyle_phantom: 1 } }
         ],
         bosses: ['boss_golem', 'boss_elder', 'boss_queen', 'boss_dragon', 'boss_flame', 'boss_ice', 'boss_storm', 'boss_abyss'], // 4階・8階・12階…の順にくり返す
         highDropPerFloor: 0.05,  // 1階深くなるごとの上位素材の確率（上限 highDropMax）
