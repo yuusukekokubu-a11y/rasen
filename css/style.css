@@ -593,3 +593,5 @@ button.primary .menu-desc { color: #4a3610; }
 .deck-diff > div > .bad, .deck-diff > div > .good { margin-bottom: 10px; font-weight: 800; }
 /* 専用装備（ボスの魂で作るランク7）の名前 */
 .unique-name { color: var(--gold-hi); text-shadow: 0 0 6px #e2bd6688, var(--outline); }
+/* 当たった・前に出る演出は、待機の揺れの時計（animation-delay）に合わせない */
+.enemy.hit .enemy-sprite, .enemy.lunge .enemy-sprite { animation-delay: 0s !important; }

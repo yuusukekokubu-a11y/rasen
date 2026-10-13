@@ -61,6 +61,14 @@
     return el;
   }
 
+  // 待機の揺れを、画面全体で共通の時計に合わせる
+  // （戦闘画面は行動のたびに描き直すので、そのままだと揺れが毎回最初からになりカクっと見える）
+  function steady(el, offset) {
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    el.style.animationDelay = `${-Math.round(now + (offset || 0))}ms`;
+    return el;
+  }
+
   function statusList(st) {
     const out = [];
     for (const k of ['weak', 'vulnerable', 'burn', 'freeze', 'shock']) {
@@ -170,7 +178,7 @@
         },
           info ? h('div', { class: 'intent ' + info.kinds.map(k => 'in-' + k).join(' '), title: info.name }, info.text) : h('div', { class: 'intent' }, '撃破'),
           h('div', { class: 'target-mark' }, '▼'),
-          R.UI.sprite(e.id, e.boss ? 104 : (combat.enemies.length >= 3 ? 64 : 76), { extraClass: 'enemy-sprite' }),
+          steady(R.UI.sprite(e.id, e.boss ? 104 : (combat.enemies.length >= 3 ? 64 : 76), { extraClass: 'enemy-sprite' }), e.index * 450),
           h('div', { class: 'enemy-shadow' }),
           h('div', { class: 'enemy-name' }, e.name),
           bar(e.hp, e.maxHp, 'hp'),
@@ -202,7 +210,7 @@
           const st = combat.currentStats(c.index);
           const pws = combat.powers.filter(p => p.owner === c.index).map(p => R.DATA.powers[p.id].name);
           return h('div', { class: 'char owner-' + c.index, title: pws.length ? 'パワー：' + pws.join('・') : null },
-            R.UI.sprite(c.job, 32),
+            steady(R.UI.sprite(c.job, 32), c.index * 350),
             h('div', { class: 'char-body' },
               h('div', { class: 'char-name' }, c.name, pws.length ? h('span', { class: 'pw-dot' }, ` ◆${pws.length}`) : null),
               R.UI.statLine(st)));

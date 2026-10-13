@@ -44,27 +44,106 @@
       }
     },
 
-    // 新しく増えた職業（データに後から足した職業）に初期装備を配る
+    // セーブデータの修復：ゲームを更新してデータ（装備・カード・素材・ダンジョンのID）が変わっても、
+    // 読めなくなった所だけを直して続きから遊べるようにする。直した内容の一覧を返す（テスト・確認用）
     migrate() {
       const s = this.state;
-      for (const job of Object.keys(R.DATA.jobs)) {
-        if (R.DATA.jobs[job].enabled && !s.equipped[job]) this.giveStarter(job);
+      const D = R.DATA;
+      const fixes = [];
+      const fresh = (() => { const keep = this.state; const n = this.newState(); this.state = keep; return n; })();
+      // 足りない項目を補う
+      for (const k of Object.keys(fresh)) {
+        if (k !== 'run' && (s[k] === undefined || s[k] === null)) { s[k] = fresh[k]; fixes.push(`項目 ${k} を補った`); }
       }
-      for (const k of Object.keys(R.Life.LIVES)) if (!s.life[k]) s.life[k] = { lv: 1, exp: 0 };
-      if (!s.maxDifficulty) s.maxDifficulty = {};
-      if (!s.bestFloor) s.bestFloor = {};
-      if (!s.settings) s.settings = { debug: false };
+      for (const k of ['equipped', 'materials', 'life', 'clears', 'maxDifficulty', 'bestFloor', 'settings']) if (typeof s[k] !== 'object' || Array.isArray(s[k])) { s[k] = fresh[k]; fixes.push(`項目 ${k} を作り直した`); }
+      for (const k of ['items', 'tools', 'consumables', 'bring', 'party']) if (!Array.isArray(s[k])) { s[k] = fresh[k]; fixes.push(`項目 ${k} を作り直した`); }
+
+      // 装備品：元の品がなくなった物は捨てる。カード・付与効果・パワーがなくなっていたら付け直す
+      const rng = R.createRng();
+      s.items = s.items.filter(it => {
+        const base = it && D.equipment.bases[it.base];
+        if (!base) { fixes.push(`装備 ${it && it.base} を取り除いた`); return false; }
+        if (!D.cards[it.randomCard]) {
+          const pool = Object.keys(D.cards).filter(id => D.cards[id].pool === base.type);
+          it.randomCard = pool.length ? rng.pick(pool) : base.fixedCard;
+          fixes.push(`${base.name} のランダムカードを付け直した`);
+        }
+        if (!Array.isArray(it.slots)) it.slots = [];
+        it.slots = it.slots.filter(sl => sl && (sl.kind === 'stat' ? D.equipment.statRolls[sl.stat] : D.enchants.list[sl.id]));
+        if (!D.config.quality[it.quality]) it.quality = 'normal';
+        if (base.slot === 'accessory' && (!it.power || !D.cards[it.power])) {
+          it.power = R.Craft.rollAccessoryPower(1, rng);
+          fixes.push(`${base.name} のパワーを付け直した`);
+        }
+        return true;
+      });
+      for (const it of s.items) if (typeof it.uid !== 'number') it.uid = undefined;
+      s.nextUid = Math.max(s.nextUid || 1, ...s.items.map(it => (it.uid || 0) + 1));
+      for (const it of s.items) if (it.uid === undefined) it.uid = s.nextUid++;
+      const uids = new Set(s.items.map(it => it.uid));
+      s.nextUid = Math.max(s.nextUid || 1, ...s.items.map(it => (it.uid || 0) + 1), ...s.consumables.map(c => (c.uid || 0) + 1));
+
+      // 職業：新しく増えた職業に初期装備を配る。装備欄から、なくなった装備を外す
+      for (const job of Object.keys(s.equipped)) if (!D.jobs[job]) { delete s.equipped[job]; fixes.push(`職業 ${job} を取り除いた`); }
+      for (const job of Object.keys(D.jobs)) {
+        if (D.jobs[job].enabled && !s.equipped[job]) this.giveStarter(job);
+      }
+      for (const eq of Object.values(s.equipped)) {
+        for (const slot of Object.keys(eq)) if (!R.Gear.SLOTS.includes(slot) || !uids.has(eq[slot])) delete eq[slot];
+      }
+      s.party = s.party.filter((j, i, a) => D.jobs[j] && D.jobs[j].enabled && a.indexOf(j) === i);
+      const jobs = Object.keys(D.jobs).filter(j => D.jobs[j].enabled);
+      for (const j of jobs) if (s.party.length < 3 && !s.party.includes(j)) s.party.push(j);
+
+      // 素材・道具・持ち込みアイテム
+      for (const [m, n] of Object.entries(s.materials)) {
+        if (!D.materials[m]) { delete s.materials[m]; fixes.push(`素材 ${m} を取り除いた`); continue; }
+        if (typeof n !== 'number' || !(n >= 0)) s.materials[m] = 0;
+      }
+      s.tools = s.tools.filter(t => D.equipment.tools[t]);
+      s.consumables = s.consumables.filter(c => c && D.items[c.id]);
+      const cu = new Set(s.consumables.map(c => c.uid));
+      s.bring = s.bring.filter((u, i, a) => cu.has(u) && a.indexOf(u) === i).slice(0, D.config.combat.itemSlots);
+
+      // 生産・採集のLv
+      for (const k of Object.keys(R.Life.LIVES)) {
+        const l = s.life[k];
+        if (!l || typeof l.lv !== 'number') s.life[k] = { lv: 1, exp: 0 };
+        else l.lv = Math.max(1, Math.min(D.config.life.maxLv, l.lv));
+      }
+
+      // ダンジョンの記録：なくなったダンジョンは消し、段は上限におさめる
+      for (const rec of ['clears', 'maxDifficulty', 'bestFloor']) {
+        for (const id of Object.keys(s[rec])) if (!D.dungeons[id]) { delete s[rec][id]; fixes.push(`記録 ${id} を取り除いた`); }
+      }
       for (const [id, n] of Object.entries(s.clears)) if (n > 0 && !s.maxDifficulty[id]) s.maxDifficulty[id] = 1;
-      s.party = s.party.filter(j => R.DATA.jobs[j] && R.DATA.jobs[j].enabled);
+      for (const id of Object.keys(s.maxDifficulty)) s.maxDifficulty[id] = Math.min(D.difficulty.max, s.maxDifficulty[id]);
+
+      // 中断中のダンジョン：読めなければ、拾った素材を持ち物に戻して中断を取り消す
+      if (s.run) {
+        const r = s.run;
+        const ok = r && D.dungeons[r.dungeonId] && Array.isArray(r.plan) && r.plan.every(f => Array.isArray(f) && f.every(e => D.encounters[e]))
+          && (r.difficulty || 1) <= D.difficulty.max;
+        if (!ok) {
+          if (r && r.bag) for (const [m, n] of Object.entries(r.bag)) if (D.materials[m]) s.materials[m] = (s.materials[m] || 0) + n;
+          s.run = null;
+          fixes.push('中断中のダンジョンを取り消した（拾った素材は持ち物へ）');
+        }
+      }
+      s.version = VERSION;
+      return fixes;
     },
 
     load() {
       let data = null;
+      let raw = null;
       try {
-        const raw = globalThis.localStorage && localStorage.getItem(SAVE_KEY);
+        raw = globalThis.localStorage && localStorage.getItem(SAVE_KEY);
         if (raw) data = JSON.parse(raw);
       } catch (e) { data = null; }
-      if (data && data.version === VERSION) {
+      if (data && typeof data === 'object') {
+        // 直す前のセーブを予備として残す（万一の取り戻し用）
+        try { if (raw && globalThis.localStorage) localStorage.setItem(SAVE_KEY + '-backup', raw); } catch (e) { /* 何もしない */ }
         this.state = data;
         try { this.migrate(); } catch (e) { this.newState(); }
       } else {

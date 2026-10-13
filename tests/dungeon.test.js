@@ -345,3 +345,44 @@ test('ボスの魂：超級・地獄級とボスラッシュで出る（初級�
   }
   assert.ok(souls > 5 && souls < 35, `魂 ${souls}`);
 });
+
+test('セーブの修復：データが変わっても、読めない所だけ直して続きから遊べる', () => {
+  const G = R.Game;
+  G.newState();
+  const s = G.state;
+  // 古い・壊れたデータを混ぜる
+  s.items.push({ uid: 999, base: 'old_removed_sword', randomCard: 'x', slots: [] });
+  const sword = s.items.find(it => it.base === 'copper_sword');
+  sword.randomCard = 'removed_card';
+  sword.slots = [{ kind: 'enchant', id: 'removed_enchant' }, { kind: 'stat', stat: 'atk', value: 1 }];
+  s.equipped.swordsman.weapon = 999;
+  s.materials.removed_mat = 5;
+  s.materials.copper_ore = 'abc';
+  s.tools.push('removed_tool');
+  s.party = ['swordsman', 'removed_job'];
+  s.clears.removed_dungeon = 3;
+  delete s.bestFloor;
+  s.run = { dungeonId: 'removed_dungeon', plan: [['slime_pair']], bag: { iron_ore: 2 } };
+  const ironBefore = s.materials.iron_ore || 0;
+  const fixes = G.migrate();
+  assert.ok(fixes.length > 0);
+  assert.ok(!s.items.some(it => it.base === 'old_removed_sword'));
+  assert.ok(R.DATA.cards[sword.randomCard]);
+  assert.deepStrictEqual(sword.slots.map(x => x.kind), ['stat']);
+  assert.strictEqual(s.equipped.swordsman.weapon, undefined);
+  assert.ok(!('removed_mat' in s.materials));
+  assert.strictEqual(s.materials.copper_ore, 0);
+  assert.ok(!s.tools.includes('removed_tool'));
+  assert.strictEqual(s.party.length, 3);
+  assert.ok(s.party.every(j => R.DATA.jobs[j]));
+  assert.ok(!('removed_dungeon' in s.clears));
+  assert.deepStrictEqual(s.bestFloor, {});
+  assert.strictEqual(s.run, null);
+  assert.strictEqual(s.materials.iron_ore, ironBefore + 2, '中断中に拾った素材は持ち物へ');
+  // 直したあとも普通に遊べる
+  assert.ok(R.Gear.buildParty(G.currentMembers()).maxHp > 0);
+  const run = G.startRun('cave'); assert.ok(run.createCombat());
+  // 正しいセーブには何もしない
+  G.newState();
+  assert.deepStrictEqual(G.migrate(), []);
+});
