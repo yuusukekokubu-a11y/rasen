@@ -8,13 +8,13 @@ function newRun(seed) {
 }
 function winCombat(c) { for (const e of c.enemies) { e.hp = 0; e.alive = false; } c._checkEnd(); }
 
-test('4階層・各階2〜3戦・4階にボス', () => {
+test('4階層・1階につき1戦・4階はボスだけ（全4戦）', () => {
   for (let s = 0; s < 20; s++) {
     const run = newRun(s);
     assert.strictEqual(run.plan.length, 4);
-    for (let f = 0; f < 3; f++) assert.ok(run.plan[f].length >= 2 && run.plan[f].length <= 3);
-    const last = run.plan[3];
-    assert.ok(R.DATA.encounters[last[last.length - 1]].boss);
+    for (let f = 0; f < 3; f++) assert.strictEqual(run.plan[f].length, 1);
+    assert.strictEqual(run.plan[3].length, 1);
+    assert.ok(R.DATA.encounters[run.plan[3][0]].boss);
   }
 });
 
@@ -190,7 +190,7 @@ test('すべてのダンジョンのデータが正しい（敵・素材・解�
       for (const t of d.gather[k]) for (const m of Object.keys(t.common || t.table).concat(Object.keys(t.rare || {}))) assert.ok(R.DATA.materials[m], `${id} の素材 ${m}`);
     }
     const run = new R.DungeonRun({ dungeonId: id, members: R.Sim.presetMembers('starter'), rng: R.createRng(1) });
-    assert.ok(run.plan[3].length >= 2);
+    if (!d.endless) assert.ok(run.plan.every(f => f.length === 1), id);
   }
   for (const e of Object.values(R.DATA.enemies)) for (const m of Object.keys(e.drops || {})) assert.ok(R.DATA.materials[m], `${e.name} の ${m}`);
 });

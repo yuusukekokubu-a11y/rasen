@@ -52,7 +52,7 @@
       const tier = E.tiers.filter(t => i + 1 >= t.from).pop();
       const isBossFloor = (i + 1) % E.segment === 0;
       return {
-        battles: E.battles, encounters: tier.encounters,
+        battles: isBossFloor ? [0, 0] : E.battles, encounters: tier.encounters,
         scale: { hp: 1 + E.hpPerFloor * i, dmg: 1 + E.dmgPerFloor * i },
         boss: isBossFloor ? E.bosses[Math.floor(i / E.segment) % E.bosses.length] : null
       };

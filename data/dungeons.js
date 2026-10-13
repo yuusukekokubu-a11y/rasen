@@ -2,7 +2,7 @@
 //   requires : 開くために先にクリアが必要なダンジョン（すべてクリアで開く）
 //   rank     : そのダンジョンの基準になる装備ランク（ステージの推奨ランクの目安）
 //   recommend: 一覧に出す目安（推奨ランク・有効な属性）
-//   floors   : 4階層。battles=[最少, 最多] の戦闘数（最後の階はこの後にボス）
+//   floors   : 4階層。1階につき1戦（battles=[最少, 最多]）。4階はボスだけ
 //              encounters は data/enemies.js の encounters の重み付き抽選
 //              scale は敵のHP・攻撃力の倍率
 //   rewards  : 戦闘後の報酬（ランダムに3つ提示されて1つ選ぶ）
@@ -17,10 +17,10 @@
       name: '岩窟の洞', requires: [],
       recommend: '推奨ランク1〜2・雷が有効',
       floors: [
-        { battles: [2, 3], encounters: { slime_pair: 3, bat_trio: 2, wolf_single: 2 }, scale: { hp: 1.0, dmg: 1.0 } },
-        { battles: [2, 3], encounters: { wolf_slime: 2, spider_bat: 2, wolf_single: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
-        { battles: [2, 3], encounters: { wolf_pair: 2, spider_pair: 2, spider_bat: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
-        { battles: [1, 2], encounters: { wolf_pair: 1, spider_pair: 1 }, scale: { hp: 1.0, dmg: 1.05 }, boss: 'boss_golem' }
+        { battles: [1, 1], encounters: { slime_pair: 3, bat_trio: 2, wolf_single: 2 }, scale: { hp: 1.08, dmg: 1.08 } },
+        { battles: [1, 1], encounters: { wolf_slime: 2, spider_bat: 2, wolf_single: 1 }, scale: { hp: 1.08, dmg: 1.08 } },
+        { battles: [1, 1], encounters: { wolf_pair: 2, spider_pair: 2, spider_bat: 1 }, scale: { hp: 1.08, dmg: 1.08 } },
+        { battles: [0, 0], encounters: {}, scale: { hp: 1.08, dmg: 1.13 }, boss: 'boss_golem' }
       ],
       rewards: {
         weights: { mining: 3, logging: 3, gathering: 3, treasure: 2, rest: 2 },
@@ -61,10 +61,10 @@
       name: '囁きの森', requires: ['cave'],
       recommend: '推奨ランク2・炎が有効',
       floors: [
-        { battles: [2, 3], encounters: { hornet_trio: 2, wolf_hornet: 2, treant_single: 2 }, scale: { hp: 1.1, dmg: 1.1 } },
-        { battles: [2, 3], encounters: { treant_wolf: 2, spider_hornet: 2, wolf_hornet: 1 }, scale: { hp: 1.1, dmg: 1.1 } },
-        { battles: [2, 3], encounters: { treant_pair: 2, spider_hornet: 2, treant_wolf: 1 }, scale: { hp: 1.15, dmg: 1.15 } },
-        { battles: [1, 2], encounters: { treant_pair: 1, treant_wolf: 1 }, scale: { hp: 1.15, dmg: 1.15 }, boss: 'boss_elder' }
+        { battles: [1, 1], encounters: { hornet_trio: 2, wolf_hornet: 2, treant_single: 2 }, scale: { hp: 1.2, dmg: 1.2 } },
+        { battles: [1, 1], encounters: { treant_wolf: 2, spider_hornet: 2, wolf_hornet: 1 }, scale: { hp: 1.2, dmg: 1.2 } },
+        { battles: [1, 1], encounters: { treant_pair: 2, spider_hornet: 2, treant_wolf: 1 }, scale: { hp: 1.25, dmg: 1.25 } },
+        { battles: [0, 0], encounters: {}, scale: { hp: 1.25, dmg: 1.25 }, boss: 'boss_elder' }
       ],
       rewards: { weights: { mining: 2, logging: 4, gathering: 3, treasure: 2, rest: 2 }, restHealRatio: 0.35 },
       gather: {
@@ -100,10 +100,10 @@
       name: '霧の沼', requires: ['cave'],
       recommend: '推奨ランク2・雷が有効',
       floors: [
-        { battles: [2, 3], encounters: { toad_pair: 2, slime_toad: 2, wisp_trio: 1 }, scale: { hp: 1.1, dmg: 1.1 } },
-        { battles: [2, 3], encounters: { toad_wisp: 2, wisp_trio: 2, slime_toad: 1 }, scale: { hp: 1.1, dmg: 1.1 } },
-        { battles: [2, 3], encounters: { toad_trio: 2, toad_wisp: 2 }, scale: { hp: 1.15, dmg: 1.15 } },
-        { battles: [1, 2], encounters: { toad_trio: 1, toad_wisp: 1 }, scale: { hp: 1.15, dmg: 1.15 }, boss: 'boss_queen' }
+        { battles: [1, 1], encounters: { toad_pair: 2, slime_toad: 2, wisp_trio: 1 }, scale: { hp: 1.23, dmg: 1.23 } },
+        { battles: [1, 1], encounters: { toad_wisp: 2, wisp_trio: 2, slime_toad: 1 }, scale: { hp: 1.23, dmg: 1.23 } },
+        { battles: [1, 1], encounters: { toad_trio: 2, toad_wisp: 2 }, scale: { hp: 1.29, dmg: 1.29 } },
+        { battles: [0, 0], encounters: {}, scale: { hp: 1.29, dmg: 1.29 }, boss: 'boss_queen' }
       ],
       rewards: { weights: { mining: 2, logging: 2, gathering: 4, treasure: 2, rest: 2 }, restHealRatio: 0.35 },
       gather: {
@@ -139,10 +139,10 @@
       name: '星降る遺跡', requires: ['forest', 'marsh'],
       recommend: '推奨ランク3・雷が有効',
       floors: [
-        { battles: [2, 3], encounters: { gargoyle_single: 2, doll_pair: 2, phantom_single: 2 }, scale: { hp: 0.95, dmg: 0.95 } },
-        { battles: [2, 3], encounters: { gargoyle_phantom: 2, phantom_doll: 2, doll_pair: 1 }, scale: { hp: 0.95, dmg: 0.95 } },
-        { battles: [2, 3], encounters: { gargoyle_pair: 2, gargoyle_phantom: 2, phantom_doll: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
-        { battles: [1, 2], encounters: { gargoyle_pair: 1, gargoyle_phantom: 1 }, scale: { hp: 1.0, dmg: 1.0 }, boss: 'boss_dragon' }
+        { battles: [1, 1], encounters: { gargoyle_single: 2, doll_pair: 2, phantom_single: 2 }, scale: { hp: 0.99, dmg: 0.99 } },
+        { battles: [1, 1], encounters: { gargoyle_phantom: 2, phantom_doll: 2, doll_pair: 1 }, scale: { hp: 0.99, dmg: 0.99 } },
+        { battles: [1, 1], encounters: { gargoyle_pair: 2, gargoyle_phantom: 2, phantom_doll: 1 }, scale: { hp: 1.04, dmg: 1.04 } },
+        { battles: [0, 0], encounters: {}, scale: { hp: 1.04, dmg: 1.04 }, boss: 'boss_dragon' }
       ],
       rewards: { weights: { mining: 4, logging: 2, gathering: 2, treasure: 3, rest: 2 }, restHealRatio: 0.35 },
       gather: {
@@ -179,10 +179,10 @@
       name: '灼熱の火山', requires: ['ruins'],
       recommend: '推奨ランク4・氷が有効',
       floors: [
-        { battles: [2, 3], encounters: { salamander_single: 2, imp_trio: 2, magma_pair: 1 }, scale: { hp: 0.99, dmg: 0.99 } },
-        { battles: [2, 3], encounters: { salamander_imp: 2, magma_pair: 2, lava_golem_single: 1 }, scale: { hp: 0.99, dmg: 0.99 } },
-        { battles: [2, 3], encounters: { golem_imp: 2, salamander_pair: 2, salamander_imp: 1 }, scale: { hp: 1.04, dmg: 1.04 } },
-        { battles: [1, 2], encounters: { golem_imp: 1, salamander_pair: 1 }, scale: { hp: 1.04, dmg: 1.04 }, boss: 'boss_flame' }
+        { battles: [1, 1], encounters: { salamander_single: 2, imp_trio: 2, magma_pair: 1 }, scale: { hp: 1.07, dmg: 1.07 } },
+        { battles: [1, 1], encounters: { salamander_imp: 2, magma_pair: 2, lava_golem_single: 1 }, scale: { hp: 1.07, dmg: 1.07 } },
+        { battles: [1, 1], encounters: { golem_imp: 2, salamander_pair: 2, salamander_imp: 1 }, scale: { hp: 1.12, dmg: 1.12 } },
+        { battles: [0, 0], encounters: {}, scale: { hp: 1.12, dmg: 1.12 }, boss: 'boss_flame' }
       ],
       rewards: { weights: { mining: 4, logging: 2, gathering: 2, treasure: 3, rest: 2 }, restHealRatio: 0.35 },
       gather: {
@@ -218,10 +218,10 @@
       name: '氷晶の洞', requires: ['ruins'],
       recommend: '推奨ランク4・炎が有効',
       floors: [
-        { battles: [2, 3], encounters: { ice_wolf_single: 2, fairy_trio: 2, ice_wolf_fairy: 1 }, scale: { hp: 1.07, dmg: 1.07 } },
-        { battles: [2, 3], encounters: { ice_wolf_fairy: 2, yeti_single: 2, crystal_fairy: 1 }, scale: { hp: 1.07, dmg: 1.07 } },
-        { battles: [2, 3], encounters: { crystal_fairy: 2, ice_wolf_pair: 2, yeti_single: 1 }, scale: { hp: 1.12, dmg: 1.12 } },
-        { battles: [1, 2], encounters: { yeti_crystal: 1, ice_wolf_pair: 1 }, scale: { hp: 1.12, dmg: 1.12 }, boss: 'boss_ice' }
+        { battles: [1, 1], encounters: { ice_wolf_single: 2, fairy_trio: 2, ice_wolf_fairy: 1 }, scale: { hp: 1.27, dmg: 1.27 } },
+        { battles: [1, 1], encounters: { ice_wolf_fairy: 2, yeti_single: 2, crystal_fairy: 1 }, scale: { hp: 1.27, dmg: 1.27 } },
+        { battles: [1, 1], encounters: { crystal_fairy: 2, ice_wolf_pair: 2, yeti_single: 1 }, scale: { hp: 1.33, dmg: 1.33 } },
+        { battles: [0, 0], encounters: {}, scale: { hp: 1.33, dmg: 1.33 }, boss: 'boss_ice' }
       ],
       rewards: { weights: { mining: 3, logging: 2, gathering: 3, treasure: 3, rest: 2 }, restHealRatio: 0.35 },
       gather: {
@@ -257,10 +257,10 @@
       name: '天空の庭', requires: ['volcano', 'glacier'],
       recommend: '推奨ランク4〜5・雷が有効',
       floors: [
-        { battles: [2, 3], encounters: { harpy_pair: 2, griffin_single: 2, cloud_harpy: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
-        { battles: [2, 3], encounters: { cloud_harpy: 2, knight_cloud: 2, harpy_trio: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
-        { battles: [2, 3], encounters: { griffin_harpy: 2, knight_cloud: 2, harpy_trio: 1 }, scale: { hp: 1.1, dmg: 1.1 } },
-        { battles: [1, 2], encounters: { knight_pair: 1, griffin_harpy: 1 }, scale: { hp: 1.1, dmg: 1.1 }, boss: 'boss_storm' }
+        { battles: [1, 1], encounters: { harpy_pair: 2, griffin_single: 2, cloud_harpy: 1 }, scale: { hp: 1.14, dmg: 1.14 } },
+        { battles: [1, 1], encounters: { cloud_harpy: 2, knight_cloud: 2, harpy_trio: 1 }, scale: { hp: 1.14, dmg: 1.14 } },
+        { battles: [1, 1], encounters: { griffin_harpy: 2, knight_cloud: 2, harpy_trio: 1 }, scale: { hp: 1.2, dmg: 1.2 } },
+        { battles: [0, 0], encounters: {}, scale: { hp: 1.2, dmg: 1.2 }, boss: 'boss_storm' }
       ],
       rewards: { weights: { mining: 3, logging: 3, gathering: 3, treasure: 3, rest: 2 }, restHealRatio: 0.35 },
       gather: {
@@ -296,10 +296,10 @@
       name: '深淵の城', requires: ['skygarden'],
       recommend: '推奨ランク5〜6・炎と雷が有効',
       floors: [
-        { battles: [2, 3], encounters: { shadow_pair: 2, vampire_single: 2, mage_shadow: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
-        { battles: [2, 3], encounters: { mage_shadow: 2, vampire_mage: 2, knight_single: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
-        { battles: [2, 3], encounters: { knight_mage: 2, shadow_trio: 2, vampire_mage: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
-        { battles: [1, 2], encounters: { knight_mage: 1, shadow_trio: 1 }, scale: { hp: 1.05, dmg: 1.05 }, boss: 'boss_abyss' }
+        { battles: [1, 1], encounters: { shadow_pair: 2, vampire_single: 2, mage_shadow: 1 }, scale: { hp: 1.08, dmg: 1.08 } },
+        { battles: [1, 1], encounters: { mage_shadow: 2, vampire_mage: 2, knight_single: 1 }, scale: { hp: 1.08, dmg: 1.08 } },
+        { battles: [1, 1], encounters: { knight_mage: 2, shadow_trio: 2, vampire_mage: 1 }, scale: { hp: 1.13, dmg: 1.13 } },
+        { battles: [0, 0], encounters: {}, scale: { hp: 1.13, dmg: 1.13 }, boss: 'boss_abyss' }
       ],
       rewards: { weights: { mining: 3, logging: 3, gathering: 2, treasure: 4, rest: 2 }, restHealRatio: 0.35 },
       gather: {
@@ -335,7 +335,7 @@
       recommend: '4階ごとに帰還できる',
       endless: {
         segment: 4,              // 何階ごとにボス（＝帰還できる区切り）
-        battles: [1, 2],         // 1階あたりの通常の戦闘数（ボスの階はこの後にボス）
+        battles: [1, 1],         // 1階あたりの戦闘数（ボスの階はボスだけ）
         hpPerFloor: 0.08,        // 1階深くなるごとの敵HPの増え方
         dmgPerFloor: 0.06,       // 1階深くなるごとの敵の攻撃力の増え方
         // 何階から、どの敵の組み合わせが出るか
