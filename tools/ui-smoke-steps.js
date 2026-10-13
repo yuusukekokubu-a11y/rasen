@@ -1,4 +1,21 @@
 // 画面確認の手順（tools/ui-smoke.js から使う）
+
+// 生産のパズルを最後まで解く（空いているマスを順に押し、置けなければ回転・捨てる）
+async function solvePuzzle(page) {
+  for (let i = 0; i < 80 && !(await page.locator('text=生産画面に戻る').count()); i++) {
+    if (await page.locator('button:has-text("完成品を見る")').count()) { await page.click('button:has-text("完成品を見る")'); continue; }
+    const before = await page.locator('.bp-cell.filled').count();
+    const open = await page.locator('.bp-cell.open').count();
+    for (let k = 0; k < open; k++) {
+      await page.click(`.bp-cell.open >> nth=${k}`);
+      if ((await page.locator('.bp-cell.filled').count()) > before || await page.locator('button:has-text("完成品を見る")').count()) break;
+    }
+    if ((await page.locator('.bp-cell.filled').count()) === before && !(await page.locator('button:has-text("完成品を見る")').count())) {
+      await page.click('button:has-text("捨てる")');
+    }
+  }
+}
+
 module.exports = [
   { name: '練習戦闘を開いて自動で戦う', run: async (page) => {
     await page.click('text=練習戦闘');
@@ -39,6 +56,7 @@ async function playDungeon(page) {
   throw new Error('ダンジョンが終わらない');
 }
 module.exports.playDungeon = playDungeon;
+module.exports.solvePuzzle = solvePuzzle;
 module.exports.push(
   { name: 'ダンジョンを最後まで進める', run: async (page) => {
     await page.click('text=ダンジョンへ出発');
@@ -56,10 +74,7 @@ module.exports.push(
   { name: '生産：銅の剣を作って比較・装備', run: async (page) => {
     await page.click('text=生産');
     await page.click('tr:has-text("銅の剣") button:has-text("作る")');
-    for (let i = 0; i < 60 && !(await page.locator('text=生産画面に戻る').count()); i++) {
-      if (await page.locator('button:has-text("完成品を見る")').count()) await page.click('button:has-text("完成品を見る")');
-      else await page.click('.forge-actions button >> nth=0');
-    }
+    await solvePuzzle(page);
     await page.waitForSelector('text=デッキに入るカード');
     await page.click('button:has-text("剣士に装備する")');
     await page.click('text=細工');

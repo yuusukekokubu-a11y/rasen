@@ -3,13 +3,44 @@ const test = require('node:test');
 const assert = require('node:assert');
 const R = require('../tools/load.js').loadGame();
 
-test('品質：少ない回数で仕上げるほど高品質・過熱すると1段下がる', () => {
-  const q = R.DATA.crafting.game.qualityHits;
-  assert.strictEqual(R.Craft.qualityFromHits(q.best, 0), 'best');
-  assert.strictEqual(R.Craft.qualityFromHits(q.best + 1, 0), 'fine');
-  assert.strictEqual(R.Craft.qualityFromHits(q.fine + 1, 0), 'normal');
-  assert.strictEqual(R.Craft.qualityFromHits(q.best, 1), 'fine');
-  assert.strictEqual(R.Craft.qualityFromHits(q.best, 5), 'normal');
+test('設計図はめ込み：ピースで埋める・重ねたりはみ出したりできない・少ない手数ほど高品質', () => {
+  const bp = { rows: ['##', '##'], best: 1, fine: 2 };
+  const st = R.Craft.puzzleStart(bp, { hand: 2, freeDiscards: 1 }, R.createRng(1));
+  assert.strictEqual(st.total, 4);
+  st.hand = ['o4', 'duo']; st.sel = 0; st.rot = 0;
+  assert.ok(!R.Craft.puzzlePlace(st, 0, 1), 'はみ出しは置けない');
+  assert.ok(!R.Craft.puzzlePlace(st, 1, 0), 'はみ出しは置けない（下）');
+  assert.ok(R.Craft.puzzlePlace(st, 0, 0));
+  assert.ok(st.done);
+  assert.strictEqual(st.turns, 1);
+  assert.strictEqual(R.Craft.puzzleQuality(st), 'best');
+  const st2 = R.Craft.puzzleStart(bp, { hand: 2, freeDiscards: 1 }, R.createRng(1));
+  st2.hand = ['duo', 'duo']; st2.sel = 0;
+  assert.ok(R.Craft.puzzlePlace(st2, 0, 0));
+  st2.hand = ['duo', 'duo']; st2.sel = 0;
+  assert.ok(!R.Craft.puzzlePlace(st2, 0, 0), '埋まったマスには置けない');
+  R.Craft.puzzleDiscard(st2);
+  assert.strictEqual(st2.turns, 1, '無料の捨ては手数に入らない');
+  R.Craft.puzzleDiscard(st2);
+  assert.strictEqual(st2.turns, 2);
+});
+
+test('設計図はめ込み：回転するとピースの向きが変わる', () => {
+  assert.deepStrictEqual(R.Craft.pieceCells('i3', 0), [[0, 0], [0, 1], [0, 2]]);
+  assert.deepStrictEqual(R.Craft.pieceCells('i3', 1), [[0, 0], [1, 0], [2, 0]]);
+});
+
+test('設計図はめ込み：手持ちのどれも置けないことはない（詰まらない）', () => {
+  for (let seed = 0; seed < 100; seed++) {
+    const bp = R.DATA.crafting.puzzle.blueprints.weapon.small;
+    const st = R.Craft.puzzleStart(bp, R.Craft.puzzleParams(1, 1), R.createRng(seed));
+    let g = 0;
+    while (!st.done && g++ < 60) {
+      assert.ok(st.hand.some((_, i) => R.Craft.canPlaceAnywhere(st, i)), 'seed ' + seed);
+      R.Craft.puzzleAutoStep(st);
+    }
+    assert.ok(st.done);
+  }
 });
 
 test('品質：最高は固定ステータス×1.2＋固定カードが強化版', () => {
@@ -20,35 +51,31 @@ test('品質：最高は固定ステータス×1.2＋固定カードが強化版
   assert.strictEqual(R.Gear.itemCards(normal)[0].upgraded, false);
 });
 
-test('鍛造：強く叩くと大きく進み熱がたまる・冷ますと熱が下がる・限界を超えると過熱', () => {
-  const g = R.DATA.crafting.game;
-  const p = R.Craft.gameParams(1, 1);
-  const rng = R.createRng(3);
-  const st = R.Craft.forgeStart();
-  const r1 = R.Craft.forgeAct(st, 'strong', p, rng);
-  assert.ok(r1.gain >= Math.round(p.perHit * g.actions.strong.progress[0]) && r1.heat > 0);
-  const heat = st.heat;
-  R.Craft.forgeAct(st, 'cool', p, rng);
-  assert.ok(st.heat < heat || st.heat === 0);
-  const st2 = R.Craft.forgeStart();
-  st2.heat = g.heatLimit;
-  const r2 = R.Craft.forgeAct(st2, 'careful', p, rng);
-  assert.ok(r2.overheated);
-  assert.strictEqual(st2.overheats, 1);
-  assert.strictEqual(st2.heat, g.heatAfterOverheat);
+test('設計図はめ込み：押したマスにピースの左上のブロックが来る', () => {
+  const bp = { rows: ['###', '###'], best: 2, fine: 3 };
+  const st = R.Craft.puzzleStart(bp, { hand: 1, freeDiscards: 0 }, R.createRng(1));
+  st.hand = ['s4']; st.sel = 0; st.rot = 0; // .## / ##.
+  assert.deepStrictEqual(R.Craft.placement(st, 0, 1).sort((a, b) => a - b), [1, 2, 3, 4]);
 });
 
-test('鍛造：いつかは必ず完成する', () => {
-  const p = R.Craft.gameParams(1, 13);
-  const rng = R.createRng(1);
-  const st = R.Craft.forgeStart();
-  for (let i = 0; i < 100 && !st.done; i++) R.Craft.forgeAct(st, 'careful', p, rng);
-  assert.ok(st.done);
+test('生産Lvが少し足りないだけでは手持ちは減らない', () => {
+  const base = R.Craft.puzzleParams(5, 5);
+  assert.deepStrictEqual([R.Craft.puzzleParams(4, 5).hand, R.Craft.puzzleParams(3, 5).hand], [base.hand, base.hand]);
 });
 
-test('生産Lvが高いと進みやすく、熱がたまりにくい', () => {
-  assert.ok(R.Craft.gameParams(15, 5).perHit > R.Craft.gameParams(1, 5).perHit);
-  assert.ok(R.Craft.gameParams(15, 5).heatMult < R.Craft.gameParams(1, 5).heatMult);
+test('生産Lvが高いと手持ちと無料の捨てが増える', () => {
+  const lo = R.Craft.puzzleParams(1, 10), mid = R.Craft.puzzleParams(10, 10), hi = R.Craft.puzzleParams(20, 10);
+  assert.ok(hi.hand > mid.hand && mid.hand > lo.hand);
+  assert.ok(hi.freeDiscards > lo.freeDiscards);
+});
+
+test('すべての設計図とピースのデータが正しい', () => {
+  const P = R.DATA.crafting.puzzle;
+  for (const [k, sizes] of Object.entries(P.blueprints)) for (const [size, bp] of Object.entries(sizes)) {
+    const cells = bp.rows.join('').split('').filter(c => c === '#').length;
+    assert.ok(cells > 0 && bp.best < bp.fine, `${k} ${size}`);
+    assert.ok(bp.best * 4 >= cells, `${k} ${size} は最高の手数で埋められる`);
+  }
 });
 
 test('ランダム2枠：必ず2枠・付与効果は付けられるカードにだけ・危険な組み合わせは同時に付かない', () => {

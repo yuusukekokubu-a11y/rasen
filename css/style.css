@@ -132,17 +132,21 @@ th { color: var(--muted); font-weight: normal; }
 /* レベルの恩恵の表示 */
 .lv-bonus { font-size: .9em; font-weight: bold; }
 
-/* 生産ミニゲーム「鍛造」 */
-.forge { display: flex; flex-direction: column; gap: 6px; }
-.forge-label { font-size: .9em; color: var(--muted); font-variant-numeric: tabular-nums; }
-.meter { height: 16px; background: #11131a; border-radius: 4px; overflow: hidden; }
-.meter-fill { height: 100%; transition: width .25s; }
-.progress-fill { background: var(--good); }
-.heat-fill { background: #d98a3a; }
-.heat-fill.hot { background: var(--bad); }
-.forge-last { font-size: .92em; }
-.forge-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
-.forge-actions button { text-align: left; }
+/* 生産ミニゲーム「設計図はめ込み」 */
+.puzzle { display: flex; flex-direction: column; gap: 8px; }
+.bp-board { display: grid; gap: 3px; max-width: 360px; }
+.bp-cell { aspect-ratio: 1; max-width: 100%; border-radius: 4px; padding: 0; border: 1px solid transparent; }
+.bp-cell.void { background: transparent; }
+.bp-cell.open { background: #3a3f4f; border-color: #5d6377; cursor: pointer; }
+.bp-cell.open.ghost { background: #6b5320; border-color: var(--accent); }
+.bp-cell.open.ghost-bad { background: #5a2626; border-color: var(--bad); }
+.bp-cell.filled { background: #c9a86a; }
+.puzzle-hand { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.piece-btn { padding: 6px; min-width: 56px; min-height: 56px; display: flex; align-items: center; justify-content: center; }
+.piece-btn.selected { border-color: var(--accent); background: #4a3d1c; }
+.piece { display: grid; gap: 2px; }
+.pc { width: 12px; height: 12px; }
+.pc.on { background: #c9a86a; border-radius: 2px; }
 
 /* 採集ミニゲーム「鉱脈探し」 */
 .gather { display: flex; flex-direction: column; gap: 8px; }

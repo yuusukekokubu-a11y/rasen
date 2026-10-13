@@ -86,55 +86,77 @@
           [{ label: 'OK', primary: true, onClick: render }]);
         return;
       }
-      // 品質ミニゲーム「鍛造」
+      // 品質ミニゲーム「設計図はめ込み」
       const lv = s.life[life].lv;
-      const params = R.Craft.gameParams(lv, rc.difficulty);
-      const g = R.DATA.crafting.game;
-      const st = R.Craft.forgeStart();
-      const rng = R.createRng();
-      let last = '';
+      const params = R.Craft.puzzleParams(lv, rc.difficulty);
+      const bp = R.Craft.blueprintFor(rc.kind, rc.base && rc.base.slot, rc.base ? rc.base.rank : 1);
+      const st = R.Craft.puzzleStart(bp, params, R.createRng());
+      let hover = null;
 
-      function renderForge() {
+      const onKey = (e) => {
+        if (!document.body.contains(boardEl)) { window.removeEventListener('keydown', onKey); return; }
+        if (e.key === 'r' || e.key === 'R') { R.Craft.puzzleRotate(st); renderPuzzle(); }
+      };
+      window.addEventListener('keydown', onKey);
+      let boardEl = null;
+
+      // ピースの小さな絵
+      function pieceView(pieceId, rot) {
+        const cells = R.Craft.pieceCells(pieceId, rot);
+        const h = Math.max(...cells.map(c => c[0])) + 1, w = Math.max(...cells.map(c => c[1])) + 1;
+        const set = new Set(cells.map(([r, c]) => r * w + c));
+        return h2('div', { class: 'piece', style: { gridTemplateColumns: `repeat(${w}, 1fr)` } },
+          [...Array(w * h).keys()].map(i => h2('div', { class: set.has(i) ? 'pc on' : 'pc' })));
+      }
+      const h2 = h;
+
+      function renderPuzzle() {
         clear(el);
         el.appendChild(R.UI.header(`生産：${rc.name}`));
-        el.appendChild(h('div', { class: 'muted' }, `最高：${g.qualityHits.best}回以内／上質：${g.qualityHits.fine}回以内／熱${g.heatLimit}超で品質ダウン`));
-        const q = R.Craft.forgeQuality(st);
-        const nextQ = R.Craft.qualityFromHits(st.turns + 1, st.overheats);
-        const heatPct = Math.min(100, st.heat / g.heatLimit * 100);
-        const actRange = (a) => {
-          const p0 = Math.round(params.perHit * a.progress[0]), p1 = Math.round(params.perHit * a.progress[1]);
-          const h0 = a.heat[0] > 0 ? Math.round(a.heat[0] * params.heatMult) : a.heat[0];
-          const h1 = a.heat[1] > 0 ? Math.round(a.heat[1] * params.heatMult) : a.heat[1];
-          const heatText = h1 < 0 ? `熱${h0}〜${h1}` : `熱+${h0}〜${h1}`;
-          return (p1 > 0 ? `進み+${p0}〜${p1}・` : '') + heatText;
+        const q = R.Craft.puzzleQuality(st);
+        // 置く場所のプレビュー：盤面は作り直さず、マスの色だけ変える（作り直すとマウスの出入りが無限に続くため）
+        const cellEls = [];
+        const showGhost = (r, c) => {
+          for (const x of cellEls) if (x) x.classList.remove('ghost', 'ghost-bad');
+          if (r === null) return;
+          const idx = R.Craft.placement(st, r, c);
+          if (idx) for (const i of idx) cellEls[i] && cellEls[i].classList.add('ghost');
+          else if (cellEls[r * st.w + c]) cellEls[r * st.w + c].classList.add('ghost-bad');
         };
-        el.appendChild(h('div', { class: 'panel forge' },
-          h('div', null, h('b', null, `${rc.name}`), h('span', { class: 'muted' }, `（難易度${rc.difficulty}・${R.Life.LIVES[life]}Lv${lv}）`)),
-          lvBonusLine(lv - rc.difficulty, [
-            `1回の進み ${pct(params.lvMult)}`,
-            `熱のたまり方 ${pct(params.heatMult)}`
-          ]),
-          h('div', { class: 'forge-label' }, `進み具合 ${st.progress} / 100`),
-          h('div', { class: 'meter' }, h('div', { class: 'meter-fill progress-fill', style: { width: st.progress + '%' } })),
-          h('div', { class: 'forge-label' }, `熱 ${st.heat} / ${g.heatLimit}`),
-          h('div', { class: 'meter' }, h('div', { class: 'meter-fill heat-fill' + (heatPct >= 70 ? ' hot' : ''), style: { width: heatPct + '%' } })),
+        boardEl = h('div', { class: 'bp-board', style: { gridTemplateColumns: `repeat(${st.w}, 1fr)` }, onmouseleave: () => { hover = null; showGhost(null); } },
+          st.cells.map((cell, i) => {
+            const r = Math.floor(i / st.w), c = i % st.w;
+            if (!cell.need) return h('div', { class: 'bp-cell void' });
+            if (cell.filled) return h('div', { class: 'bp-cell filled' });
+            const b = h('button', {
+              class: 'bp-cell open', disabled: st.done, 'aria-label': `${r + 1}行${c + 1}列`,
+              onmouseenter: () => { hover = [r, c]; showGhost(r, c); },
+              onclick: () => { R.Craft.puzzlePlace(st, r, c); renderPuzzle(); }
+            });
+            cellEls[i] = b;
+            return b;
+          }));
+        if (hover) setTimeout(() => showGhost(hover[0], hover[1]), 0);
+        el.appendChild(h('div', { class: 'panel puzzle' },
+          h('div', null, h('b', null, rc.name), h('span', { class: 'muted' }, `（難易度${rc.difficulty}・${R.Life.LIVES[life]}Lv${lv}）`)),
+          lvBonusLine(params.diff, [`手持ち${params.hand}個`, `無料で捨てる${params.freeDiscards}回`]),
           h('div', { class: 'row' },
-            h('span', null, `${st.turns}回作業`),
-            st.overheats ? h('span', { class: 'bad' }, `過熱${st.overheats}回`) : null,
-            h('span', null, st.done ? `完成：${R.DATA.config.quality[q].name}` : `次で仕上がれば：${R.DATA.config.quality[nextQ].name}`)),
-          last ? h('div', { class: 'forge-last' }, last) : null,
+            h('span', { class: 'energy' }, `${st.turns}手`),
+            h('span', { class: 'muted' }, `最高：${st.thresholds.best}手以内／上質：${st.thresholds.fine}手以内`),
+            h('span', null, `${st.filledCount}/${st.total}マス`)),
+          boardEl,
           st.done
-            ? h('button', { class: 'primary', onclick: () => complete(rc, R.Craft.forgeQuality(st), lv) }, '完成品を見る')
-            : h('div', { class: 'forge-actions' }, Object.entries(g.actions).map(([id, a]) =>
-              h('button', { class: id === 'strong' ? 'primary' : '', onclick: () => {
-                const r = R.Craft.forgeAct(st, id, params, rng);
-                last = `${a.name}：` + (r.gain ? `進み+${r.gain}　` : '') + `熱${r.heat >= 0 ? '+' : ''}${r.heat}` + (r.overheated ? '　過熱した！（品質が1段下がる）' : '');
-                renderForge();
-              } },
-                h('div', { class: 'menu-label' }, a.name),
-                h('div', { class: 'menu-desc' }, actRange(a)))))));
+            ? h('div', { class: 'row' },
+              h('span', { class: 'result result-win' }, `完成！（${R.DATA.config.quality[q].name}）`),
+              h('button', { class: 'primary', onclick: () => complete(rc, q, lv) }, '完成品を見る'))
+            : h('div', { class: 'puzzle-hand' },
+              st.hand.map((p, i) => h('button', { class: 'piece-btn' + (i === st.sel ? ' selected' : ''), 'aria-label': `ピース${i + 1}`, onclick: () => { R.Craft.puzzleSelect(st, i); renderPuzzle(); } },
+                pieceView(p, i === st.sel ? st.rot : 0))),
+              h('button', { onclick: () => { R.Craft.puzzleRotate(st); renderPuzzle(); } }, '回転（R）'),
+              h('button', { onclick: () => { R.Craft.puzzleDiscard(st); renderPuzzle(); } },
+                st.freeDiscards > 0 ? `捨てる（無料あと${st.freeDiscards}）` : '捨てる（+1手）'))));
       }
-      renderForge();
+      renderPuzzle();
     }
 
     function complete(rc, quality, lv) {

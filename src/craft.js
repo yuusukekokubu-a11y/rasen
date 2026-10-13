@@ -22,47 +22,167 @@
     return out.sort((a, b) => a.difficulty - b.difficulty);
   }
 
-  // ===== 品質ミニゲーム「鍛造」 =====
-  function gameParams(lv, difficulty) {
-    const g = C().game;
+  // ===== 品質ミニゲーム「設計図はめ込み」 =====
+  const P = () => C().puzzle;
+
+  function parseShape(rows) {
+    const cells = [];
+    rows.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === '#') cells.push([r, c]); }));
+    return cells;
+  }
+  // ピースの形（回転 rot=0〜3）。左上が(0,0)になるようにそろえる
+  const shapeCache = {};
+  function pieceCells(pieceId, rot) {
+    const key = pieceId + ':' + (((rot || 0) % 4 + 4) % 4);
+    if (!shapeCache[key]) shapeCache[key] = rotatedCells(pieceId, rot);
+    return shapeCache[key];
+  }
+  function rotatedCells(pieceId, rot) {
+    let cells = parseShape(P().pieces[pieceId].cells);
+    for (let i = 0; i < ((rot || 0) % 4 + 4) % 4; i++) cells = cells.map(([r, c]) => [c, -r]);
+    const minR = Math.min(...cells.map(x => x[0])), minC = Math.min(...cells.map(x => x[1]));
+    return cells.map(([r, c]) => [r - minR, c - minC]).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  }
+
+  // 生産Lvと難易度から、手持ちの数・無料で捨てられる回数を決める
+  function puzzleParams(lv, difficulty) {
     const diff = lv - difficulty;
-    const lvMult = Math.max(g.lvMultMin, Math.min(g.lvMultMax, 1 + diff * g.lvDiffRate));
-    const heatMult = Math.max(g.heatMultMin, Math.min(g.heatMultMax, 1 - diff * g.heatLvRate));
-    return { perHit: (100 / g.baseHits) * lvMult, heatMult, lvMult };
+    // Lv差が少しマイナスなだけでは減らない（切り捨てでなく0に向かって丸める）
+    const f = (o) => Math.max(o.min || 0, Math.min(o.max, o.base + Math.trunc(diff / o.perLv)));
+    return { hand: f(P().hand), freeDiscards: f(P().freeDiscards), diff };
   }
-  function forgeStart() { return { progress: 0, heat: 0, turns: 0, overheats: 0, done: false }; }
-  function rand(rng, [a, b]) { return a + (b - a) * rng.next(); }
 
-  // 1回作業する。action: 'strong' / 'careful' / 'cool'
-  function forgeAct(st, action, params, rng) {
-    const g = C().game;
-    const a = g.actions[action];
-    if (!a || st.done) return null;
-    st.turns++;
-    const gain = Math.round(params.perHit * rand(rng, a.progress));
-    let heat = rand(rng, a.heat);
-    heat = Math.round(heat > 0 ? heat * params.heatMult : heat);
-    st.progress = Math.min(100, st.progress + gain);
-    st.heat = Math.max(0, st.heat + heat);
-    let overheated = false;
-    if (st.heat > g.heatLimit) {
-      overheated = true;
-      st.overheats++;
-      st.heat = g.heatAfterOverheat;
+  function blueprintFor(kind, slot, rank) {
+    const key = kind === 'item' ? 'item' : slot;
+    const bp = P().blueprints[key];
+    return bp[(rank || 1) >= 3 ? 'large' : 'small'];
+  }
+
+  // bp: { rows, best, fine }（data/crafting.js の設計図）
+  function puzzleStart(bp, params, rng) {
+    const shape = bp.rows.map(r => [...r]);
+    const h = shape.length, w = Math.max(...shape.map(r => r.length));
+    const cells = [];
+    for (let r = 0; r < h; r++) for (let c = 0; c < w; c++) cells.push({ need: shape[r][c] === '#', filled: false });
+    const total = cells.filter(x => x.need).length;
+    const st = {
+      w, h, cells, total, filledCount: 0, turns: 0, rot: 0, sel: 0,
+      freeDiscards: params.freeDiscards, hand: [], done: false, thresholds: { best: bp.best, fine: bp.fine }
+    };
+    const weights = Object.fromEntries(Object.entries(P().pieces).map(([k, v]) => [k, v.weight]));
+    st.draw = () => rng.weighted(weights);
+    // 手持ちのどれも置けないときは、置けるピースの中から引き直す（詰まり防止）
+    st.drawFitting = () => {
+      const ok = {};
+      for (const [k, w] of Object.entries(weights)) if (fitsAnywhere(st, k)) ok[k] = w;
+      return Object.keys(ok).length ? rng.weighted(ok) : st.draw();
+    };
+    for (let i = 0; i < params.hand; i++) st.hand.push(st.draw());
+    ensureFit(st, 0);
+    return st;
+  }
+  function puzzleSelect(st, i) { if (i >= 0 && i < st.hand.length) { st.sel = i; st.rot = 0; } }
+
+  // (r,c) にピースの左上のブロックが来るように置けるか。置けるならマスの番号の配列を返す
+  function placement(st, r, c, rot, sel) {
+    const piece = st.hand[sel === undefined ? st.sel : sel];
+    const cells = pieceCells(piece, rot === undefined ? st.rot : rot);
+    const [r0, c0] = cells[0];
+    const out = [];
+    for (const [dr, dc] of cells) {
+      const rr = r + dr - r0, cc = c + dc - c0;
+      if (rr < 0 || cc < 0 || rr >= st.h || cc >= st.w) return null;
+      const i = rr * st.w + cc;
+      if (!st.cells[i].need || st.cells[i].filled) return null;
+      out.push(i);
     }
-    if (st.progress >= 100) st.done = true;
-    return { gain, heat, overheated };
+    return out;
+  }
+  function fitsAnywhere(st, pieceId) {
+    for (let rot = 0; rot < 4; rot++) {
+      const shape = pieceCells(pieceId, rot);
+      for (let r = 0; r < st.h; r++) for (let c = 0; c < st.w; c++) {
+        if (shape.every(([dr, dc]) => {
+          const rr = r + dr, cc = c + dc;
+          if (rr >= st.h || cc >= st.w) return false;
+          const cell = st.cells[rr * st.w + cc];
+          return cell.need && !cell.filled;
+        })) return true;
+      }
+    }
+    return false;
+  }
+  function ensureFit(st, slot) {
+    if (st.filledCount >= st.total) return;
+    if (!st.hand.some(p => fitsAnywhere(st, p))) st.hand[slot] = st.drawFitting();
+  }
+  // 使った（捨てた）ピースを補充する
+  function refill(st) {
+    st.hand[st.sel] = st.draw();
+    st.rot = 0;
+    ensureFit(st, st.sel);
+  }
+  function puzzlePlace(st, r, c) {
+    if (st.done) return false;
+    const idx = placement(st, r, c);
+    if (!idx) return false;
+    for (const i of idx) st.cells[i].filled = true;
+    st.filledCount += idx.length;
+    st.turns++;
+    if (st.filledCount >= st.total) st.done = true;
+    refill(st);
+    return true;
+  }
+  function puzzleRotate(st) { st.rot = (st.rot + 1) % 4; }
+  function puzzleDiscard(st) {
+    if (st.done) return;
+    if (st.freeDiscards > 0) st.freeDiscards--; else st.turns++;
+    refill(st);
+  }
+  function puzzleQuality(st) {
+    if (st.turns <= st.thresholds.best) return 'best';
+    if (st.turns <= st.thresholds.fine) return 'fine';
+    return 'normal';
+  }
+  function canPlaceAnywhere(st, sel) {
+    for (let rot = 0; rot < 4; rot++) for (let r = 0; r < st.h; r++) for (let c = 0; c < st.w; c++) if (placement(st, r, c, rot, sel)) return true;
+    return false;
   }
 
-  const QUALITY_ORDER = ['normal', 'fine', 'best'];
-  // 回数 → 品質（過熱した回数だけ下がる）
-  function qualityFromHits(n, overheats) {
-    const q = C().game.qualityHits;
-    let i = n <= q.best ? 2 : n <= q.fine ? 1 : 0;
-    i = Math.max(0, i - (overheats || 0));
-    return QUALITY_ORDER[i];
+  // 自動操作（テスト・調整用）：大きく、埋まったマスや外枠に多く接する置き方を選ぶ。どれも置けなければ小さいピースを捨てる
+  function puzzleAutoStep(st) {
+    let best = null;
+    st.hand.forEach((_, sel) => {
+      for (let rot = 0; rot < 4; rot++) for (let r = 0; r < st.h; r++) for (let c = 0; c < st.w; c++) {
+        const idx = placement(st, r, c, rot, sel);
+        if (!idx) continue;
+        const set = new Set(idx);
+        let score = idx.length * 10;
+        for (const i of idx) {
+          const rr = Math.floor(i / st.w), cc = i % st.w;
+          for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const nr = rr + dr, nc = cc + dc;
+            if (nr < 0 || nc < 0 || nr >= st.h || nc >= st.w) { score++; continue; }
+            const j = nr * st.w + nc;
+            if (set.has(j)) continue;
+            if (!st.cells[j].need || st.cells[j].filled) score++;
+          }
+        }
+        if (!best || score > best.score) best = { r, c, rot, sel, score };
+      }
+    });
+    if (!best) {
+      // 一番大きいピースを捨てる
+      let big = 0;
+      st.hand.forEach((p, i) => { if (pieceCells(p, 0).length > pieceCells(st.hand[big], 0).length) big = i; });
+      st.sel = big;
+      puzzleDiscard(st);
+      return;
+    }
+    st.sel = best.sel;
+    st.rot = best.rot;
+    puzzlePlace(st, best.r, best.c);
   }
-  function forgeQuality(st) { return qualityFromHits(st.turns, st.overheats); }
 
   // ===== パワー解禁（細工Lv） =====
   function unlockedPowerCount(jewelerLv) {
@@ -145,7 +265,7 @@
   }
 
   R.Craft = {
-    recipesFor, gameParams, forgeStart, forgeAct, forgeQuality, qualityFromHits,
+    recipesFor, pieceCells, puzzleParams, blueprintFor, puzzleStart, puzzleSelect, placement, puzzlePlace, puzzleRotate, puzzleDiscard, puzzleQuality, canPlaceAnywhere, puzzleAutoStep,
     unlockedPowerCount, unlockedPowers, rollGrade, gradeChances, enchantCandidates, rollSlots, makeEquipment, expFor
   };
 })(globalThis.RASEN = globalThis.RASEN || {});
