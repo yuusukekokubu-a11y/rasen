@@ -26,6 +26,14 @@
       h('div', { class: 'card-type' }, (opts.ownerName ? opts.ownerName + '・' : '') + R.Cards.TYPE_NAMES[def.type]));
   }
 
+  // カードを並べる列の数（縦向き：3〜5列で折り返す／横向き：基本1行）を CSS に渡す
+  function handGrid(el) {
+    const n = el.children.length;
+    el.style.setProperty('--cols', String(n <= 6 ? 3 : n <= 8 ? 4 : 5));
+    el.style.setProperty('--wide', String(n <= 7 ? Math.max(n, 5) : Math.ceil(n / 2)));
+    return el;
+  }
+
   function statusList(st) {
     const out = [];
     for (const k of ['weak', 'vulnerable', 'burn', 'freeze', 'shock']) {
@@ -137,7 +145,10 @@
 
       // 情報行：エネルギーの宝珠・ターン・山札など
       const pileBtn = (k, label, n) => h('button', { class: 'small' + (showPile === k ? ' on' : ''), onclick: () => { showPile = showPile === k ? null : k; render(); } }, `${label} ${n}`);
-      root.appendChild(h('div', { class: 'infobar' },
+      // 横向きの画面では、エネルギー・山札・操作ボタンを手札の右に縦に並べる（縦向きでは CSS でばらして元の位置に置く）
+      const side = h('div', { class: 'side' });
+      root.appendChild(side);
+      side.appendChild(h('div', { class: 'infobar' },
         h('span', { class: 'energy' + (combat.energy === 0 ? ' empty' : ''), title: 'エネルギー' }, h('b', null, String(combat.energy)), `/${combat.cfg.energyPerTurn}`),
         h('span', { class: 'turn-label' }, `T${combat.turn}`),
         h('span', { class: 'spacer' }),
@@ -169,7 +180,7 @@
         const pool = p.kind === 'scry' ? combat.draw : combat.hand;
         root.appendChild(h('div', { class: 'panel choice' },
           h('div', { class: 'choice-prompt' }, p.prompt),
-          h('div', { class: 'cards scroll' }, p.options.map(iid => {
+          handGrid(h('div', { class: 'cards hand-grid' }, p.options.map(iid => {
             const inst = pool.find(c => c.iid === iid);
             const order = selection.indexOf(iid);
             return h('div', { class: 'choice-card' },
@@ -183,12 +194,12 @@
                   render();
                 }
               }));
-          })),
+          }))),
           h('button', { class: 'primary', onclick: () => doAct(() => combat.resolveChoice(selection)) }, '決定')));
       }
 
-      // 手札（横にスクロール）
-      root.appendChild(h('div', { class: 'hand cards scroll' }, combat.hand.map(inst => {
+      // 手札（スクロールなしで全部見えるように並べる）
+      root.appendChild(handGrid(h('div', { class: 'hand cards hand-grid' }, combat.hand.map(inst => {
         const playable = combat.canPlay(inst);
         return cardEl(inst, {
           owner: inst.owner, ownerJob: combat.chars[inst.owner].job, ownerName: combat.chars[inst.owner].name,
@@ -196,7 +207,7 @@
           disabled: !playable,
           onClick: () => { if (playable) doAct(() => combat.playCard(inst.iid, target)); else act({ ok: false, error: combat.pending ? '選択を先に済ませてください' : 'エネルギーが足りません' }); }
         });
-      })));
+      }))));
 
       // ログ（たたんでおける）
       const log = h('div', { class: 'log' }, combat.log.slice(-40).map(l => h('div', null, l)));
@@ -212,7 +223,7 @@
       } else if (opts.onFinish) {
         ctrl.appendChild(h('button', { class: 'primary', onclick: () => opts.onFinish(combat.result) }, '次へ'));
       }
-      root.appendChild(ctrl);
+      side.appendChild(ctrl);
       container.appendChild(root);
       log.scrollTop = log.scrollHeight;
 

@@ -126,7 +126,7 @@ td { font-variant-numeric: tabular-nums; }
 
 /* ===== 舞台（ドット絵の背景を敷いた枠） ===== */
 .stage { position: relative; overflow: hidden; border: 2px solid var(--void); border-radius: 6px; box-shadow: inset 0 0 0 2px var(--win-line), 0 4px 14px #000a; background: #000; }
-.stage > :not(.backdrop) { position: relative; }
+.stage > :not(.backdrop):not(.banner):not(.float) { position: relative; }
 .stage::after { content: ''; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 2px var(--win-line), inset 0 0 40px #000c; border-radius: 4px; }
 
 /* ===== 拠点 ===== */
@@ -423,3 +423,74 @@ button.primary .menu-desc { color: #4a3610; }
 .mat-rank { color: var(--muted); font-size: 11px; }
 .mat-n { font-weight: 800; color: var(--gold-hi); }
 .equip-stats { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+
+/* ===== 手札：スクロールなしで全部並べる ===== */
+.cards.hand-grid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 10px 8px; padding: 8px 4px 4px; }
+.hand-grid .card, .hand-grid .choice-card { width: auto; min-width: 0; }
+.hand-grid .card { min-height: 112px; font-size: 10.5px; }
+.hand-grid .card-type { display: none; }
+.combat > .battle-stage { height: 196px; }
+.hand-grid .card-art { height: 26px; }
+.hand-grid .card-art .type-ico { width: 20px; height: 20px; }
+.hand-grid .card-art .own-ico { width: 18px; height: 18px; }
+.hand-grid .card-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hand-grid .choice-card .card { height: 100%; }
+
+/* 縦向き：横向き用のまとまり（.side）をばらして、上から 舞台→パーティ→エネルギー→…→手札→ログ→操作 の順に */
+.combat > .side { display: contents; }
+.combat > .battle-stage { order: 1; } .combat > .party { order: 2; } .side > .infobar { order: 3; }
+.combat > .pile { order: 4; } .combat > .items-row { order: 5; } .combat > .choice { order: 6; }
+.combat > .hand { order: 7; } .combat > .log-box { order: 8; } .side > .action-bar { order: 9; }
+
+/* ===== 横向き（スマホを横にしたとき・PC）：舞台とパーティを横に、手札は1行、右に操作 ===== */
+@media (orientation: landscape) and (min-width: 640px) {
+  #app:has(.combat) { max-width: 1100px; padding-bottom: 12px; }
+  .combat {
+    display: grid; grid-template-columns: minmax(0, 1fr) 200px; column-gap: 10px; row-gap: 0;
+    grid-template-areas: "stage party" "stage log" "choice choice" "pile pile" "items items" "hand side";
+  }
+  .combat > * { margin-bottom: 8px; }
+  .combat > .battle-stage { grid-area: stage; height: auto; min-height: 170px; }
+  .combat > .party { grid-area: party; padding: 8px; gap: 6px; }
+  .combat > .choice { grid-area: choice; }
+  .combat > .pile { grid-area: pile; }
+  .combat > .items-row { grid-area: items; }
+  .combat > .hand { grid-area: hand; align-self: start; padding-top: 6px; }
+  .combat > .log-box { grid-area: log; }
+  .combat > .side { grid-area: side; display: flex; flex-direction: column; gap: 8px; justify-content: flex-end; }
+  .party .chars { grid-template-columns: 1fr; gap: 3px; }
+  .party .char { padding: 2px 4px; }
+  .party .char .sprite { width: 24px !important; height: 24px !important; }
+  .combat > .log-box { align-self: end; }
+  .party .char-body { display: flex; align-items: center; gap: 6px; }
+  .side .infobar { flex-wrap: wrap; justify-content: center; }
+  .side .infobar .spacer { display: none; }
+  .side .action-bar { position: static; margin: 0; padding: 0; background: none; }
+  .side .action-bar .row { flex-direction: column; align-items: stretch; gap: 6px; }
+  .side .action-bar button { min-height: 44px; }
+  .cards.hand-grid { grid-template-columns: repeat(var(--wide, 5), minmax(0, 1fr)); }
+}
+/* 横向きで高さが低い（スマホ）：詰めて1画面に収める */
+@media (orientation: landscape) and (min-width: 640px) and (max-height: 520px) {
+  .topbar { min-height: 38px; padding: 3px 14px; margin-bottom: 6px; }
+  .topbar h1 { font-size: var(--fs); }
+  .back-btn { width: 30px; height: 30px; }
+  .combat > .battle-stage { min-height: 150px; }
+  .battle-stage .enemy-sprite { width: 60px !important; height: 60px !important; }
+  .battle-stage .enemy.boss .enemy-sprite { width: 80px !important; height: 80px !important; }
+  .hand-grid .card { min-height: 108px; }
+  .party .chips .chip { padding-top: 0; padding-bottom: 0; }
+  .party .char { padding: 1px 4px; }
+  .party .char .sprite { width: 20px !important; height: 20px !important; }
+  .party .party-hp .bar { height: 18px; }
+  .hand-grid .card-art { height: 20px; }
+  .hand-grid .card-body { margin-top: 2px; padding: 3px 4px; }
+  .energy { width: 44px; height: 44px; }
+  .energy b { font-size: 19px; }
+  .side { gap: 6px; }
+  .side .infobar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; align-items: center; justify-items: center; }
+  .side .infobar .turn-label { grid-column: 2 / 4; justify-self: start; }
+  .side .infobar button.small { width: 100%; padding: 2px 4px; min-height: 26px; font-size: 11px; }
+  .side .action-bar .row { flex-direction: row; }
+  .side .action-bar .row button { flex: 1; min-height: 40px; padding: 4px 6px; }
+}
