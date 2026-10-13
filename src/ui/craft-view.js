@@ -11,16 +11,6 @@
     });
   }
 
-  // 倍率を「+12%」「−10%」のように表示
-  function pct(m) {
-    const v = Math.round((m - 1) * 100);
-    return v > 0 ? `+${v}%` : v < 0 ? `−${-v}%` : '±0%';
-  }
-  // レベルの恩恵の表示（レベル差がプラスなら緑、マイナスなら赤）
-  function lvBonusLine(diff, parts) {
-    return h('div', { class: 'lv-bonus ' + (diff > 0 ? 'good' : diff < 0 ? 'bad' : 'muted') },
-      `Lv差${diff > 0 ? '+' : ''}${diff}：` + parts.join('・'));
-  }
 
   function craftScreen(el) {
     let life = 'smith';
@@ -39,17 +29,20 @@
         const ok = G().hasMaterials(rc.mats);
         const owned = rc.kind === 'tool' && s.tools.includes(rc.id);
         let info = '';
+        let skills = null;
         if (rc.kind === 'equip') {
-          const ch = R.Craft.gradeChances(lv, rc.difficulty);
-          info = `${R.DATA.equipment.types[rc.base.type].name}・${R.DATA.equipment.slotNames[rc.base.slot]}・R${rc.base.rank}　枠 並${Math.round(ch[0] * 100)} 良${Math.round(ch[1] * 100)} 極${Math.round(ch[2] * 100)}`;
+          info = `${R.DATA.equipment.types[rc.base.type].name}・R${rc.base.rank}`;
+          skills = R.Craft.craftSkills(lv, rc.difficulty);
         } else if (rc.kind === 'tool') {
-          info = `採集道具・強さ${rc.tool.power}` + (owned ? '・所持済み' : '');
+          info = owned ? '所持' : `強さ${rc.tool.power}`;
         } else {
           info = rc.item.desc;
         }
         return h('div', { class: 'recipe' + (ok && !owned ? '' : ' unavailable') },
           h('div', { class: 'recipe-main' },
-            h('div', null, h('b', null, rc.name), h('span', { class: 'muted' }, `　難${rc.difficulty}`)),
+            h('div', null, h('b', null, rc.name), h('span', { class: 'muted' }, `　難${rc.difficulty}`),
+              skills && skills.cardChoice ? h('span', { class: 'skill-chip' }, 'カード2択') : null,
+              skills && skills.slotChoice ? h('span', { class: 'skill-chip' }, '枠2択') : null),
             h('div', { class: 'muted recipe-info' }, info),
             h('div', { class: 'recipe-mats' }, matReqView(rc.mats))),
           h('button', { class: ok && !owned ? 'primary' : '', disabled: !ok || owned, onclick: () => startCraft(rc) }, '作る'));
@@ -95,7 +88,7 @@
 
       function renderPuzzle() {
         clear(el);
-        el.appendChild(R.UI.header(`生産：${rc.name}`));
+        el.appendChild(R.UI.header(rc.name));
         const q = R.Craft.puzzleQuality(st);
         // 置く場所のプレビュー：盤面は作り直さず、マスの色だけ変える（作り直すとマウスの出入りが無限に続くため）
         const cellEls = [];
@@ -121,12 +114,10 @@
           }));
         if (hover) setTimeout(() => showGhost(hover[0], hover[1]), 0);
         el.appendChild(h('div', { class: 'panel puzzle' },
-          h('div', null, h('b', null, rc.name), h('span', { class: 'muted' }, `（難易度${rc.difficulty}・${R.Life.LIVES[life]}Lv${lv}）`)),
-          lvBonusLine(params.diff, [`手持ち${params.hand}`, `無料捨て${params.freeDiscards}`]),
           h('div', { class: 'row' },
-            h('span', { class: 'energy' }, `${st.turns}手`),
-            h('span', { class: 'muted' }, `最高：${st.thresholds.best}手以内／上質：${st.thresholds.fine}手以内`),
-            h('span', null, `${st.filledCount}/${st.total}マス`)),
+            h('span', { class: 'energy', title: '手数' }, h('b', null, String(st.turns)), '手'),
+            h('span', { class: 'q-chip best' + (st.turns <= st.thresholds.best ? '' : ' off') }, `最高 ${st.thresholds.best}`),
+            h('span', { class: 'q-chip fine' + (st.turns <= st.thresholds.fine ? '' : ' off') }, `上質 ${st.thresholds.fine}`)),
           boardEl,
           st.done
             ? h('div', { class: 'row' },
@@ -135,9 +126,9 @@
             : h('div', { class: 'puzzle-hand' },
               st.hand.map((p, i) => h('button', { class: 'piece-btn' + (i === st.sel ? ' selected' : ''), 'aria-label': `ピース${i + 1}`, onclick: () => { R.Craft.puzzleSelect(st, i); renderPuzzle(); } },
                 pieceView(p, i === st.sel ? st.rot : 0))),
-              h('button', { onclick: () => { R.Craft.puzzleRotate(st); renderPuzzle(); } }, '回転（R）'),
+              h('button', { title: 'R キー', onclick: () => { R.Craft.puzzleRotate(st); renderPuzzle(); } }, '回転'),
               h('button', { onclick: () => { R.Craft.puzzleDiscard(st); renderPuzzle(); } },
-                st.freeDiscards > 0 ? `捨てる（無料あと${st.freeDiscards}）` : '捨てる（+1手）'))));
+                st.freeDiscards > 0 ? `捨てる（無料${st.freeDiscards}）` : '捨てる（+1手）'))));
       }
       renderPuzzle();
     }
@@ -159,28 +150,62 @@
       const ups = R.Life.addExp(s.life[life], R.Craft.expFor(rc, quality));
       G().save();
       clear(el);
-      el.appendChild(R.UI.header(`生産：${rc.name}`));
-      el.appendChild(h('div', { class: 'result result-win' }, `完成！ 品質：${R.DATA.config.quality[quality].name}`));
+      el.appendChild(R.UI.header(rc.name));
+      el.appendChild(h('div', { class: 'result result-win' }, `完成！ ${R.DATA.config.quality[quality].name}`));
       if (ups) el.appendChild(h('div', { class: 'good' }, `${R.Life.LIVES[life]}Lvが上がった！（Lv${s.life[life].lv}）`));
       if (rc.kind === 'equip') {
-        el.appendChild(R.UI.itemDetail(made));
-        // 装備できるキャラの今の装備と比較
-        const slot = R.Gear.getBase(made).slot;
-        const job = s.party.find(j => R.Gear.canEquip(j, made)) || Object.keys(R.DATA.jobs).find(j => R.DATA.jobs[j].enabled && R.Gear.canEquip(j, made));
-        if (job) {
-          el.appendChild(R.UI.comparison(job, slot, made));
-          el.appendChild(h('button', { class: 'primary', onclick: () => { G().equip(job, slot, made.uid); G().save(); render(); } }, `${R.DATA.jobs[job].name}に装備する`));
+        // 固有スキル（Lv差で発動）：ランダムカード・ランダム枠を2択から選べる。選び直すと詳細と比較だけ描き直す
+        const choices = R.Craft.equipmentChoices(made, lv, R.Craft.craftSkills(lv, rc.difficulty));
+        const detail = h('div');
+        const drawDetail = () => {
+          clear(detail);
+          detail.appendChild(R.UI.itemDetail(made));
+          // 装備できるキャラの今の装備と比較
+          const slot = R.Gear.getBase(made).slot;
+          const job = s.party.find(j => R.Gear.canEquip(j, made)) || Object.keys(R.DATA.jobs).find(j => R.DATA.jobs[j].enabled && R.Gear.canEquip(j, made));
+          if (job) {
+            detail.appendChild(R.UI.comparison(job, slot, made));
+            detail.appendChild(h('button', { class: 'primary', onclick: () => { G().equip(job, slot, made.uid); G().save(); render(); } }, `${R.DATA.jobs[job].name}に装備する`));
+          }
+        };
+        if (choices.cards) {
+          const row = h('div', { class: 'choice-row' });
+          const drawCards = () => {
+            clear(row);
+            for (const id of choices.cards) {
+              row.appendChild(R.UI.cardEl({ cardId: id, upgraded: false, enchants: [] }, {
+                selected: made.randomCard === id,
+                onClick: () => { made.randomCard = id; G().save(); drawCards(); drawDetail(); }
+              }));
+            }
+          };
+          drawCards();
+          el.appendChild(h('div', { class: 'panel pick-panel' }, h('div', { class: 'pick-title' }, 'カード'), row));
         }
+        if (choices.slots) {
+          const row = h('div', { class: 'choice-row slots' });
+          const drawSlots = () => {
+            clear(row);
+            for (const set of choices.slots) {
+              row.appendChild(h('button', { class: made.slots === set ? 'primary' : '', onclick: () => { made.slots = set; G().save(); drawSlots(); drawDetail(); } },
+                set.map(x => h('div', null, R.UI.slotText(x)))));
+            }
+          };
+          drawSlots();
+          el.appendChild(h('div', { class: 'panel pick-panel' }, h('div', { class: 'pick-title' }, 'ランダム枠'), row));
+        }
+        el.appendChild(detail);
+        drawDetail();
       } else {
         el.appendChild(h('div', { class: 'panel' }, `${rc.name}（${R.DATA.config.quality[quality].name}）：${rc.item.desc}`));
       }
-      el.appendChild(h('button', { onclick: render }, '生産画面に戻る'));
+      el.appendChild(h('button', { onclick: render }, 'もどる'));
     }
 
     render();
   }
 
   R.UI.extraMenu = R.UI.extraMenu || [];
-  R.UI.extraMenu.push({ label: '生産', icon: 'icon_craft', desc: '装備・道具を作る', fn: () => R.UI.show(craftScreen), order: 30 });
+  R.UI.extraMenu.push({ label: '生産', icon: 'icon_craft', fn: () => R.UI.show(craftScreen), order: 30 });
   R.UI.craftScreen = craftScreen;
 })(globalThis.RASEN = globalThis.RASEN || {});

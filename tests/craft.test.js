@@ -174,3 +174,23 @@ test('全レシピの素材がデータにある', () => {
   for (const b of Object.values(R.DATA.equipment.bases)) for (const m of Object.keys(b.mats)) assert.ok(R.DATA.materials[m], `${b.name} の ${m}`);
   for (const t of Object.values(R.DATA.equipment.tools)) for (const m of Object.keys(t.mats)) assert.ok(R.DATA.materials[m], `${t.name} の ${m}`);
 });
+
+test('生産の固有スキル：Lv差で2択が発動（ランダムカード・ランダム枠）', () => {
+  const sk = R.DATA.crafting.skills;
+  const d = R.DATA.equipment.bases.copper_sword.difficulty;
+  assert.deepStrictEqual(R.Craft.craftSkills(d + sk.cardChoice - 1, d), { cardChoice: false, slotChoice: false });
+  assert.deepStrictEqual(R.Craft.craftSkills(d + sk.cardChoice, d), { cardChoice: true, slotChoice: false });
+  assert.deepStrictEqual(R.Craft.craftSkills(d + sk.slotChoice, d), { cardChoice: true, slotChoice: true });
+  const rng = R.createRng(3);
+  for (const baseId of ['copper_sword', 'copper_ring', 'oak_staff']) {
+    const item = R.Craft.makeEquipment(baseId, { lv: 10, quality: 'normal', rng });
+    const ch = R.Craft.equipmentChoices(item, 10, { cardChoice: true, slotChoice: true }, rng);
+    assert.strictEqual(ch.cards[0], item.randomCard);
+    assert.notStrictEqual(ch.cards[1], item.randomCard);
+    assert.strictEqual(R.DATA.cards[ch.cards[1]].pool, R.DATA.equipment.bases[baseId].type);
+    assert.strictEqual(ch.slots[0], item.slots);
+    assert.strictEqual(ch.slots[1].length, 2);
+  }
+  const none = R.Craft.equipmentChoices(R.Craft.makeEquipment('copper_sword', { lv: 1, quality: 'normal', rng }), 1, { cardChoice: false, slotChoice: false }, rng);
+  assert.deepStrictEqual(none, {});
+});

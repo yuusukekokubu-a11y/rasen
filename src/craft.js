@@ -265,6 +265,29 @@
     return item;
   }
 
+  // 生産の固有スキル：Lv差で決まる（天井の役割）
+  function craftSkills(lv, difficulty) {
+    const sk = C().skills;
+    const diff = lv - difficulty;
+    return { cardChoice: diff >= sk.cardChoice, slotChoice: diff >= sk.slotChoice };
+  }
+  // 完成した装備の「もう1つの候補」を作る（スキルが発動しているぶんだけ）
+  //   cards: [今のランダムカード, 別のカード] / slots: [今のランダム枠, 別の組]
+  function equipmentChoices(item, lv, skills, rng) {
+    rng = rng || R.createRng();
+    const base = R.DATA.equipment.bases[item.base];
+    const out = {};
+    if (skills.cardChoice) {
+      const pool = Object.keys(R.DATA.cards).filter(id => R.DATA.cards[id].pool === base.type && id !== item.randomCard);
+      if (pool.length) out.cards = [item.randomCard, rng.pick(pool)];
+    }
+    if (skills.slotChoice) {
+      const target = base.slot === 'accessory' ? item.power : base.fixedCard;
+      out.slots = [item.slots, rollSlots(base, target, lv, rng)];
+    }
+    return out;
+  }
+
   function expFor(recipe, quality) {
     const e = C().exp;
     if (recipe.kind === 'tool') return e.tool + recipe.difficulty;
@@ -273,6 +296,6 @@
 
   R.Craft = {
     recipesFor, pieceCells, puzzleParams, blueprintFor, puzzleStart, puzzleSelect, placement, puzzlePlace, puzzleRotate, puzzleDiscard, puzzleQuality, canPlaceAnywhere, puzzleAutoStep,
-    unlockedPowerCount, unlockedPowers, rollAccessoryPower, rollGrade, gradeChances, enchantCandidates, rollSlots, makeEquipment, expFor
+    unlockedPowerCount, unlockedPowers, rollAccessoryPower, rollGrade, gradeChances, enchantCandidates, rollSlots, makeEquipment, craftSkills, equipmentChoices, expFor
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

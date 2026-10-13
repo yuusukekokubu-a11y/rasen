@@ -85,7 +85,7 @@
     const s = G().state;
     const d = R.DATA.dungeons[id];
     clear(el);
-    el.appendChild(R.UI.header(d.name, () => R.UI.show(departScreen), d.recommend));
+    el.appendChild(R.UI.header(d.name, () => R.UI.show(departScreen)));
     el.appendChild(R.UI.stage(id, 'stage-head', R.UI.sprite(dungeonSprite(d), 72, { extraClass: 'boss' })));
     const max = G().maxUnlockedDifficulty(id);
     const done = s.maxDifficulty[id] || 0;
@@ -132,12 +132,11 @@
 
     // 持ち込みアイテム
     const slots = R.DATA.config.combat.itemSlots;
-    if (R.DATA.items) {
+    if (R.DATA.items && s.consumables.length) {
       const title = h('h2', null, '');
       const setTitle = () => { title.textContent = `持ち込みアイテム（${s.bring.length}/${slots}）`; };
       setTitle();
       el.appendChild(title);
-      if (!s.consumables.length) el.appendChild(h('div', { class: 'muted' }, 'なし'));
       const boxes = [];
       const syncBoxes = () => { for (const b of boxes) b.disabled = !b.checked && s.bring.length >= slots; };
       el.appendChild(h('div', { class: 'items-pick' }, s.consumables.map(c => {
@@ -152,7 +151,6 @@
       syncBoxes();
     }
     el.appendChild(h('div', { class: 'action-bar' },
-      h('div', { class: 'muted center' }, '全滅すると素材と持ち込みを失う'),
       goBtn));
     refresh();
   }
@@ -184,8 +182,8 @@
       pips,
       h('div', { class: 'party-hp' }, R.UI.sprite('ico_hp', 18), bar(run.hp, run.maxHp, 'hp big')));
     el.appendChild(prog);
-    el.appendChild(h('div', { class: 'panel' },
-      h('div', null, h('b', null, '素材　'), matText(run.bag)),
+    if (Object.keys(run.bag).length || run.items.length || run.endless) el.appendChild(h('div', { class: 'panel' },
+      Object.keys(run.bag).length ? h('div', null, h('b', null, '素材　'), matText(run.bag)) : null,
       run.items.length ? h('div', null, h('b', null, '持ち込み　'), run.items.map(i => R.DATA.items[i.id].name).join('、')) : null,
       run.endless ? h('div', { class: 'muted' }, `最高記録 ${G().state.bestFloor[run.dungeonId] || 0}階`) : null));
     const area = h('div');
@@ -206,7 +204,7 @@
           h('button', { class: 'primary', onclick: () => { run.checkpointChoice(false); G().saveRun(); R.UI.show(runScreen); } }, '帰還する'),
           h('button', { class: 'danger', onclick: () => { run.checkpointChoice(true); G().saveRun(); R.UI.show(runScreen); } }, `さらに潜る（次のボスは${nextBoss}階）`))));
     } else if (run.phase === 'reward') {
-      area.appendChild(h('h2', null, '報酬を1つ選ぶ'));
+      area.appendChild(h('h2', null, '報酬'));
       const desc = {
         mining: `${R.Gather.gatherParams(run.gatherEntry('mining'), G().state.life.mining.lv, run.tools.pick).swings}回`,
         logging: `${R.Gather.gatherParams(run.gatherEntry('logging'), G().state.life.logging.lv, run.tools.axe).swings}回`,
@@ -284,24 +282,11 @@
       clear(area);
       const rareFound = board.found.filter(v => v === 'rare').length;
       area.appendChild(h('div', { class: 'panel gather' },
-        h('div', null, h('b', null, `${R.Dungeon.REWARD_NAMES[gn.kind]}`),
-          h('span', { class: 'muted' }, `（${word.target}の硬さ${gn.node.hardness}・${R.Life.LIVES[gn.life]}Lv${run.lives[gn.life].lv}）`)),
-        (() => {
-          const lv = run.lives[gn.life].lv;
-          const diff = lv - gn.node.hardness;
-          const base = R.Gather.gatherParams(gn.node, gn.node.hardness, 1);
-          const noTool = R.Gather.gatherParams(gn.node, lv, 1);
-          const lvSw = noTool.swings - base.swings;
-          const toolSw = gn.params.swings - noTool.swings;
-          const sign = (n) => (n > 0 ? '+' : n < 0 ? '−' : '±') + Math.abs(n);
-          return h('div', { class: 'lv-bonus ' + (diff > 0 ? 'good' : diff < 0 ? 'bad' : 'muted') },
-            `Lv差${diff > 0 ? '+' : ''}${diff}：回数${sign(lvSw)}・開始マス${gn.params.hints}／道具：回数${sign(toolSw)}`);
-        })(),
-        h('div', { class: 'muted' }, `${word.vein}${total}つ（★${G2.rareVeins}）・数字＝まわりの${word.vein}の数`),
         h('div', { class: 'row' },
+          h('b', null, R.Dungeon.REWARD_NAMES[gn.kind]),
           h('span', { class: 'energy', title: '残り回数' }, h('b', null, String(board.swingsLeft)), `/${board.swings}`),
-          h('span', null, `見つけた ${board.found.length} / ${total}`),
-          rareFound ? h('span', { class: 'good' }, `★レア ${rareFound}`) : null),
+          h('span', { class: 'vein-count' }, `◆ ${board.found.length}/${total}`),
+          rareFound ? h('span', { class: 'good' }, `★${rareFound}`) : null),
         h('div', { class: 'vein-grid', style: { gridTemplateColumns: `repeat(${G2.size}, 1fr)` } }, board.cells.map((c, i) => {
           if (!c.open) {
             return h('button', { class: 'vein-cell closed', disabled: board.done, 'aria-label': `マス${i + 1}を掘る`, onclick: () => {
@@ -330,6 +315,6 @@
   }
 
   R.UI.extraMenu = R.UI.extraMenu || [];
-  R.UI.extraMenu.push({ label: 'ダンジョンへ出発', desc: 'パーティを組んで出発', icon: 'icon_dungeon', fn: () => R.UI.show(G().run ? runScreen : departScreen), order: 10 });
+  R.UI.extraMenu.push({ label: 'ダンジョン', icon: 'icon_dungeon', fn: () => R.UI.show(G().run ? runScreen : departScreen), order: 10 });
   Object.assign(R.UI, { departScreen, runScreen, matText, partySummary });
 })(globalThis.RASEN = globalThis.RASEN || {});

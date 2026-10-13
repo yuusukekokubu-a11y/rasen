@@ -44,7 +44,6 @@
     function render() {
       clear(el);
       el.appendChild(header('練習戦闘', () => show(homeScreen)));
-      el.appendChild(h('p', { class: 'muted' }, '記録は残りません'));
       // 仲間を選んでも画面は作り直さず、ボタンだけ書き換える（画面が動かないように）
       const startBtn = h('button', { class: 'primary', onclick: start });
       const refresh = () => {
@@ -89,22 +88,23 @@
     // 夜の野営地の絵の上に、題名とパーティ
     el.appendChild(R.UI.stage('camp', 'home-hero',
       h('div', { class: 'home-title' }, 'ラセン'),
-      h('div', { class: 'home-sub' }, '拠点'),
       h('div', { class: 'home-party' }, party.map(j => R.UI.sprite(j, 68)))));
+    // 文字は名前だけ（説明は出さない）。シミュレーターは開発用なので「テスト用の機能」がオンのときだけ
+    const debug = R.Game.state.settings && R.Game.state.settings.debug;
     const menu = [
-      { label: '練習戦闘', desc: '記録なし', icon: 'icon_practice', fn: () => show(practiceScreen), order: 80 },
-      { label: '持ち物', desc: '素材・道具・Lv', icon: 'icon_bag', fn: () => show(inventoryScreen), order: 70 }
-    ].concat(R.UI.extraMenu || []).sort((x, y) => (x.order || 50) - (y.order || 50));
+      { label: '練習戦闘', icon: 'icon_practice', fn: () => show(practiceScreen), order: 80 },
+      { label: '持ち物', icon: 'icon_bag', fn: () => show(inventoryScreen), order: 70 }
+    ].concat(R.UI.extraMenu || []).filter(m => debug || !m.devOnly).sort((x, y) => (x.order || 50) - (y.order || 50));
     const run = R.Game.run;
     el.appendChild(h('div', { class: 'menu' }, menu.map((m, i) => {
       const wide = i === 0;
       const label = wide && run ? '冒険の続き' : m.label;
-      const desc = wide && run ? `${run.def.name}・${run.whereText()}` : m.desc;
+      const desc = wide && run ? `${run.def.name}・${run.whereText()}` : null;
       return h('button', { class: 'menu-item' + (wide ? ' wide primary' : ''), onclick: m.fn ? m.fn : () => show(m.screen) },
         m.icon ? R.UI.sprite(m.icon, wide ? 44 : 36) : null,
         h('div', { class: 'menu-text' },
           h('div', { class: 'menu-label' }, label),
-          h('div', { class: 'menu-desc' }, desc)));
+          desc ? h('div', { class: 'menu-desc' }, desc) : null));
     })));
   }
 

@@ -67,8 +67,7 @@
         if (onToggle(j, ev.target.checked) === false) ev.target.checked = !ev.target.checked;
       } }),
       R.UI.sprite ? R.UI.sprite(j, 48) : null,
-      h('span', { class: 'job-name' }, R.DATA.jobs[j].name),
-      h('span', { class: 'job-desc' }, R.DATA.jobs[j].desc))));
+      h('span', { class: 'job-name' }, R.DATA.jobs[j].name))));
   }
 
   // ステータスをアイコンで表示（HP・攻撃力・防御力・魔力）

@@ -3,7 +3,6 @@
   const { h, clear } = R.UI;
   const G = () => R.Game;
   const STAT_LABEL = { hp: 'HP', atk: '攻撃力', def: '防御力', mag: '魔力' };
-  const GRADE_LABEL = ['並', '良', '極'];
 
   function slotText(slot) {
     if (slot.kind === 'stat') return `${STAT_LABEL[slot.stat]}+${slot.value}`;
@@ -22,10 +21,10 @@
     const powerJob = item.power ? Object.keys(R.DATA.jobs).find(j => R.DATA.jobs[j].powers.includes(item.power)) : null;
     return h('div', { class: 'panel item-detail' },
       h('div', null, h('b', null, R.Gear.itemName(item)),
-        h('span', { class: 'muted' }, `　${type.name}・${R.DATA.equipment.slotNames[base.slot]}・ランク${base.rank}`),
+        h('span', { class: 'muted' }, `　${type.name}・R${base.rank}`),
         powerJob ? h('span', { class: 'muted' }, `・${R.DATA.jobs[powerJob].name}専用`) : null),
-      h('div', null, `固定：${fixedText}`),
-      h('div', null, 'ランダム枠：' + ((item.slots || []).length ? item.slots.map(s => slotText(s) + (s.grade !== undefined ? `［${GRADE_LABEL[s.grade]}］` : '')).join('／') : 'なし')),
+      h('div', null, fixedText),
+      (item.slots || []).length ? h('div', { class: 'slot-line' }, item.slots.map(s => h('span', { class: 'slot-chip g' + (s.grade || 0) }, slotText(s)))) : null,
       opts.cards === false ? null : h('div', { class: 'cards small' }, R.Gear.itemCards(item).map(c => R.UI.cardEl(c, {
         extraClass: c.source === 'power' ? 'power-src' : '', title: { fixed: '固定カード', random: 'ランダムカード', power: 'パワーカード' }[c.source]
       }))));
@@ -41,10 +40,11 @@
     const partyAfter = partyBefore - sBefore.hp + sAfter.hp;
     const inParty = G().state.party.includes(job);
 
-    const statRows = R.Gear.STATS.map(k => {
+    // 変わるステータスだけを出す
+    const statRows = R.Gear.STATS.filter(k => sAfter[k] !== sBefore[k]).map(k => {
       const d = sAfter[k] - sBefore[k];
-      return h('tr', null, h('td', null, STAT_LABEL[k]), h('td', null, String(sBefore[k])), h('td', null, '→'),
-        h('td', null, String(sAfter[k])), h('td', { class: d > 0 ? 'good' : d < 0 ? 'bad' : 'muted' }, d > 0 ? `+${d}` : d < 0 ? String(d) : '±0'));
+      return h('div', { class: 'stat-change' }, R.UI.sprite({ hp: 'ico_hp', atk: 'ico_atk', def: 'ico_def', mag: 'ico_mag' }[k], 14),
+        h('span', null, `${sBefore[k]} → ${sAfter[k]}`), h('b', { class: d > 0 ? 'good' : 'bad' }, d > 0 ? `+${d}` : String(d)));
     });
 
     // デッキの変化：外れるカード・入るカード
@@ -55,17 +55,14 @@
     const added = newCards.filter(c => !oldCards.some(o => key(o) === key(c)));
 
     return h('div', { class: 'panel compare' },
-      h('h2', null, `比較：${R.DATA.jobs[job].name}の${R.DATA.equipment.slotNames[slot]}`),
-      h('div', { class: 'row' },
-        h('div', null, h('div', { class: 'muted' }, '今の装備'), gear[slot] ? itemDetail(gear[slot], { cards: false }) : h('div', null, 'なし')),
-        h('div', null, h('div', { class: 'muted' }, '付け替え後'), itemDetail(newItem, { cards: false }))),
-      h('table', { class: 'stat-compare' }, h('tr', null, h('th', null, 'ステータス'), h('th', null, '今'), h('th'), h('th', null, '後'), h('th', null, '増減')), statRows),
-      inParty ? h('div', null, `パーティHP：${partyBefore} → ${partyAfter}`) : h('div', { class: 'muted' }, '（パーティ外）'),
-      h('div', { class: 'row deck-diff' },
-        h('div', null, h('div', { class: 'bad' }, `デッキから外れるカード（${removed.length}）`),
-          h('div', { class: 'cards small' }, removed.length ? removed.map(c => R.UI.cardEl(c, { extraClass: 'removed', stats: sBefore })) : h('span', { class: 'muted' }, 'なし'))),
-        h('div', null, h('div', { class: 'good' }, `デッキに入るカード（${added.length}）`),
-          h('div', { class: 'cards small' }, added.length ? added.map(c => R.UI.cardEl(c, { extraClass: 'added', stats: sAfter })) : h('span', { class: 'muted' }, 'なし')))));
+      h('h2', null, `${R.DATA.jobs[job].name}の${R.DATA.equipment.slotNames[slot]}`),
+      statRows.length ? h('div', { class: 'stat-changes' }, statRows) : null,
+      inParty && partyAfter !== partyBefore ? h('div', { class: 'stat-change' }, 'パーティHP', h('span', null, `${partyBefore} → ${partyAfter}`)) : null,
+      removed.length || added.length ? h('div', { class: 'row deck-diff' },
+        removed.length ? h('div', null, h('div', { class: 'bad' }, '外れる'),
+          h('div', { class: 'cards small' }, removed.map(c => R.UI.cardEl(c, { extraClass: 'removed', stats: sBefore })))) : null,
+        added.length ? h('div', null, h('div', { class: 'good' }, '入る'),
+          h('div', { class: 'cards small' }, added.map(c => R.UI.cardEl(c, { extraClass: 'added', stats: sAfter })))) : null) : null);
   }
 
   function equipScreen(el) {
@@ -94,12 +91,12 @@
 
       // 候補
       const cands = G().state.items.filter(it => R.Gear.getBase(it).slot === slot && R.Gear.canEquip(job, it) && it.uid !== (gear[slot] && gear[slot].uid));
-      el.appendChild(h('h2', null, `付け替え候補（${cands.length}）`));
+      el.appendChild(h('h2', null, `候補 ${cands.length}`));
       if (!cands.length) el.appendChild(h('div', { class: 'muted' }, 'なし'));
       el.appendChild(h('div', { class: 'row' }, cands.map(it => {
         const who = G().equippedBy(it.uid);
         return h('button', { class: candidate === it ? 'primary' : '', onclick: () => { candidate = it; message = ''; render(); } },
-          R.Gear.itemName(it) + (who ? `（${R.DATA.jobs[who.job].name}が装備中）` : ''));
+          R.Gear.itemName(it) + (who ? `（${R.DATA.jobs[who.job].name}）` : ''));
       })));
       if (candidate) {
         el.appendChild(comparison(job, slot, candidate));
@@ -124,6 +121,6 @@
   }
 
   R.UI.extraMenu = R.UI.extraMenu || [];
-  R.UI.extraMenu.push({ label: '装備', icon: 'icon_equip', desc: '付け替え・比較', fn: () => R.UI.show(equipScreen), order: 20 });
+  R.UI.extraMenu.push({ label: '装備', icon: 'icon_equip', fn: () => R.UI.show(equipScreen), order: 20 });
   Object.assign(R.UI, { equipScreen, itemDetail, comparison, slotText });
 })(globalThis.RASEN = globalThis.RASEN || {});

@@ -571,3 +571,23 @@ button.primary .menu-desc { color: #4a3610; }
 /* 仲間選び：3人そろう前も能力の枠の高さを確保して、下の部分が動かないようにする */
 .summary-slot { min-height: 118px; }
 .summary-wait { min-height: 110px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-weight: 800; letter-spacing: .1em; }
+
+/* 生産の固有スキル：2択 */
+.pick-panel { display: flex; flex-direction: column; gap: 6px; }
+.pick-title { font-weight: 800; color: var(--gold-hi); letter-spacing: .1em; }
+.choice-row { display: flex; gap: 10px; justify-content: center; }
+.choice-row.slots button { flex: 1; min-height: 56px; font-size: var(--fs-s); }
+.skill-chip { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 3px; font-size: 10.5px; font-weight: 800; color: #2b1c04; background: linear-gradient(#f4d98a, #c9a24a); vertical-align: 1px; }
+
+/* 文章を減らした表示 */
+.stat-changes { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 4px 0 8px; }
+.stat-change { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.slot-line { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 4px; }
+.slot-chip { font-size: 11px; padding: 0 6px; border-radius: 3px; border: 1px solid var(--win-line); background: #0e1018; }
+.slot-chip.g1 { border-color: #5a8ad8; color: #bcd4ff; }
+.slot-chip.g2 { border-color: var(--gold); color: var(--gold-hi); }
+.q-chip { font-size: 12px; font-weight: 800; padding: 1px 8px; border-radius: 3px; border: 2px solid var(--void); }
+.q-chip.best { background: linear-gradient(#f4d98a, #c9a24a); color: #2b1c04; }
+.q-chip.fine { background: linear-gradient(#a8c4f0, #5a86d8); color: #0c1a33; }
+.q-chip.off { filter: grayscale(1) brightness(.5); }
+.deck-diff > div > .bad, .deck-diff > div > .good { margin-bottom: 10px; font-weight: 800; }

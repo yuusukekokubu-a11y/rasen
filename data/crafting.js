@@ -75,6 +75,10 @@
     statChoices: ['hp', 'atk', 'def', 'mag'],
 
     // ===== 経験値 =====
-    exp: { base: 14, perDifficulty: 2, quality: { normal: 1.0, fine: 1.2, best: 1.5 }, tool: 8 }
+    exp: { base: 14, perDifficulty: 2, quality: { normal: 1.0, fine: 1.2, best: 1.5 }, tool: 8 },
+
+    // 生産の固有スキル（ガチャの簡易的な天井）：生産Lv − レシピの難易度 がこの値以上なら、完成時に2択から選べる
+    //   cardChoice：ランダムカードを2枚の候補から選ぶ / slotChoice：ランダム枠を2組の候補から選ぶ
+    skills: { cardChoice: 3, slotChoice: 6 }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});
