@@ -34,9 +34,7 @@
       el.appendChild(h('div', { class: 'row' }, Object.entries(R.DATA.crafting.lives).map(([k, L]) =>
         h('button', { class: k === life ? 'primary' : '', onclick: () => { life = k; render(); } }, `${L.name} Lv${s.life[k].lv}`))));
       const L = R.DATA.crafting.lives[life];
-      const typeNames = L.types.filter(t => R.DATA.equipment.types[t]).map(t => R.DATA.equipment.types[t].name);
-      el.appendChild(h('div', { class: 'muted' }, `作れる物：${typeNames.join('・')}${L.tools ? '・採集道具' : ''}${L.items ? '・持ち込みアイテム' : ''}`));
-      el.appendChild(h('div', { class: 'muted' }, '生産Lvが難易度より高いほど、ランダム枠に良い物が出やすく、ミニゲームも進みやすくなります。'));
+      
 
       // アクセサリー：乗せるパワーを選ぶ
       if (life === 'jeweler') {
@@ -46,12 +44,12 @@
         if (!powers.includes(accPower)) accPower = powers[0];
         const nextLv = R.DATA.config.life.powerUnlockLvs.find(lv => lv > s.life.jeweler.lv);
         el.appendChild(h('div', { class: 'panel' },
-          h('div', null, 'アクセサリーに乗せるパワー（その職業専用になります）'),
+          h('div', null, 'パワー（職業専用）'),
           h('div', { class: 'row' }, '職業：', h('select', { onchange: (e) => { accJob = e.target.value; accPower = null; render(); } },
             jobs.map(j => h('option', { value: j, selected: j === accJob }, R.DATA.jobs[j].name)))),
           h('div', { class: 'row' }, 'パワー：', h('select', { onchange: (e) => { accPower = e.target.value; render(); } },
             powers.map(p => h('option', { value: p, selected: p === accPower }, `${R.DATA.cards[p].name}：${R.DATA.powers[R.DATA.cards[p].effects[0].id].desc}`)))),
-          h('div', { class: 'muted' }, `解禁済み ${powers.length}/${R.DATA.jobs[accJob].powers.length}` + (nextLv ? `（細工Lv${nextLv}で次のパワーが解禁）` : ''))));
+          h('div', { class: 'muted' }, `解禁 ${powers.length}/${R.DATA.jobs[accJob].powers.length}` + (nextLv ? `・次は細工Lv${nextLv}` : ''))));
       }
 
       const lv = s.life[life].lv;
@@ -99,9 +97,7 @@
       function renderForge() {
         clear(el);
         el.appendChild(R.UI.header(`生産：${rc.name}`));
-        el.appendChild(h('div', { class: 'muted' },
-          `少ない回数で仕上げるほど高品質：${g.qualityHits.best}回以内＝最高（固定カードが強化版）／${g.qualityHits.fine}回以内＝上質／それ以上＝ふつう。` +
-          `熱が${g.heatLimit}を超える（過熱）と品質が1段下がります。`));
+        el.appendChild(h('div', { class: 'muted' }, `最高：${g.qualityHits.best}回以内／上質：${g.qualityHits.fine}回以内／熱${g.heatLimit}超で品質ダウン`));
         const q = R.Craft.forgeQuality(st);
         const nextQ = R.Craft.qualityFromHits(st.turns + 1, st.overheats);
         const heatPct = Math.min(100, st.heat / g.heatLimit * 100);
@@ -136,7 +132,7 @@
                 renderForge();
               } },
                 h('div', { class: 'menu-label' }, a.name),
-                h('div', { class: 'menu-desc' }, `${a.desc}（${actRange(a)}）`))))));
+                h('div', { class: 'menu-desc' }, actRange(a)))))));
       }
       renderForge();
     }

@@ -60,7 +60,7 @@
         h('div', null, h('div', { class: 'muted' }, '今の装備'), gear[slot] ? itemDetail(gear[slot], { cards: false }) : h('div', null, 'なし')),
         h('div', null, h('div', { class: 'muted' }, '付け替え後'), itemDetail(newItem, { cards: false }))),
       h('table', { class: 'stat-compare' }, h('tr', null, h('th', null, 'ステータス'), h('th', null, '今'), h('th'), h('th', null, '後'), h('th', null, '増減')), statRows),
-      inParty ? h('div', null, `パーティHP：${partyBefore} → ${partyAfter}`) : h('div', { class: 'muted' }, '（このキャラは今パーティにいません）'),
+      inParty ? h('div', null, `パーティHP：${partyBefore} → ${partyAfter}`) : h('div', { class: 'muted' }, '（パーティ外）'),
       h('div', { class: 'row deck-diff' },
         h('div', null, h('div', { class: 'bad' }, `デッキから外れるカード（${removed.length}）`),
           h('div', { class: 'cards small' }, removed.length ? removed.map(c => R.UI.cardEl(c, { extraClass: 'removed', stats: sBefore })) : h('span', { class: 'muted' }, 'なし'))),
@@ -81,7 +81,6 @@
       el.appendChild(h('div', { class: 'row' }, jobs.map(j =>
         h('button', { class: j === job ? 'primary' : '', onclick: () => { job = j; candidate = null; render(); } },
           R.DATA.jobs[j].name + (G().state.party.includes(j) ? '★' : '')))));
-      el.appendChild(h('div', { class: 'muted' }, '★＝パーティにいるキャラ。部位を選ぶと装備できる物が並び、選ぶと比較が出ます。'));
 
       const gear = G().gearOf(job);
       const st = R.Gear.charStats(job, gear);
@@ -96,7 +95,7 @@
       // 候補
       const cands = G().state.items.filter(it => R.Gear.getBase(it).slot === slot && R.Gear.canEquip(job, it) && it.uid !== (gear[slot] && gear[slot].uid));
       el.appendChild(h('h2', null, `付け替え候補（${cands.length}）`));
-      if (!cands.length) el.appendChild(h('div', { class: 'muted' }, 'この部位に付けられる物がありません。生産で作りましょう。'));
+      if (!cands.length) el.appendChild(h('div', { class: 'muted' }, 'なし'));
       el.appendChild(h('div', { class: 'row' }, cands.map(it => {
         const who = G().equippedBy(it.uid);
         return h('button', { class: candidate === it ? 'primary' : '', onclick: () => { candidate = it; message = ''; render(); } },

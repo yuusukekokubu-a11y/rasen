@@ -18,7 +18,7 @@
     function render() {
       clear(el);
       el.appendChild(R.UI.header('シミュレーター', () => R.UI.show(R.UI.homeScreen)));
-      el.appendChild(h('p', { class: 'muted' }, '自動操作で何回も戦わせて、勝率や平均ターン数を出します。数値の調整は data/ フォルダのファイルで行い、ページを再読み込みしてください。'));
+      el.appendChild(h('p', { class: 'muted' }, '数値は data/ フォルダで調整'));
       el.appendChild(h('div', { class: 'panel' },
         h('div', { class: 'row' }, '装備：',
           h('select', { onchange: (e) => { source = e.target.value; } },

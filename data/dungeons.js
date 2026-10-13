@@ -13,7 +13,7 @@
   R.DATA.dungeons = {
     cave: {
       name: '岩窟の洞', requires: [],
-      recommend: 'ランク1〜2の装備向け。打たれ強い敵が多く、ボスは力を溜めて大技を撃つ',
+      recommend: '推奨ランク1〜2・雷が有効',
       floors: [
         { battles: [2, 3], encounters: { slime_pair: 3, bat_trio: 2, wolf_single: 2 }, scale: { hp: 1.0, dmg: 1.0 } },
         { battles: [2, 3], encounters: { wolf_slime: 2, spider_bat: 2, wolf_single: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
@@ -56,7 +56,7 @@
 
     forest: {
       name: '囁きの森', requires: ['cave'],
-      recommend: 'ランク2の装備向け。手数の多い虫と、回復する樹木。炎が弱点の敵が多い',
+      recommend: '推奨ランク2・炎が有効',
       floors: [
         { battles: [2, 3], encounters: { hornet_trio: 2, wolf_hornet: 2, treant_single: 2 }, scale: { hp: 1.0, dmg: 1.0 } },
         { battles: [2, 3], encounters: { treant_wolf: 2, spider_hornet: 2, wolf_hornet: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
@@ -94,7 +94,7 @@
 
     marsh: {
       name: '霧の沼', requires: ['cave'],
-      recommend: 'ランク2の装備向け。脱力・弱体をばらまく敵が多い。雷が弱点の敵が多い',
+      recommend: '推奨ランク2・雷が有効',
       floors: [
         { battles: [2, 3], encounters: { toad_pair: 2, slime_toad: 2, wisp_trio: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
         { battles: [2, 3], encounters: { toad_wisp: 2, wisp_trio: 2, slime_toad: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
@@ -132,7 +132,7 @@
 
     ruins: {
       name: '星降る遺跡', requires: ['forest', 'marsh'],
-      recommend: 'ランク3の装備向け。硬い石像と呪いを使う亡霊。最奥には星喰いの竜',
+      recommend: '推奨ランク3・雷が有効',
       floors: [
         { battles: [2, 3], encounters: { gargoyle_single: 2, doll_pair: 2, phantom_single: 2 }, scale: { hp: 1.0, dmg: 1.0 } },
         { battles: [2, 3], encounters: { gargoyle_phantom: 2, phantom_doll: 2, doll_pair: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
@@ -171,7 +171,7 @@
     // 無限階層（エンドコンテンツ）：4階ごとにボス。倒すたびに「帰還／さらに潜る」を選ぶ。毎回1階から
     spiral: {
       name: '螺旋の塔', requires: ['cave', 'forest', 'marsh', 'ruins'],
-      recommend: '終わりのない塔。4階ごとにボスがいて、倒すたびに帰るか潜るかを選ぶ。深いほど敵が強く、上位素材が出やすい',
+      recommend: '4階ごとに帰還できる',
       endless: {
         segment: 4,              // 何階ごとにボス（＝帰還できる区切り）
         battles: [1, 2],         // 1階あたりの通常の戦闘数（ボスの階はこの後にボス）

@@ -25,7 +25,7 @@
     function render() {
       clear(el);
       el.appendChild(header('練習戦闘', () => show(homeScreen)));
-      el.appendChild(h('p', null, '今の装備で好きな敵と戦えます（結果は何も残りません）。パーティを3人選んでください。'));
+      el.appendChild(h('p', { class: 'muted' }, '記録は残りません'));
       el.appendChild(h('div', { class: 'job-picker' }, jobs.map(j => h('label', { class: 'job-option' },
         h('input', { type: 'checkbox', checked: picked.includes(j), onchange: (ev) => {
           if (ev.target.checked) picked.push(j); else picked = picked.filter(x => x !== j);
@@ -90,7 +90,7 @@
     el.appendChild(h('h2', null, '記録'));
     el.appendChild(h('div', null, `出発 ${s.runs}回／クリア ${Object.values(s.clears).reduce((a, b) => a + b, 0)}回`));
     el.appendChild(h('h2', null, 'セーブデータ'));
-    el.appendChild(h('button', { class: 'danger', onclick: () => R.UI.modal(h('div', null, 'セーブデータを消して最初からやり直しますか？（元に戻せません）'), [
+    el.appendChild(h('button', { class: 'danger', onclick: () => R.UI.modal(h('div', null, 'セーブデータを消去しますか？（元に戻せません）'), [
       { label: 'やめる' },
       { label: '消去する', onClick: () => { R.Game.reset(); R.Game.run = null; show(homeScreen); } }
     ]) }, 'セーブデータを消去'));

@@ -107,7 +107,7 @@ module.exports.push(
   { name: '細工：パワーの選択と持ち込みアイテムのレシピ', run: async (page) => {
     await page.click('.menu-item:has-text("生産")');
     await page.click('button:has-text("細工")');
-    await page.waitForSelector('text=アクセサリーに乗せるパワー');
+    await page.waitForSelector('text=パワー（職業専用）');
     await page.selectOption('select >> nth=0', 'priest');
     await page.waitForSelector('text=回復薬');
     await page.click('text=もどる');

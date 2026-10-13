@@ -52,7 +52,7 @@
       const slots = R.DATA.config.combat.itemSlots;
       if (R.DATA.items) {
         el.appendChild(h('h2', null, `持ち込みアイテム（${s.bring.length}/${slots}）`));
-        if (!s.consumables.length) el.appendChild(h('div', { class: 'muted' }, '持ち込みアイテムがありません（細工で作れます）'));
+        if (!s.consumables.length) el.appendChild(h('div', { class: 'muted' }, 'なし'));
         el.appendChild(h('div', { class: 'job-picker' }, s.consumables.map(c => {
           const d = R.DATA.items[c.id];
           const on = s.bring.includes(c.uid);
@@ -66,8 +66,7 @@
       }
 
       el.appendChild(h('h2', null, 'ダンジョン'));
-      el.appendChild(h('div', { class: 'muted' }, '全滅すると、集めた素材と持ち込みアイテムをすべて失います。途中で帰ることはできません。'));
-      if (G().allCleared()) el.appendChild(h('div', { class: 'panel good' }, 'すべてのダンジョンをクリア済み：各ダンジョンで難易度を上げて挑めます。上の難易度ほど上位素材（ランク4装備の材料）が出やすくなります。'));
+      el.appendChild(h('div', { class: 'muted' }, '全滅すると素材と持ち込みを失う'));
       for (const [id, d] of Object.entries(R.DATA.dungeons)) {
         const open = G().isUnlocked(id);
         const clears = s.clears[id] || 0;
@@ -90,7 +89,7 @@
             h('select', { id: 'diff-' + id, onchange: (e) => { chosenDiff[id] = Number(e.target.value); render(); } },
               [...Array(maxD).keys()].map(i => h('option', { value: i + 1, selected: i + 1 === chosenDiff[id] }, String(i + 1)))),
             h('span', { class: 'muted' }, difficultyText(chosenDiff[id])),
-            maxD < R.DATA.difficulty.max ? h('span', { class: 'muted' }, `（難易度${maxD}をクリアすると次が開く）`) : null) : null,
+            null) : null,
           h('button', { class: 'primary', disabled: s.party.length !== 3, onclick: () => { G().startRun(id, chosenDiff[id]); R.UI.show(runScreen); } },
             s.party.length === 3 ? '出発する' : 'パーティを3人選んでください')));
       }
@@ -129,24 +128,23 @@
       const nextBoss = run.floor + 1 + run.def.endless.segment;
       area.appendChild(h('div', { class: 'panel' },
         h('div', { class: 'result result-win' }, `${run.floor + 1}階のボスを倒した！`),
-        h('div', null, '帰還すると、集めた素材を持ち帰れます。さらに潜ると敵は強くなり、上位素材が出やすくなります。全滅すると集めた素材はすべて失います。'),
-        h('div', { class: 'muted' }, `上位素材が出る確率：今 ${Math.round(run.highDropChance() * 100)}%`),
+        h('div', { class: 'muted' }, `上位素材 ${Math.round(run.highDropChance() * 100)}%`),
         h('div', { class: 'row' },
           h('button', { class: 'primary', onclick: () => { run.checkpointChoice(false); G().saveRun(); R.UI.show(runScreen); } }, '帰還する'),
           h('button', { class: 'danger', onclick: () => { run.checkpointChoice(true); G().saveRun(); R.UI.show(runScreen); } }, `さらに潜る（次のボスは${nextBoss}階）`))));
     } else if (run.phase === 'reward') {
       area.appendChild(h('h2', null, '報酬を1つ選んでください'));
       const desc = {
-        mining: `鉱脈探し（採掘Lv${G().state.life.mining.lv}／岩の硬さ${run.def.gather.mining[run.floor].hardness}／${R.Gather.gatherParams(run.def.gather.mining[run.floor], G().state.life.mining.lv, run.tools.pick).swings}回振れる）`,
-        logging: `鉱脈探し（伐採Lv${G().state.life.logging.lv}／木の硬さ${run.def.gather.logging[run.floor].hardness}／${R.Gather.gatherParams(run.def.gather.logging[run.floor], G().state.life.logging.lv, run.tools.axe).swings}回振れる）`,
-        gathering: '素材をいくつか拾う',
-        treasure: '宝箱を開ける',
+        mining: `${R.Gather.gatherParams(run.gatherEntry('mining'), G().state.life.mining.lv, run.tools.pick).swings}回`,
+        logging: `${R.Gather.gatherParams(run.gatherEntry('logging'), G().state.life.logging.lv, run.tools.axe).swings}回`,
+        gathering: '',
+        treasure: '',
         rest: `HPを${Math.round(run.def.rewards.restHealRatio * 100)}%回復`
       };
       area.appendChild(h('div', { class: 'menu' }, run.rewardOptions.map(k =>
         h('button', { class: 'menu-item', onclick: () => chooseReward(area, k) },
           h('div', { class: 'menu-label' }, R.Dungeon.REWARD_NAMES[k]),
-          h('div', { class: 'menu-desc' }, desc[k])))));
+          desc[k] ? h('div', { class: 'menu-desc' }, desc[k]) : null))));
     } else if (run.phase === 'gather') {
       startGather(area);
     } else {
@@ -213,7 +211,7 @@
           `レベル差 ${diff > 0 ? '+' : ''}${diff}：振れる回数 ${sign(lvSw)}・最初から開いているマス ${gn.params.hints}` +
           `　／道具：振れる回数 ${sign(toolSw)}`);
       })(),
-      h('div', { class: 'muted' }, `マスを選んで${word.tool}を振ります。${word.vein}が${total}つ（うち★レア${G2.rareVeins}つ）隠れています。外れのマスの数字は、まわり8マスにある${word.vein}の数です。`),
+      h('div', { class: 'muted' }, `${word.vein}${total}つ（★${G2.rareVeins}）・数字＝まわりの${word.vein}の数`),
       h('div', { class: 'row' },
         h('span', { class: 'energy' }, `残り ${board.swingsLeft} / ${board.swings} 回`),
         h('span', null, `見つけた ${board.found.length} / ${total}`),
