@@ -59,19 +59,20 @@
         let info = '';
         if (rc.kind === 'equip') {
           const ch = R.Craft.gradeChances(lv, rc.difficulty);
-          info = `${R.DATA.equipment.types[rc.base.type].name}・${R.DATA.equipment.slotNames[rc.base.slot]}・ランク${rc.base.rank}／枠の良さ 並${Math.round(ch[0] * 100)}% 良${Math.round(ch[1] * 100)}% 極${Math.round(ch[2] * 100)}%`;
+          info = `${R.DATA.equipment.types[rc.base.type].name}・${R.DATA.equipment.slotNames[rc.base.slot]}・R${rc.base.rank}　枠 並${Math.round(ch[0] * 100)} 良${Math.round(ch[1] * 100)} 極${Math.round(ch[2] * 100)}`;
         } else if (rc.kind === 'tool') {
-          info = `採集道具（強さ${rc.tool.power}）` + (owned ? '・所持済み' : '');
+          info = `採集道具・強さ${rc.tool.power}` + (owned ? '・所持済み' : '');
         } else {
-          info = `持ち込みアイテム：${rc.item.desc}`;
+          info = rc.item.desc;
         }
-        return h('tr', null,
-          h('td', null, h('b', null, rc.name), h('div', { class: 'muted' }, info)),
-          h('td', null, String(rc.difficulty)),
-          h('td', null, matReqView(rc.mats)),
-          h('td', null, h('button', { disabled: !ok || owned, onclick: () => startCraft(rc) }, '作る')));
+        return h('div', { class: 'recipe' + (ok && !owned ? '' : ' unavailable') },
+          h('div', { class: 'recipe-main' },
+            h('div', null, h('b', null, rc.name), h('span', { class: 'muted' }, `　難${rc.difficulty}`)),
+            h('div', { class: 'muted recipe-info' }, info),
+            h('div', { class: 'recipe-mats' }, matReqView(rc.mats))),
+          h('button', { class: ok && !owned ? 'primary' : '', disabled: !ok || owned, onclick: () => startCraft(rc) }, '作る'));
       });
-      el.appendChild(h('table', null, h('tr', null, h('th', null, '品物'), h('th', null, '難易度'), h('th', null, '素材（所持/必要）'), h('th')), rows));
+      el.appendChild(h('div', { class: 'recipes' }, rows));
     }
 
     function startCraft(rc) {
@@ -197,6 +198,6 @@
   }
 
   R.UI.extraMenu = R.UI.extraMenu || [];
-  R.UI.extraMenu.push({ label: '生産', desc: '鍛冶・大工・裁縫・細工で装備や道具を作る', fn: () => R.UI.show(craftScreen), order: 30 });
+  R.UI.extraMenu.push({ label: '生産', icon: 'icon_craft', desc: '鍛冶・大工・裁縫・細工で装備や道具を作る', fn: () => R.UI.show(craftScreen), order: 30 });
   R.UI.craftScreen = craftScreen;
 })(globalThis.RASEN = globalThis.RASEN || {});

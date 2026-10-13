@@ -73,7 +73,7 @@ module.exports.push(
 module.exports.push(
   { name: '生産：銅の剣を作って比較・装備', run: async (page) => {
     await page.click('text=生産');
-    await page.click('tr:has-text("銅の剣") button:has-text("作る")');
+    await page.click('.recipe:has-text("銅の剣") button:has-text("作る")');
     await solvePuzzle(page);
     await page.waitForSelector('text=デッキに入るカード');
     await page.click('button:has-text("剣士に装備する")');
@@ -95,8 +95,13 @@ module.exports.push(
 module.exports.push(
   { name: '盗賊・弓使い・僧侶で練習戦闘（選択肢の操作）', run: async (page) => {
     await page.click('.menu-item:has-text("練習戦闘")');
-    for (const j of ['剣士', '魔法使い', '占星師']) await page.uncheck(`label:has-text("${j}") input`);
-    for (const j of ['盗賊', '弓使い', '僧侶']) await page.check(`label:has-text("${j}") input`);
+    // 職業はタイルを押して選ぶ
+    const setJob = async (name, on) => {
+      const tile = page.locator(`label.job-option:has(.job-name:text-is("${name}"))`);
+      if ((await tile.locator('input').isChecked()) !== on) await tile.click();
+    };
+    for (const j of ['剣士', '魔法使い', '占星師']) await setJob(j, false);
+    for (const j of ['盗賊', '弓使い', '僧侶']) await setJob(j, true);
     await page.click('text=戦闘開始');
     for (let i = 0; i < 400; i++) {
       if (await page.locator('button:has-text("次へ")').count()) break;

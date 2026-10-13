@@ -15,8 +15,10 @@
     return h('div', { class: 'panel' },
       h('div', null, `パーティHP ${party.maxHp}`),
       h('div', { class: 'chars' }, party.chars.map(c => h('div', { class: 'char owner-' + c.index },
-        h('div', { class: 'char-name' }, c.name),
-        h('div', { class: 'char-stats' }, `HP${c.stats.hp} 攻${c.stats.atk} 防${c.stats.def} 魔${c.stats.mag}`)))));
+        R.UI.sprite(c.job, 32),
+        h('div', { class: 'char-body' },
+          h('div', { class: 'char-name' }, c.name),
+          h('div', { class: 'char-stats' }, `HP${c.stats.hp} 攻${c.stats.atk} 防${c.stats.def} 魔${c.stats.mag}`))))));
   }
 
   // ===== 出発準備 =====
@@ -26,6 +28,13 @@
     if (d <= 1) return '難易度1（通常）';
     const lv = d - 1;
     return `難易度${d}：敵HP×${(1 + D.hpPerLevel * lv).toFixed(2)}・攻撃×${(1 + D.dmgPerLevel * lv).toFixed(2)}・上位素材${Math.round(Math.min(D.highDropMax, D.highDropPerLevel * lv) * 100)}%`;
+  }
+
+  // ダンジョンの顔になるドット絵（最後のボス）
+  function dungeonSprite(d) {
+    if (d.endless) return d.endless.bosses.length ? R.DATA.encounters[d.endless.bosses[d.endless.bosses.length - 1]].enemies[0] : 'icon_dungeon';
+    const last = d.floors[d.floors.length - 1];
+    return last.boss ? R.DATA.encounters[last.boss].enemies[0] : 'icon_dungeon';
   }
 
   function departScreen(el) {
@@ -38,14 +47,12 @@
       clear(el);
       el.appendChild(R.UI.header('ダンジョンへ出発', () => R.UI.show(R.UI.homeScreen)));
       el.appendChild(h('h2', null, 'パーティ（3人）'));
-      el.appendChild(h('div', { class: 'job-picker' }, jobs.map(j => h('label', { class: 'job-option' },
-        h('input', { type: 'checkbox', checked: s.party.includes(j), onchange: (ev) => {
-          if (ev.target.checked) { if (s.party.length < 3) s.party.push(j); }
-          else s.party = s.party.filter(x => x !== j);
-          G().save();
-          render();
-        } }),
-        `${R.DATA.jobs[j].name}（${R.DATA.jobs[j].desc}）`))));
+      el.appendChild(R.UI.jobPicker(jobs, s.party, (j, on) => {
+        if (on) { if (s.party.length < 3) s.party.push(j); }
+        else s.party = s.party.filter(x => x !== j);
+        G().save();
+        render();
+      }));
       if (s.party.length === 3) el.appendChild(partySummary(G().currentMembers()));
 
       // 持ち込みアイテム
@@ -53,7 +60,7 @@
       if (R.DATA.items) {
         el.appendChild(h('h2', null, `持ち込みアイテム（${s.bring.length}/${slots}）`));
         if (!s.consumables.length) el.appendChild(h('div', { class: 'muted' }, 'なし'));
-        el.appendChild(h('div', { class: 'job-picker' }, s.consumables.map(c => {
+        el.appendChild(h('div', { class: 'items-pick' }, s.consumables.map(c => {
           const d = R.DATA.items[c.id];
           const on = s.bring.includes(c.uid);
           return h('label', null,
@@ -73,13 +80,16 @@
         if (!open) {
           const need = (d.requires || []).filter(r => !(s.clears[r] > 0)).map(r => R.DATA.dungeons[r].name);
           el.appendChild(h('div', { class: 'panel dungeon locked' },
-            h('div', null, h('b', null, '？？？'), h('span', { class: 'muted' }, `　${need.join('と')}をクリアすると開く`))));
+            R.UI.sprite('icon_dungeon', 48),
+            h('div', null, h('b', null, '？？？')),
+            h('div', { class: 'muted' }, `${need.join('と')}をクリアすると開く`)));
           continue;
         }
         const maxD = G().maxUnlockedDifficulty(id);
         if (!chosenDiff[id] || chosenDiff[id] > maxD) chosenDiff[id] = maxD > 1 ? (s.maxDifficulty[id] || 1) : 1;
         const best = s.maxDifficulty[id] || 0;
         el.appendChild(h('div', { class: 'panel dungeon' },
+          R.UI.sprite(dungeonSprite(d), 48),
           h('div', null, h('b', null, d.name),
             h('span', { class: clears ? 'good' : 'muted' }, clears ? `　${d.endless ? '帰還' : 'クリア'} ${clears}回` : (d.endless ? '' : '　未クリア')),
             best > 1 ? h('span', { class: 'good' }, `・最高難易度${best}`) : null,
@@ -123,7 +133,7 @@
       const enc = R.DATA.encounters[run.currentEncounterId()];
       area.appendChild(h('div', { class: 'panel' },
         h('div', null, `次の戦闘：${enc.name}`),
-        h('button', { class: 'primary', onclick: () => startBattle(area) }, '戦う')));
+        h('button', { class: 'primary', onclick: () => startBattle(el) }, '戦う')));
     } else if (run.phase === 'checkpoint') {
       const nextBoss = run.floor + 1 + run.def.endless.segment;
       area.appendChild(h('div', { class: 'panel' },
@@ -161,10 +171,16 @@
     }
   }
 
-  function startBattle(area) {
+  function startBattle(el) {
     const run = G().run;
     const combat = run.createCombat();
-    clear(area);
+    // 戦闘中は場所だけを1行で出す（HPなどは戦闘画面にある）
+    clear(el);
+    el.appendChild(h('div', { class: 'header' },
+      h('h1', null, run.def.name + (run.difficulty > 1 ? `（難易度${run.difficulty}）` : '')),
+      h('span', { class: 'muted' }, run.whereText())));
+    const area = h('div');
+    el.appendChild(area);
     R.UI.mountCombat(area, combat, {
       onFinish: () => {
         run.finishCombat(combat);
@@ -240,6 +256,6 @@
   }
 
   R.UI.extraMenu = R.UI.extraMenu || [];
-  R.UI.extraMenu.push({ label: 'ダンジョンへ出発', desc: 'パーティと持ち込みを決めて出発', fn: () => R.UI.show(G().run ? runScreen : departScreen), order: 10 });
+  R.UI.extraMenu.push({ label: 'ダンジョンへ出発', desc: 'パーティと持ち込みを決めて出発', icon: 'icon_dungeon', fn: () => R.UI.show(G().run ? runScreen : departScreen), order: 10 });
   Object.assign(R.UI, { departScreen, runScreen, matText, partySummary });
 })(globalThis.RASEN = globalThis.RASEN || {});

@@ -46,6 +46,15 @@
     return close;
   }
 
+  // 職業を選ぶタイル（ドット絵＋名前＋説明）。picked は選ばれている職業の配列
+  function jobPicker(jobs, picked, onToggle) {
+    return h('div', { class: 'job-picker' }, jobs.map(j => h('label', { class: 'job-option' },
+      h('input', { type: 'checkbox', checked: picked.includes(j), onchange: (ev) => onToggle(j, ev.target.checked) }),
+      R.UI.sprite ? R.UI.sprite(j, 48) : null,
+      h('span', { class: 'job-name' }, R.DATA.jobs[j].name),
+      h('span', { class: 'job-desc' }, R.DATA.jobs[j].desc))));
+  }
+
   R.UI = R.UI || {};
-  Object.assign(R.UI, { h, clear, bar, modal });
+  Object.assign(R.UI, { h, clear, bar, modal, jobPicker });
 })(globalThis.RASEN = globalThis.RASEN || {});

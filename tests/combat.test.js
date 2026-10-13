@@ -214,3 +214,15 @@ test('すべてのカードとパワーのデータが正しい', () => {
   for (const job of Object.values(R.DATA.jobs)) for (const p of job.powers) assert.ok(R.DATA.cards[p], p);
   for (const b of Object.values(R.DATA.equipment.bases)) assert.ok(R.DATA.cards[b.fixedCard], b.name);
 });
+
+test('ドット絵のデータが正しい（16×16・使っている色がある・職業と敵の絵がそろっている）', () => {
+  for (const [id, sp] of Object.entries(R.DATA.sprites)) {
+    assert.strictEqual(sp.rows.length, 16, id);
+    sp.rows.forEach((row, i) => {
+      assert.strictEqual(row.length, 16, `${id} の${i + 1}行目`);
+      for (const ch of row) if (ch !== '.') assert.ok(sp.pal[ch], `${id} の色 ${ch}`);
+    });
+  }
+  for (const id of Object.keys(R.DATA.jobs)) assert.ok(R.DATA.sprites[id], id);
+  for (const id of Object.keys(R.DATA.enemies)) assert.ok(R.DATA.sprites[id], id);
+});

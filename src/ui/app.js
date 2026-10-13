@@ -26,12 +26,10 @@
       clear(el);
       el.appendChild(header('練習戦闘', () => show(homeScreen)));
       el.appendChild(h('p', { class: 'muted' }, '記録は残りません'));
-      el.appendChild(h('div', { class: 'job-picker' }, jobs.map(j => h('label', { class: 'job-option' },
-        h('input', { type: 'checkbox', checked: picked.includes(j), onchange: (ev) => {
-          if (ev.target.checked) picked.push(j); else picked = picked.filter(x => x !== j);
-          render();
-        } }),
-        `${R.DATA.jobs[j].name}（${R.DATA.jobs[j].desc}）`))));
+      el.appendChild(R.UI.jobPicker(jobs, picked, (j, on) => {
+        if (on) picked.push(j); else picked = picked.filter(x => x !== j);
+        render();
+      }));
       el.appendChild(h('div', null, '敵：',
         h('select', { onchange: (ev) => { encounter = ev.target.value; } },
           Object.entries(R.DATA.encounters).map(([id, enc]) => h('option', { value: id, selected: id === encounter }, enc.name)))));
@@ -54,16 +52,20 @@
 
   // ===== 拠点メニュー =====
   function homeScreen(el) {
-    el.appendChild(header('拠点'));
+    el.appendChild(h('div', { class: 'title' },
+      h('div', { class: 'title-name' }, 'ラセン'),
+      h('div', { class: 'title-sub' }, '拠点')));
     const menu = [
-      { label: '練習戦闘', desc: '今の装備で好きな敵と戦う（記録なし）', fn: () => show(practiceScreen), order: 80 },
-      { label: '持ち物・ライフ', desc: '素材・道具・生産Lv／セーブの消去', fn: () => show(inventoryScreen), order: 70 }
+      { label: '練習戦闘', desc: '今の装備で好きな敵と戦う（記録なし）', icon: 'icon_practice', fn: () => show(practiceScreen), order: 80 },
+      { label: '持ち物・ライフ', desc: '素材・道具・生産Lv', icon: 'icon_bag', fn: () => show(inventoryScreen), order: 70 }
     ].concat(R.UI.extraMenu || []).sort((x, y) => (x.order || 50) - (y.order || 50));
     if (R.Game.run) el.appendChild(h('div', { class: 'panel' }, `ダンジョン「${R.Game.run.def.name}」の途中です（${R.Game.run.whereText()}）。「ダンジョンへ出発」から続きを遊べます。`));
     el.appendChild(h('div', { class: 'menu' }, menu.map(m =>
       h('button', { class: 'menu-item', onclick: m.fn ? m.fn : () => show(m.screen) },
-        h('div', { class: 'menu-label' }, m.label),
-        h('div', { class: 'menu-desc' }, m.desc)))));
+        m.icon ? R.UI.sprite(m.icon, 40) : null,
+        h('div', { class: 'menu-text' },
+          h('div', { class: 'menu-label' }, m.label),
+          h('div', { class: 'menu-desc' }, m.desc))))));
   }
 
   // ===== 持ち物・ライフ =====

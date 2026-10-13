@@ -25,7 +25,7 @@
   function statusList(st) {
     const out = [];
     for (const k of ['weak', 'vulnerable', 'burn', 'freeze', 'shock']) {
-      if (st[k] > 0) out.push(h('span', { class: 'status st-' + k }, `${R.Cards.STATUS_NAMES[k]}${st[k]}`));
+      if (st[k] > 0) out.push(h('span', { class: 'chip status st-' + k }, `${R.Cards.STATUS_NAMES[k]}${st[k]}`));
     }
     return out;
   }
@@ -49,19 +49,21 @@
       clear(container);
       const root = h('div', { class: 'combat' });
 
-      // 敵
-      root.appendChild(h('div', { class: 'enemies' }, combat.enemies.map(e => {
+      // 敵（上に行動予告、真ん中にドット絵、下にHP）
+      root.appendChild(h('div', { class: 'enemies', style: { gridTemplateColumns: `repeat(${combat.enemies.length}, minmax(0, 1fr))` } }, combat.enemies.map(e => {
         const info = e.alive ? combat.intentInfo(e) : null;
-        return h('div', {
+        return h('button', {
           class: 'enemy' + (e.alive ? '' : ' dead') + (e.index === target && e.alive ? ' targeted' : '') + (e.boss ? ' boss' : ''),
+          disabled: !e.alive, 'aria-label': `${e.name}を狙う`,
           onclick: () => { if (e.alive) { target = e.index; render(); } }
         },
+          info ? h('div', { class: 'intent ' + info.kinds.map(k => 'in-' + k).join(' '), title: info.name }, info.text) : h('div', { class: 'intent' }, '撃破'),
+          R.UI.sprite(e.id, e.boss ? 96 : 64, { extraClass: 'enemy-sprite' }),
           h('div', { class: 'enemy-name' }, e.name),
-          info ? h('div', { class: 'intent ' + info.kinds.map(k => 'in-' + k).join(' ') }, `次：${info.name}（${info.text}）`) : h('div', { class: 'intent' }, '撃破'),
           bar(e.hp, e.maxHp, 'hp'),
-          h('div', { class: 'enemy-sub' },
-            e.block > 0 ? h('span', { class: 'block' }, `ブロック${e.block}`) : null,
-            e.str > 0 ? h('span', { class: 'status st-str' }, `攻撃+${e.str}`) : null,
+          h('div', { class: 'chips' },
+            e.block > 0 ? h('span', { class: 'chip block' }, `盾${e.block}`) : null,
+            e.str > 0 ? h('span', { class: 'chip st-str' }, `攻+${e.str}`) : null,
             statusList(e.st)));
       })));
 
@@ -69,30 +71,32 @@
       const incoming = combat.incomingDamage();
       root.appendChild(h('div', { class: 'party' },
         h('div', { class: 'party-hp' },
-          h('div', null, 'パーティHP'),
-          bar(combat.party.hp, combat.party.maxHp, 'hp'),
-          h('div', { class: 'party-sub' },
-            h('span', { class: 'block' }, `ブロック${combat.party.block}`),
-            combat.party.ward > 0 ? h('span', { class: 'ward' }, `結界${combat.party.ward}`) : null,
-            incoming > 0 ? h('span', { class: 'incoming' }, `敵の攻撃予定 ${incoming}`) : null,
-            combat.party.weak > 0 ? h('span', { class: 'status st-weak' }, `脱力${combat.party.weak}`) : null,
-            combat.party.vulnerable > 0 ? h('span', { class: 'status st-vulnerable' }, `弱体${combat.party.vulnerable}`) : null)),
+          bar(combat.party.hp, combat.party.maxHp, 'hp big'),
+          h('div', { class: 'chips' },
+            h('span', { class: 'chip block' }, `ブロック${combat.party.block}`),
+            combat.party.ward > 0 ? h('span', { class: 'chip ward' }, `結界${combat.party.ward}`) : null,
+            incoming > 0 ? h('span', { class: 'chip incoming' }, `被弾予定 ${Math.max(0, incoming - combat.party.block - combat.party.ward)}`) : null,
+            combat.party.weak > 0 ? h('span', { class: 'chip status st-weak' }, `脱力${combat.party.weak}`) : null,
+            combat.party.vulnerable > 0 ? h('span', { class: 'chip status st-vulnerable' }, `弱体${combat.party.vulnerable}`) : null)),
         h('div', { class: 'chars' }, combat.chars.map(c => {
-          const s = combat.currentStats(c.index);
+          const st = combat.currentStats(c.index);
           const pws = combat.powers.filter(p => p.owner === c.index).map(p => R.DATA.powers[p.id].name);
-          return h('div', { class: 'char owner-' + c.index },
-            h('div', { class: 'char-name' }, c.name),
-            h('div', { class: 'char-stats' }, `攻${s.atk} 防${s.def} 魔${s.mag}`),
-            pws.length ? h('div', { class: 'char-powers' }, 'パワー：' + pws.join('・')) : null);
+          return h('div', { class: 'char owner-' + c.index, title: pws.length ? 'パワー：' + pws.join('・') : null },
+            R.UI.sprite(c.job, 32),
+            h('div', { class: 'char-body' },
+              h('div', { class: 'char-name' }, c.name, pws.length ? h('span', { class: 'pw-dot' }, ` ◆${pws.length}`) : null),
+              h('div', { class: 'char-stats' }, `攻${st.atk} 防${st.def} 魔${st.mag}`)));
         }))));
 
       // 情報行
+      const pileBtn = (k, label, n) => h('button', { class: 'small' + (showPile === k ? ' on' : ''), onclick: () => { showPile = showPile === k ? null : k; render(); } }, `${label} ${n}`);
       root.appendChild(h('div', { class: 'infobar' },
-        h('span', { class: 'energy' }, `エネルギー ${combat.energy}/${combat.cfg.energyPerTurn}`),
-        h('span', null, `ターン${combat.turn}`),
-        h('button', { class: 'small', onclick: () => { showPile = showPile === 'draw' ? null : 'draw'; render(); } }, `山札 ${combat.draw.length}`),
-        h('button', { class: 'small', onclick: () => { showPile = showPile === 'discard' ? null : 'discard'; render(); } }, `捨て札 ${combat.discard.length}`),
-        h('button', { class: 'small', onclick: () => { showPile = showPile === 'exhaust' ? null : 'exhaust'; render(); } }, `廃棄 ${combat.exhaust.length}`)));
+        h('span', { class: 'energy', title: 'エネルギー' }, h('b', null, String(combat.energy)), `/${combat.cfg.energyPerTurn}`),
+        h('span', { class: 'muted' }, `ターン${combat.turn}`),
+        h('span', { class: 'spacer' }),
+        pileBtn('draw', '山札', combat.draw.length),
+        pileBtn('discard', '捨て札', combat.discard.length),
+        pileBtn('exhaust', '廃棄', combat.exhaust.length)));
 
       if (showPile) {
         // 山札は順番がわかってしまうので並べ替えて表示
@@ -105,9 +109,9 @@
 
       // 持ち込みアイテム
       if (combat.items.length) {
-        root.appendChild(h('div', { class: 'items-row' }, '持ち込み：', combat.items.map((it, i) => {
+        root.appendChild(h('div', { class: 'items-row' }, combat.items.map((it, i) => {
           const d = R.DATA.items[it.id];
-          return h('button', { class: 'small', disabled: !!combat.result, title: d.desc,
+          return h('button', { class: 'small item-btn', disabled: !!combat.result, title: d.desc,
             onclick: () => act(combat.useItem(i, target)) }, d.name + (it.quality && it.quality !== 'normal' ? `（${R.DATA.config.quality[it.quality].name}）` : ''));
         })));
       }
@@ -117,12 +121,12 @@
         const p = combat.pending;
         const pool = p.kind === 'scry' ? combat.draw : combat.hand;
         root.appendChild(h('div', { class: 'choice' },
-          h('div', { class: 'choice-prompt' }, p.prompt + (p.kind === 'scry' ? '（クリックした順に上から置かれます）' : '')),
-          h('div', { class: 'cards' }, p.options.map(iid => {
+          h('div', { class: 'choice-prompt' }, p.prompt),
+          h('div', { class: 'cards scroll' }, p.options.map(iid => {
             const inst = pool.find(c => c.iid === iid);
             const order = selection.indexOf(iid);
             return h('div', { class: 'choice-card' },
-              order >= 0 ? h('div', { class: 'order' }, p.kind === 'scry' ? `${order + 1}番目` : '選択中') : null,
+              order >= 0 ? h('div', { class: 'order' }, p.kind === 'scry' ? `${order + 1}` : '✓') : null,
               cardEl(inst, {
                 owner: inst.owner, ownerName: combat.chars[inst.owner].name, selected: order >= 0,
                 stats: combat.currentStats(inst.owner),
@@ -136,8 +140,8 @@
           h('button', { class: 'primary', onclick: () => act(combat.resolveChoice(selection)) }, '決定')));
       }
 
-      // 手札
-      root.appendChild(h('div', { class: 'hand cards' }, combat.hand.map(inst => {
+      // 手札（横にスクロール）
+      root.appendChild(h('div', { class: 'hand cards scroll' }, combat.hand.map(inst => {
         const playable = combat.canPlay(inst);
         return cardEl(inst, {
           owner: inst.owner, ownerName: combat.chars[inst.owner].name,
@@ -147,22 +151,24 @@
         });
       })));
 
-      // 操作
-      const ctrl = h('div', { class: 'controls' });
+      // 操作（画面下に固定）
+      const ctrl = h('div', { class: 'action-bar' });
+      if (message) ctrl.appendChild(h('div', { class: 'message' }, message));
       if (!combat.result) {
-        ctrl.appendChild(h('button', { class: 'primary', onclick: () => act(combat.endTurn()) }, 'ターン終了'));
-        ctrl.appendChild(h('button', { onclick: () => { R.AI.playTurn(combat); act({ ok: true }); } }, '自動で1ターン'));
+        ctrl.appendChild(h('div', { class: 'row' },
+          h('button', { class: 'ghost', onclick: () => { R.AI.playTurn(combat); act({ ok: true }); } }, '自動で1ターン'),
+          h('button', { class: 'primary grow', onclick: () => act(combat.endTurn()) }, 'ターン終了')));
       } else {
         const label = { win: '勝利！', lose: '全滅…', timeout: '時間切れ' }[combat.result];
-        ctrl.appendChild(h('div', { class: 'result result-' + combat.result }, label));
-        if (opts.onFinish) ctrl.appendChild(h('button', { class: 'primary', onclick: () => opts.onFinish(combat.result) }, '次へ'));
+        ctrl.appendChild(h('div', { class: 'row' },
+          h('div', { class: 'result result-' + combat.result }, label),
+          opts.onFinish ? h('button', { class: 'primary grow', onclick: () => opts.onFinish(combat.result) }, '次へ') : null));
       }
-      if (message) ctrl.appendChild(h('span', { class: 'message' }, message));
-      root.appendChild(ctrl);
 
-      // ログ
+      // ログ（たたんでおける）
       const log = h('div', { class: 'log' }, combat.log.slice(-40).map(l => h('div', null, l)));
-      root.appendChild(log);
+      root.appendChild(h('details', { class: 'log-box' }, h('summary', null, 'ログ'), log));
+      root.appendChild(ctrl);
       container.appendChild(root);
       log.scrollTop = log.scrollHeight;
     }
