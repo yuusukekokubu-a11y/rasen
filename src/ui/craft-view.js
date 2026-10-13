@@ -19,7 +19,7 @@
   // レベルの恩恵の表示（レベル差がプラスなら緑、マイナスなら赤）
   function lvBonusLine(diff, parts) {
     return h('div', { class: 'lv-bonus ' + (diff > 0 ? 'good' : diff < 0 ? 'bad' : 'muted') },
-      `レベル差 ${diff > 0 ? '+' : ''}${diff}：` + parts.join('・'));
+      `Lv差${diff > 0 ? '+' : ''}${diff}：` + parts.join('・'));
   }
 
   function craftScreen(el) {
@@ -31,8 +31,9 @@
       const s = G().state;
       clear(el);
       el.appendChild(R.UI.header('生産', () => R.UI.show(R.UI.homeScreen)));
-      el.appendChild(h('div', { class: 'row' }, Object.entries(R.DATA.crafting.lives).map(([k, L]) =>
-        h('button', { class: k === life ? 'primary' : '', onclick: () => { life = k; render(); } }, `${L.name} Lv${s.life[k].lv}`))));
+      el.appendChild(R.UI.stage('workshop', 'craft-head',
+        h('div', { class: 'life-tabs' }, Object.entries(R.DATA.crafting.lives).map(([k, L]) =>
+          h('button', { class: k === life ? 'primary' : '', onclick: () => { life = k; render(); } }, L.name, h('small', null, `Lv${s.life[k].lv}`))))));
       const L = R.DATA.crafting.lives[life];
       
 
@@ -140,7 +141,7 @@
         if (hover) setTimeout(() => showGhost(hover[0], hover[1]), 0);
         el.appendChild(h('div', { class: 'panel puzzle' },
           h('div', null, h('b', null, rc.name), h('span', { class: 'muted' }, `（難易度${rc.difficulty}・${R.Life.LIVES[life]}Lv${lv}）`)),
-          lvBonusLine(params.diff, [`手持ち${params.hand}個`, `無料で捨てる${params.freeDiscards}回`]),
+          lvBonusLine(params.diff, [`手持ち${params.hand}`, `無料捨て${params.freeDiscards}`]),
           h('div', { class: 'row' },
             h('span', { class: 'energy' }, `${st.turns}手`),
             h('span', { class: 'muted' }, `最高：${st.thresholds.best}手以内／上質：${st.thresholds.fine}手以内`),
@@ -198,6 +199,6 @@
   }
 
   R.UI.extraMenu = R.UI.extraMenu || [];
-  R.UI.extraMenu.push({ label: '生産', icon: 'icon_craft', desc: '鍛冶・大工・裁縫・細工で装備や道具を作る', fn: () => R.UI.show(craftScreen), order: 30 });
+  R.UI.extraMenu.push({ label: '生産', icon: 'icon_craft', desc: '装備・道具を作る', fn: () => R.UI.show(craftScreen), order: 30 });
   R.UI.craftScreen = craftScreen;
 })(globalThis.RASEN = globalThis.RASEN || {});

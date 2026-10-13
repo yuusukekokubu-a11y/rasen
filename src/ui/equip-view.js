@@ -85,7 +85,7 @@
       const gear = G().gearOf(job);
       const st = R.Gear.charStats(job, gear);
       el.appendChild(h('div', { class: 'panel' },
-        h('div', null, `${R.DATA.jobs[job].name}：HP${st.hp} 攻撃力${st.atk} 防御力${st.def} 魔力${st.mag}`),
+        h('div', { class: 'equip-stats' }, R.UI.sprite(job, 24), h('b', null, R.DATA.jobs[job].name), R.UI.statLine(st, ['hp', 'atk', 'def', 'mag'])),
         h('div', { class: 'row' }, R.Gear.SLOTS.map(sl => h('button', {
           class: sl === slot ? 'primary' : '', onclick: () => { slot = sl; candidate = null; render(); }
         }, `${R.DATA.equipment.slotNames[sl]}：${gear[sl] ? R.Gear.itemName(gear[sl]) : 'なし'}`)))));
@@ -124,6 +124,6 @@
   }
 
   R.UI.extraMenu = R.UI.extraMenu || [];
-  R.UI.extraMenu.push({ label: '装備', icon: 'icon_equip', desc: '付け替え（ステータスとデッキの変化を比較）', fn: () => R.UI.show(equipScreen), order: 20 });
+  R.UI.extraMenu.push({ label: '装備', icon: 'icon_equip', desc: '付け替え・比較', fn: () => R.UI.show(equipScreen), order: 20 });
   Object.assign(R.UI, { equipScreen, itemDetail, comparison, slotText });
 })(globalThis.RASEN = globalThis.RASEN || {});

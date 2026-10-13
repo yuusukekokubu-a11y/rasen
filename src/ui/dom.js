@@ -55,6 +55,19 @@
       h('span', { class: 'job-desc' }, R.DATA.jobs[j].desc))));
   }
 
+  // ステータスをアイコンで表示（HP・攻撃力・防御力・魔力）
+  function statLine(st, keys) {
+    const ico = { hp: 'ico_hp', atk: 'ico_atk', def: 'ico_def', mag: 'ico_mag' };
+    const name = { hp: 'HP', atk: '攻撃力', def: '防御力', mag: '魔力' };
+    return h('span', { class: 'stats' }, (keys || ['atk', 'def', 'mag']).map(k =>
+      h('span', { class: 'stat', title: name[k] }, R.UI.sprite(ico[k], 13), String(st[k] || 0))));
+  }
+
+  // ドット絵の背景を敷いた枠（舞台）。中身は children
+  function stage(kind, cls, ...children) {
+    return h('div', { class: 'stage ' + (cls || '') }, R.UI.backdrop(kind), ...children);
+  }
+
   R.UI = R.UI || {};
-  Object.assign(R.UI, { h, clear, bar, modal, jobPicker });
+  Object.assign(R.UI, { h, clear, bar, modal, jobPicker, statLine, stage });
 })(globalThis.RASEN = globalThis.RASEN || {});

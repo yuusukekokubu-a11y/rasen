@@ -23,10 +23,10 @@ module.exports = [
     await page.click('.hand .card >> nth=0');
     for (let i = 0; i < 40; i++) {
       if (await page.locator('text=次へ').count()) break;
-      await page.click('text=自動で1ターン');
+      await page.click('text=おまかせ');
     }
     await page.click('text=次へ');
-    await page.click('text=もどる');
+    await page.click('.back-btn');
   } }
 ];
 module.exports.push(
@@ -36,7 +36,7 @@ module.exports.push(
     await page.press('input[type=number] >> nth=0', 'Tab');
     await page.click('text=実行');
     await page.waitForSelector('table');
-    await page.click('text=もどる');
+    await page.click('.back-btn');
   } }
 );
 // ダンジョンを最後（クリアか全滅）まで自動で進める
@@ -46,7 +46,7 @@ async function playDungeon(page) {
     if (await has('text=拠点へ戻る')) { await page.click('text=拠点へ戻る'); return; }
     if (await has('.modal button')) { await page.click('.modal button'); continue; }
     if (await has('button:has-text("次へ")')) { await page.click('button:has-text("次へ")'); continue; }
-    if (await has('button:has-text("自動で1ターン")')) { await page.click('button:has-text("自動で1ターン")'); continue; }
+    if (await has('button:has-text("おまかせ")')) { await page.click('button:has-text("おまかせ")'); continue; }
     if (await has('button:has-text("戦う")')) { await page.click('button:has-text("戦う")'); continue; }
     if (await has('button:has-text("結果を見る")')) { await page.click('button:has-text("結果を見る")'); continue; }
     if (await has('.vein-cell.closed:not([disabled])')) { await page.click('.vein-cell.closed:not([disabled]) >> nth=0'); continue; }
@@ -65,9 +65,9 @@ module.exports.push(
     await page.waitForSelector('text=拠点');
   } },
   { name: '持ち物画面', run: async (page) => {
-    await page.click('text=持ち物・ライフ');
-    await page.waitForSelector('text=ライフ（生産・採集のレベル）');
-    await page.click('text=もどる');
+    await page.click('.menu-item:has-text("持ち物")');
+    await page.waitForSelector('.life-tile');
+    await page.click('.back-btn');
   } }
 );
 module.exports.push(
@@ -78,7 +78,7 @@ module.exports.push(
     await page.waitForSelector('text=デッキに入るカード');
     await page.click('button:has-text("剣士に装備する")');
     await page.click('text=細工');
-    await page.click('text=もどる');
+    await page.click('.back-btn');
   } },
   { name: '装備画面で付け替え', run: async (page) => {
     await page.click('.menu-item:has-text("装備")');
@@ -89,7 +89,7 @@ module.exports.push(
       await page.waitForSelector('text=デッキから外れるカード');
       await page.click('button:has-text("装備する")');
     }
-    await page.click('text=もどる');
+    await page.click('.back-btn');
   } }
 );
 module.exports.push(
@@ -122,7 +122,7 @@ module.exports.push(
       await page.click('button:has-text("ターン終了")');
     }
     await page.click('button:has-text("次へ")');
-    await page.click('text=もどる');
+    await page.click('.back-btn');
   } },
   { name: '細工：パワーの選択と持ち込みアイテムのレシピ', run: async (page) => {
     await page.click('.menu-item:has-text("生産")');
@@ -130,6 +130,6 @@ module.exports.push(
     await page.waitForSelector('text=パワー（職業専用）');
     await page.selectOption('select >> nth=0', 'priest');
     await page.waitForSelector('text=回復薬');
-    await page.click('text=もどる');
+    await page.click('.back-btn');
   } }
 );

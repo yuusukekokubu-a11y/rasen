@@ -80,6 +80,6 @@
   }
 
   R.UI.extraMenu = R.UI.extraMenu || [];
-  R.UI.extraMenu.push({ label: 'シミュレーター', icon: 'icon_sim', desc: '自動対戦で勝率・平均ターン数を確認', screen: simScreen, order: 90 });
+  R.UI.extraMenu.push({ label: 'シミュレーター', icon: 'icon_sim', desc: '勝率を確認', screen: simScreen, order: 90 });
   R.UI.simScreen = simScreen;
 })(globalThis.RASEN = globalThis.RASEN || {});

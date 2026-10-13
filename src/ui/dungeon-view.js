@@ -13,12 +13,12 @@
   function partySummary(members) {
     const party = R.Gear.buildParty(members);
     return h('div', { class: 'panel' },
-      h('div', null, `パーティHP ${party.maxHp}`),
+      h('div', { class: 'party-hp' }, R.UI.sprite('ico_hp', 18), bar(party.maxHp, party.maxHp, 'hp')),
       h('div', { class: 'chars' }, party.chars.map(c => h('div', { class: 'char owner-' + c.index },
         R.UI.sprite(c.job, 32),
         h('div', { class: 'char-body' },
           h('div', { class: 'char-name' }, c.name),
-          h('div', { class: 'char-stats' }, `HP${c.stats.hp} 攻${c.stats.atk} 防${c.stats.def} 魔${c.stats.mag}`))))));
+          R.UI.statLine(c.stats, ['hp', 'atk', 'def', 'mag']))))));
   }
 
   // ===== 出発準備 =====
@@ -79,29 +79,32 @@
         const clears = s.clears[id] || 0;
         if (!open) {
           const need = (d.requires || []).filter(r => !(s.clears[r] > 0)).map(r => R.DATA.dungeons[r].name);
-          el.appendChild(h('div', { class: 'panel dungeon locked' },
-            R.UI.sprite('icon_dungeon', 48),
-            h('div', null, h('b', null, '？？？')),
-            h('div', { class: 'muted' }, `${need.join('と')}をクリアすると開く`)));
+          el.appendChild(h('div', { class: 'panel dungeon-card locked' },
+            R.UI.stage(id, '', h('div', { class: 'locked-label' }, '？？？')),
+            h('div', { class: 'dungeon-body' }, h('div', { class: 'muted' }, `${need.join('と')}をクリアすると開く`))));
           continue;
         }
         const maxD = G().maxUnlockedDifficulty(id);
         if (!chosenDiff[id] || chosenDiff[id] > maxD) chosenDiff[id] = maxD > 1 ? (s.maxDifficulty[id] || 1) : 1;
         const best = s.maxDifficulty[id] || 0;
-        el.appendChild(h('div', { class: 'panel dungeon' },
-          R.UI.sprite(dungeonSprite(d), 48),
-          h('div', null, h('b', null, d.name),
-            h('span', { class: clears ? 'good' : 'muted' }, clears ? `　${d.endless ? '帰還' : 'クリア'} ${clears}回` : (d.endless ? '' : '　未クリア')),
-            best > 1 ? h('span', { class: 'good' }, `・最高難易度${best}`) : null,
-            d.endless ? h('span', { class: 'good' }, `　最高到達 ${s.bestFloor[id] || 0}階`) : null),
-          d.recommend ? h('div', { class: 'muted' }, d.recommend) : null,
-          maxD > 1 ? h('div', { class: 'row' }, '難易度：',
-            h('select', { id: 'diff-' + id, onchange: (e) => { chosenDiff[id] = Number(e.target.value); render(); } },
-              [...Array(maxD).keys()].map(i => h('option', { value: i + 1, selected: i + 1 === chosenDiff[id] }, String(i + 1)))),
-            h('span', { class: 'muted' }, difficultyText(chosenDiff[id])),
-            null) : null,
-          h('button', { class: 'primary', disabled: s.party.length !== 3, onclick: () => { G().startRun(id, chosenDiff[id]); R.UI.show(runScreen); } },
-            s.party.length === 3 ? '出発する' : 'パーティを3人選んでください')));
+        const meta = [
+          clears ? `${d.endless ? '帰還' : 'クリア'} ${clears}回` : (d.endless ? '' : '未クリア'),
+          best > 1 ? `最高難易度${best}` : '',
+          d.endless ? `最高到達 ${s.bestFloor[id] || 0}階` : ''
+        ].filter(Boolean).join('・');
+        el.appendChild(h('div', { class: 'panel dungeon-card' },
+          R.UI.stage(id, '',
+            R.UI.sprite(dungeonSprite(d), 64, { extraClass: 'boss' }),
+            h('div', null,
+              h('div', { class: 'dungeon-name' }, d.name),
+              h('div', { class: 'dungeon-meta' }, [d.recommend, meta].filter(Boolean).join('　')))),
+          h('div', { class: 'dungeon-body' },
+            maxD > 1 ? h('div', { class: 'row' }, '難易度',
+              h('select', { id: 'diff-' + id, onchange: (e) => { chosenDiff[id] = Number(e.target.value); render(); } },
+                [...Array(maxD).keys()].map(i => h('option', { value: i + 1, selected: i + 1 === chosenDiff[id] }, String(i + 1)))),
+              h('span', { class: 'muted' }, difficultyText(chosenDiff[id]))) : null,
+            h('button', { class: 'primary', disabled: s.party.length !== 3, onclick: () => { G().startRun(id, chosenDiff[id]); R.UI.show(runScreen); } },
+              s.party.length === 3 ? '出発する' : 'パーティを3人選んでください'))));
       }
     }
     render();
@@ -112,27 +115,37 @@
     const run = G().run;
     if (!run) { R.UI.show(departScreen); return; }
     clear(el);
-    el.appendChild(R.UI.header(`${run.def.name}${run.difficulty > 1 ? `（難易度${run.difficulty}）` : ''}`));
+    el.appendChild(R.UI.header(`${run.def.name}${run.difficulty > 1 ? `（難易度${run.difficulty}）` : ''}`, null, run.phase === 'battle' ? run.whereText() : null));
 
-    // 進み具合
-    const prog = h('div', { class: 'panel' },
-      h('div', { class: 'row' },
-        h('span', null, run.phase === 'cleared' || run.phase === 'wiped' ? '' : `${run.floor + 1}階　${run.index + 1} / ${run.plan[run.floor].length} 戦目`),
-        run.phase === 'cleared' || run.phase === 'wiped' ? null
-        : run.endless
-          ? h('span', { class: 'muted' }, `（勝利 ${run.battlesWon}・最高記録 ${G().state.bestFloor[run.dungeonId] || 0}階／次のボスは${Math.ceil((run.floor + 1) / run.def.endless.segment) * run.def.endless.segment}階）`)
-          : h('span', { class: 'muted' }, `（勝利 ${run.battlesWon} / 全${run.totalBattles()}戦）`)),
-      h('div', null, 'パーティHP'), bar(run.hp, run.maxHp, 'hp'),
-      h('div', null, '集めた素材：' + matText(run.bag)),
-      run.items.length ? h('div', null, '持ち込み：' + run.items.map(i => R.DATA.items[i.id].name).join('、')) : null);
+    // 進み具合：場所の絵の上に、階ごとの戦闘の印（◆＝戦闘、●＝ボス）とHP
+    const ended = run.phase === 'cleared' || run.phase === 'wiped';
+    const seg = run.endless ? run.def.endless.segment : run.plan.length;
+    const first = run.endless ? run.floor - (run.floor % seg) : 0;
+    const pips = h('div', { class: 'floor-pips' }, [...Array(seg).keys()].map(k => {
+      const fi = first + k;
+      const list = run.plan[fi] || [];
+      return h('span', { class: 'floor-pip' }, `${fi + 1}F`, list.map((enc, bi) => {
+        const done = fi < run.floor || (fi === run.floor && bi < run.index) || ended;
+        const now = !ended && fi === run.floor && bi === run.index;
+        return h('i', { class: (done ? 'done' : now ? 'now' : '') + (R.DATA.encounters[enc].boss ? ' boss' : '') });
+      }));
+    }));
+    const prog = R.UI.stage(run.dungeonId, 'run-head',
+      pips,
+      h('div', { class: 'party-hp' }, R.UI.sprite('ico_hp', 18), bar(run.hp, run.maxHp, 'hp big')));
     el.appendChild(prog);
+    el.appendChild(h('div', { class: 'panel' },
+      h('div', null, h('b', null, '素材　'), matText(run.bag)),
+      run.items.length ? h('div', null, h('b', null, '持ち込み　'), run.items.map(i => R.DATA.items[i.id].name).join('、')) : null,
+      run.endless ? h('div', { class: 'muted' }, `最高記録 ${G().state.bestFloor[run.dungeonId] || 0}階`) : null));
     const area = h('div');
     el.appendChild(area);
 
     if (run.phase === 'battle') {
       const enc = R.DATA.encounters[run.currentEncounterId()];
-      area.appendChild(h('div', { class: 'panel' },
-        h('div', null, `次の戦闘：${enc.name}`),
+      area.appendChild(h('div', { class: 'panel next-battle' + (enc.boss ? ' boss' : '') },
+        h('div', { class: 'next-foes' }, enc.enemies.map(e => R.UI.sprite(e, enc.boss ? 72 : 56))),
+        h('div', { class: 'next-name' }, enc.boss ? `ボス：${enc.name}` : enc.name),
         h('button', { class: 'primary', onclick: () => startBattle(el) }, '戦う')));
     } else if (run.phase === 'checkpoint') {
       const nextBoss = run.floor + 1 + run.def.endless.segment;
@@ -143,7 +156,7 @@
           h('button', { class: 'primary', onclick: () => { run.checkpointChoice(false); G().saveRun(); R.UI.show(runScreen); } }, '帰還する'),
           h('button', { class: 'danger', onclick: () => { run.checkpointChoice(true); G().saveRun(); R.UI.show(runScreen); } }, `さらに潜る（次のボスは${nextBoss}階）`))));
     } else if (run.phase === 'reward') {
-      area.appendChild(h('h2', null, '報酬を1つ選んでください'));
+      area.appendChild(h('h2', null, '報酬を1つ選ぶ'));
       const desc = {
         mining: `${R.Gather.gatherParams(run.gatherEntry('mining'), G().state.life.mining.lv, run.tools.pick).swings}回`,
         logging: `${R.Gather.gatherParams(run.gatherEntry('logging'), G().state.life.logging.lv, run.tools.axe).swings}回`,
@@ -153,8 +166,9 @@
       };
       area.appendChild(h('div', { class: 'menu' }, run.rewardOptions.map(k =>
         h('button', { class: 'menu-item', onclick: () => chooseReward(area, k) },
-          h('div', { class: 'menu-label' }, R.Dungeon.REWARD_NAMES[k]),
-          desc[k] ? h('div', { class: 'menu-desc' }, desc[k]) : null))));
+          R.UI.sprite({ mining: 'mat_ore', logging: 'mat_wood', gathering: 'mat_plant', treasure: 'mat_gem', rest: 'ico_hp' }[k] || 'icon_bag', 32),
+          h('div', null, h('div', { class: 'menu-label' }, R.Dungeon.REWARD_NAMES[k]),
+          desc[k] ? h('div', { class: 'menu-desc' }, desc[k]) : null)))));
     } else if (run.phase === 'gather') {
       startGather(area);
     } else {
@@ -176,12 +190,11 @@
     const combat = run.createCombat();
     // 戦闘中は場所だけを1行で出す（HPなどは戦闘画面にある）
     clear(el);
-    el.appendChild(h('div', { class: 'header' },
-      h('h1', null, run.def.name + (run.difficulty > 1 ? `（難易度${run.difficulty}）` : '')),
-      h('span', { class: 'muted' }, run.whereText())));
+    el.appendChild(R.UI.header(run.def.name + (run.difficulty > 1 ? `（難易度${run.difficulty}）` : ''), null, run.whereText()));
     const area = h('div');
     el.appendChild(area);
     R.UI.mountCombat(area, combat, {
+      scene: run.dungeonId,
       onFinish: () => {
         run.finishCombat(combat);
         G().saveRun();
@@ -224,12 +237,11 @@
         const toolSw = gn.params.swings - noTool.swings;
         const sign = (n) => (n > 0 ? '+' : n < 0 ? '−' : '±') + Math.abs(n);
         return h('div', { class: 'lv-bonus ' + (diff > 0 ? 'good' : diff < 0 ? 'bad' : 'muted') },
-          `レベル差 ${diff > 0 ? '+' : ''}${diff}：振れる回数 ${sign(lvSw)}・最初から開いているマス ${gn.params.hints}` +
-          `　／道具：振れる回数 ${sign(toolSw)}`);
+          `Lv差${diff > 0 ? '+' : ''}${diff}：回数${sign(lvSw)}・開始マス${gn.params.hints}／道具：回数${sign(toolSw)}`);
       })(),
       h('div', { class: 'muted' }, `${word.vein}${total}つ（★${G2.rareVeins}）・数字＝まわりの${word.vein}の数`),
       h('div', { class: 'row' },
-        h('span', { class: 'energy' }, `残り ${board.swingsLeft} / ${board.swings} 回`),
+        h('span', { class: 'energy', title: '残り回数' }, h('b', null, String(board.swingsLeft)), `/${board.swings}`),
         h('span', null, `見つけた ${board.found.length} / ${total}`),
         rareFound ? h('span', { class: 'good' }, `★レア ${rareFound}`) : null),
       h('div', { class: 'vein-grid', style: { gridTemplateColumns: `repeat(${G2.size}, 1fr)` } }, board.cells.map((c, i) => {
@@ -256,6 +268,6 @@
   }
 
   R.UI.extraMenu = R.UI.extraMenu || [];
-  R.UI.extraMenu.push({ label: 'ダンジョンへ出発', desc: 'パーティと持ち込みを決めて出発', icon: 'icon_dungeon', fn: () => R.UI.show(G().run ? runScreen : departScreen), order: 10 });
+  R.UI.extraMenu.push({ label: 'ダンジョンへ出発', desc: 'パーティを組んで出発', icon: 'icon_dungeon', fn: () => R.UI.show(G().run ? runScreen : departScreen), order: 10 });
   Object.assign(R.UI, { departScreen, runScreen, matText, partySummary });
 })(globalThis.RASEN = globalThis.RASEN || {});

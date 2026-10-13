@@ -1,19 +1,25 @@
 // 画面の切り替え（拠点メニューなど）
 (function (R) {
-  const { h, clear } = R.UI;
+  const { h, clear, bar } = R.UI;
   const app = { el: null, screen: null };
 
   function show(screenFn) {
     app.screen = screenFn;
     clear(app.el);
+    // 画面が切り替わるときにふわっと出す
+    app.el.classList.remove('screen-in');
+    void app.el.offsetWidth;
+    app.el.classList.add('screen-in');
     screenFn(app.el);
     window.scrollTo(0, 0);
   }
 
-  function header(title, back) {
-    return h('div', { class: 'header' },
-      back ? h('button', { class: 'small', onclick: back }, '← もどる') : null,
-      h('h1', null, title));
+  // 画面の上のバー（もどるボタン＋題名）
+  function header(title, back, sub) {
+    return h('div', { class: 'topbar' },
+      back ? h('button', { class: 'back-btn', 'aria-label': 'もどる', onclick: back }, '◀') : null,
+      h('h1', null, title),
+      sub ? h('span', { class: 'sub' }, sub) : null);
   }
 
   // ===== 練習戦闘（フェーズ1：戦闘だけ動くもの） =====
@@ -45,48 +51,62 @@
       el.appendChild(header('練習戦闘', () => show(practiceScreen)));
       const area = h('div');
       el.appendChild(area);
-      R.UI.mountCombat(area, combat, { onFinish: () => show(practiceScreen) });
+      const scene = Object.keys(R.DATA.dungeons).find(id => {
+        const d = R.DATA.dungeons[id];
+        const fl = d.endless ? d.endless.tiers.map(t => ({ encounters: t.encounters })) : d.floors;
+        return fl.some(f => f.encounters[encounter] !== undefined || f.boss === encounter);
+      }) || 'cave';
+      R.UI.mountCombat(area, combat, { scene, onFinish: () => show(practiceScreen) });
     }
     render();
   }
 
   // ===== 拠点メニュー =====
   function homeScreen(el) {
-    el.appendChild(h('div', { class: 'title' },
-      h('div', { class: 'title-name' }, 'ラセン'),
-      h('div', { class: 'title-sub' }, '拠点')));
+    const party = R.Game.state.party;
+    // 夜の野営地の絵の上に、題名とパーティ
+    el.appendChild(R.UI.stage('camp', 'home-hero',
+      h('div', { class: 'home-title' }, 'ラセン'),
+      h('div', { class: 'home-sub' }, '拠点'),
+      h('div', { class: 'home-party' }, party.map(j => R.UI.sprite(j, 56)))));
     const menu = [
-      { label: '練習戦闘', desc: '今の装備で好きな敵と戦う（記録なし）', icon: 'icon_practice', fn: () => show(practiceScreen), order: 80 },
-      { label: '持ち物・ライフ', desc: '素材・道具・生産Lv', icon: 'icon_bag', fn: () => show(inventoryScreen), order: 70 }
+      { label: '練習戦闘', desc: '記録なし', icon: 'icon_practice', fn: () => show(practiceScreen), order: 80 },
+      { label: '持ち物', desc: '素材・道具・Lv', icon: 'icon_bag', fn: () => show(inventoryScreen), order: 70 }
     ].concat(R.UI.extraMenu || []).sort((x, y) => (x.order || 50) - (y.order || 50));
-    if (R.Game.run) el.appendChild(h('div', { class: 'panel' }, `ダンジョン「${R.Game.run.def.name}」の途中です（${R.Game.run.whereText()}）。「ダンジョンへ出発」から続きを遊べます。`));
-    el.appendChild(h('div', { class: 'menu' }, menu.map(m =>
-      h('button', { class: 'menu-item', onclick: m.fn ? m.fn : () => show(m.screen) },
-        m.icon ? R.UI.sprite(m.icon, 40) : null,
+    const run = R.Game.run;
+    el.appendChild(h('div', { class: 'menu' }, menu.map((m, i) => {
+      const wide = i === 0;
+      const label = wide && run ? '冒険の続き' : m.label;
+      const desc = wide && run ? `${run.def.name}・${run.whereText()}` : m.desc;
+      return h('button', { class: 'menu-item' + (wide ? ' wide primary' : ''), onclick: m.fn ? m.fn : () => show(m.screen) },
+        m.icon ? R.UI.sprite(m.icon, wide ? 44 : 36) : null,
         h('div', { class: 'menu-text' },
-          h('div', { class: 'menu-label' }, m.label),
-          h('div', { class: 'menu-desc' }, m.desc))))));
+          h('div', { class: 'menu-label' }, label),
+          h('div', { class: 'menu-desc' }, desc)));
+    })));
   }
 
   // ===== 持ち物・ライフ =====
   function inventoryScreen(el) {
     const s = R.Game.state;
     el.appendChild(header('持ち物・ライフ', () => show(homeScreen)));
-    el.appendChild(h('h2', null, 'ライフ（生産・採集のレベル）'));
-    el.appendChild(h('table', null,
-      h('tr', null, h('th', null, 'ライフ'), h('th', null, 'Lv'), h('th', null, '経験値')),
-      Object.entries(R.Life.LIVES).map(([k, name]) => h('tr', null,
-        h('td', null, name), h('td', null, String(s.life[k].lv)),
-        h('td', null, `${s.life[k].exp} / ${R.Life.expToNext(s.life[k].lv)}`)))));
+    el.appendChild(h('h2', null, 'ライフ'));
+    el.appendChild(h('div', { class: 'life-grid' }, Object.entries(R.Life.LIVES).map(([k, name]) => {
+      const need = R.Life.expToNext(s.life[k].lv);
+      return h('div', { class: 'life-tile' },
+        h('div', { class: 'life-top' }, h('span', { class: 'life-name' }, name), h('span', { class: 'life-lv' }, `Lv${s.life[k].lv}`)),
+        bar(s.life[k].exp, need, 'exp'));
+    })));
     el.appendChild(h('h2', null, '素材'));
     const mats = Object.entries(s.materials).filter(([, n]) => n > 0);
-    el.appendChild(mats.length ? h('table', null,
-      h('tr', null, h('th', null, '素材'), h('th', null, '種類'), h('th', null, '格'), h('th', null, '個数')),
-      mats.map(([m, n]) => {
-        const d = R.DATA.materials[m] || { name: m, kind: '?', rank: '?' };
-        const kind = { ore: '鉱石', wood: '木材', plant: '採取物', monster: 'モンスター素材', gem: '宝石' }[d.kind] || d.kind;
-        return h('tr', null, h('td', null, d.name), h('td', null, kind), h('td', null, String(d.rank)), h('td', null, String(n)));
-      })) : h('div', { class: 'muted' }, 'なし'));
+    el.appendChild(mats.length ? h('div', { class: 'mat-grid' }, mats.map(([m, n]) => {
+      const d = R.DATA.materials[m] || { name: m, kind: '?', rank: '?' };
+      return h('div', { class: 'mat-tile', title: `ランク${d.rank}` },
+        R.UI.sprite('mat_' + d.kind, 24),
+        h('span', { class: 'mat-name' }, d.name),
+        h('span', { class: 'mat-rank' }, `R${d.rank}`),
+        h('span', { class: 'mat-n' }, `×${n}`));
+    })) : h('div', { class: 'muted' }, 'なし'));
     el.appendChild(h('h2', null, '採集道具'));
     el.appendChild(h('div', null, s.tools.map(t => R.DATA.equipment.tools[t] ? R.DATA.equipment.tools[t].name : t).join('、') || 'なし'));
     el.appendChild(h('h2', null, '記録'));
