@@ -89,6 +89,18 @@
     el.appendChild(h('div', null, s.tools.map(t => R.DATA.equipment.tools[t] ? R.DATA.equipment.tools[t].name : t).join('、') || 'なし'));
     el.appendChild(h('h2', null, '記録'));
     el.appendChild(h('div', null, `出発 ${s.runs}回／クリア ${Object.values(s.clears).reduce((a, b) => a + b, 0)}回`));
+    el.appendChild(h('h2', null, 'テスト用'));
+    el.appendChild(h('label', null,
+      h('input', { type: 'checkbox', id: 'debug-toggle', checked: s.settings.debug, onchange: (e) => { s.settings.debug = e.target.checked; R.Game.save(); show(inventoryScreen); } }),
+      ' テスト用の機能を表示'));
+    if (s.settings.debug) {
+      const act = (label, fn) => h('button', { class: 'small', onclick: () => { fn(); R.Game.save(); show(inventoryScreen); } }, label);
+      el.appendChild(h('div', { class: 'row' },
+        act('全ダンジョンをクリア済みにする', () => R.Game.debugClearAll()),
+        act('素材を全種類+10', () => R.Game.debugAllMaterials(10)),
+        act('生産・採集Lv+5', () => R.Game.debugLifeUp(5)),
+        act('採集道具をすべて入手', () => R.Game.debugAllTools())));
+    }
     el.appendChild(h('h2', null, 'セーブデータ'));
     el.appendChild(h('button', { class: 'danger', onclick: () => R.UI.modal(h('div', null, 'セーブデータを消去しますか？（元に戻せません）'), [
       { label: 'やめる' },

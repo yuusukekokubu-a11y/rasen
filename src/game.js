@@ -24,7 +24,8 @@
         maxDifficulty: {},     // { ダンジョンID: クリアした一番高い難易度 }
         bestFloor: {},         // { 無限階層のID: 到達した一番深い階 }
         runs: 0,
-        run: null              // 進行中のダンジョン
+        run: null,             // 進行中のダンジョン
+        settings: { debug: false } // テスト用の機能を表示するか
       };
       this.state = s;
       for (const job of jobs) this.giveStarter(job);
@@ -52,6 +53,7 @@
       for (const k of Object.keys(R.Life.LIVES)) if (!s.life[k]) s.life[k] = { lv: 1, exp: 0 };
       if (!s.maxDifficulty) s.maxDifficulty = {};
       if (!s.bestFloor) s.bestFloor = {};
+      if (!s.settings) s.settings = { debug: false };
       for (const [id, n] of Object.entries(s.clears)) if (n > 0 && !s.maxDifficulty[id]) s.maxDifficulty[id] = 1;
       s.party = s.party.filter(j => R.DATA.jobs[j] && R.DATA.jobs[j].enabled);
     },
@@ -142,6 +144,18 @@
       }
       return best || 0.5;
     },
+
+    // ===== テスト用（後半の確認のため） =====
+    debugClearAll() {
+      for (const [id, d] of Object.entries(R.DATA.dungeons)) {
+        if (d.endless) continue;
+        this.state.clears[id] = Math.max(1, this.state.clears[id] || 0);
+        this.state.maxDifficulty[id] = Math.max(1, this.state.maxDifficulty[id] || 0);
+      }
+    },
+    debugAllMaterials(n) { for (const m of Object.keys(R.DATA.materials)) this.state.materials[m] = (this.state.materials[m] || 0) + n; },
+    debugLifeUp(n) { for (const k of Object.keys(this.state.life)) this.state.life[k].lv = Math.min(R.DATA.config.life.maxLv, this.state.life[k].lv + n); },
+    debugAllTools() { this.state.tools = Object.keys(R.DATA.equipment.tools); },
 
     // ===== ダンジョンの解禁 =====
     // 先にクリアが必要なダンジョンをすべてクリアしていれば開いている

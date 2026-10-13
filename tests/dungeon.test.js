@@ -247,3 +247,15 @@ test('無限階層：4階ごとにボス→帰還か続行を選ぶ・深いほ�
   const run2 = G.startRun('spiral');
   assert.strictEqual(run2.floor, 0);
 });
+
+test('テスト用機能：全クリア済み・素材・Lv', () => {
+  const G = R.Game;
+  G.newState();
+  G.debugClearAll();
+  assert.ok(G.allCleared() && G.isUnlocked('spiral'));
+  assert.strictEqual(G.maxUnlockedDifficulty('cave'), 2);
+  G.debugAllMaterials(3);
+  assert.ok(Object.keys(R.DATA.materials).every(m => G.state.materials[m] >= 3));
+  G.debugLifeUp(5);
+  assert.strictEqual(G.state.life.smith.lv, 6);
+});
