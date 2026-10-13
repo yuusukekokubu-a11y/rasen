@@ -33,7 +33,7 @@ test('盗賊：捨てた枚数でダメージが増える・捨てたときの�
   assert.ok(c.pending);
   c.resolveChoice([a.iid]);
   assert.strictEqual(c.counters.discardedThisTurn, 1);
-  assert.strictEqual(999 - e.hp, 3, '影走りで3ダメージ');
+  assert.strictEqual(999 - e.hp, R.DATA.powers.th_shadow.cardDiscarded[0].v, '影走りのダメージ');
   const hp = e.hp;
   c.playCard(flurry.iid, 0);
   assert.strictEqual(hp - e.hp, 3 + c.statOf(0, 'atk') + 3);

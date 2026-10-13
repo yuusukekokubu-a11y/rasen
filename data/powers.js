@@ -45,8 +45,8 @@
       turnStart: [{ t: 'buff', stat: 'atk', v: 1, who: 'party' }, { t: 'buff', stat: 'mag', v: 1, who: 'party' }] },
 
     // 盗賊
-    th_shadow:   { name: '影走り', desc: 'カードを捨てるたび、ランダムな敵に3ダメージ',
-      cardDiscarded: [{ t: 'dmg', v: 3, scale: 'none', target: 'random' }] },
+    th_shadow:   { name: '影走り', desc: 'カードを捨てるたび、ランダムな敵に4ダメージ',
+      cardDiscarded: [{ t: 'dmg', v: 4, scale: 'none', target: 'random' }] },
     th_nimble:   { name: '身軽', desc: '毎ターン開始時、1枚引いて1枚捨てる',
       turnStart: [{ t: 'draw', v: 1 }, { t: 'discard', v: 1 }] },
     th_mist:     { name: '霧隠れ', desc: 'カードを捨てるたび、ブロック2',
@@ -65,8 +65,8 @@
       onPlay: [{ t: 'buff', stat: 'atk', v: 2, who: 'self' }] },
 
     // 僧侶
-    pr_ward:     { name: '加護', desc: '毎ターン開始時、結界2（魔力が乗る）',
-      turnStart: [{ t: 'ward', v: 2 }] },
+    pr_ward:     { name: '加護', desc: '毎ターン開始時、結界1（魔力の半分が乗る）',
+      turnStart: [{ t: 'ward', v: 1, magRate: 0.5 }] },
     pr_ascetic:  { name: '苦行', desc: 'カードが廃棄されるたび、結界3（魔力が乗る）',
       cardExhausted: [{ t: 'ward', v: 3 }] },
     pr_grace:    { name: '不朽の結界', desc: '結界が時間で減らなくなる',

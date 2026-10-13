@@ -60,7 +60,7 @@
 
     // ===== 杖（魔法使い） =====
     staff_fire:     { name: '火球', pool: 'staff', type: 'attack', cost: 1, tags: ['magic'],
-      effects: [{ t: 'dmg', v: 6, scale: 'mag', element: 'fire' }, { t: 'status', s: 'burn', v: 2 }],
+      effects: [{ t: 'dmg', v: 7, scale: 'mag', element: 'fire' }, { t: 'status', s: 'burn', v: 2 }],
       upgrade: { effects: [{ t: 'dmg', v: 9, scale: 'mag', element: 'fire' }, { t: 'status', s: 'burn', v: 3 }] } },
     staff_ice:      { name: '氷槍', pool: 'staff', type: 'attack', cost: 1, tags: ['magic'],
       effects: [{ t: 'dmg', v: 6, scale: 'mag', element: 'ice' }, { t: 'status', s: 'freeze', v: 1 }],
@@ -71,7 +71,7 @@
     staff_meteor:   { name: '隕石', pool: 'staff', type: 'attack', cost: 3, tags: ['magic'],
       effects: [{ t: 'dmg', v: 24, scale: 'mag', element: 'fire' }], upgrade: { effects: [{ t: 'dmg', v: 32, scale: 'mag', element: 'fire' }] } },
     staff_bolt:     { name: '魔力弾', pool: 'staff', type: 'attack', cost: 0, tags: ['magic'],
-      effects: [{ t: 'dmg', v: 3, scale: 'mag' }], upgrade: { effects: [{ t: 'dmg', v: 5, scale: 'mag' }] } },
+      effects: [{ t: 'dmg', v: 4, scale: 'mag' }], upgrade: { effects: [{ t: 'dmg', v: 6, scale: 'mag' }] } },
     staff_focus:    { name: '集中', pool: 'staff', type: 'skill', cost: 1, tags: ['magic'],
       effects: [{ t: 'buff', stat: 'mag', v: 2, who: 'self' }], upgrade: { effects: [{ t: 'buff', stat: 'mag', v: 3, who: 'self' }] } },
     staff_blizzard: { name: '吹雪', pool: 'staff', type: 'attack', cost: 2, tags: ['magic'],
@@ -94,10 +94,10 @@
     star_read:      { name: '星読み', pool: 'starboard', type: 'skill', cost: 1,
       effects: [{ t: 'scry', v: 3 }, { t: 'draw', v: 1 }], upgrade: { effects: [{ t: 'scry', v: 4 }, { t: 'draw', v: 2 }] } },
     star_blessing:  { name: '星の祝福', pool: 'starboard', type: 'skill', cost: 1, tags: ['magic'],
-      effects: [{ t: 'buff', stat: 'atk', v: 1, who: 'party' }, { t: 'buff', stat: 'mag', v: 1, who: 'party' }],
-      upgrade: { effects: [{ t: 'buff', stat: 'atk', v: 2, who: 'party' }, { t: 'buff', stat: 'mag', v: 2, who: 'party' }] } },
+      effects: [{ t: 'buff', stat: 'atk', v: 2, who: 'party' }, { t: 'buff', stat: 'mag', v: 2, who: 'party' }],
+      upgrade: { effects: [{ t: 'buff', stat: 'atk', v: 3, who: 'party' }, { t: 'buff', stat: 'mag', v: 3, who: 'party' }] } },
     star_beam:      { name: '星光', pool: 'starboard', type: 'attack', cost: 1, tags: ['magic'],
-      effects: [{ t: 'dmg', v: 6, scale: 'mag' }], upgrade: { effects: [{ t: 'dmg', v: 9, scale: 'mag' }] } },
+      effects: [{ t: 'dmg', v: 9, scale: 'mag' }], upgrade: { effects: [{ t: 'dmg', v: 12, scale: 'mag' }] } },
     star_align:     { name: '星辰の導き', pool: 'starboard', type: 'skill', cost: 0, exhaust: true,
       effects: [{ t: 'draw', v: 2 }], upgrade: { exhaust: false } },
     star_oracle:    { name: '天啓', pool: 'starboard', type: 'skill', cost: 1, exhaust: true,
@@ -122,7 +122,7 @@
 
     // ===== 短剣（盗賊） =====
     dagger_stab:    { name: '刺突', pool: 'dagger', type: 'attack', cost: 1,
-      effects: [{ t: 'dmg', v: 6 }], upgrade: { effects: [{ t: 'dmg', v: 9 }] } },
+      effects: [{ t: 'dmg', v: 7 }], upgrade: { effects: [{ t: 'dmg', v: 10 }] } },
     dagger_prepare: { name: '下準備', pool: 'dagger', type: 'skill', cost: 0,
       effects: [{ t: 'draw', v: 2 }, { t: 'discard', v: 1 }], upgrade: { effects: [{ t: 'draw', v: 3 }, { t: 'discard', v: 1 }] } },
     dagger_flurry:  { name: '乱れ斬り', pool: 'dagger', type: 'attack', cost: 1,

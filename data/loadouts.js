@@ -25,7 +25,7 @@
       weapon:    { base: 'oak_board',    randomCard: 'star_blessing' },
       head:      { base: 'flax_hat',     randomCard: 'robe_insight' },
       body:      { base: 'flax_robe',    randomCard: 'robe_ward' },
-      accessory: { base: 'copper_ring',  randomCard: 'acc_quick', power: 'pw_as_stargaze' }
+      accessory: { base: 'copper_ring',  randomCard: 'acc_spark', power: 'pw_as_stargaze' }
     },
     thief: {
       weapon:    { base: 'copper_dagger', randomCard: 'dagger_prepare' },

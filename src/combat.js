@@ -455,7 +455,8 @@
           break;
         }
         case 'ward': {
-          const amount = Math.max(0, Math.floor((e.v + this.statOf(ctx.owner, e.scale || 'mag')) * mult));
+          const rate = e.magRate === undefined ? 1 : e.magRate;
+          const amount = Math.max(0, Math.floor((e.v + Math.floor(this.statOf(ctx.owner, e.scale || 'mag') * rate)) * mult));
           this.party.ward += amount;
           break;
         }

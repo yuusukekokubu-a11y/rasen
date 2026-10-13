@@ -58,10 +58,10 @@
       name: '囁きの森', requires: ['cave'],
       recommend: '推奨ランク2・炎が有効',
       floors: [
-        { battles: [2, 3], encounters: { hornet_trio: 2, wolf_hornet: 2, treant_single: 2 }, scale: { hp: 1.0, dmg: 1.0 } },
-        { battles: [2, 3], encounters: { treant_wolf: 2, spider_hornet: 2, wolf_hornet: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
-        { battles: [2, 3], encounters: { treant_pair: 2, spider_hornet: 2, treant_wolf: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
-        { battles: [1, 2], encounters: { treant_pair: 1, treant_wolf: 1 }, scale: { hp: 1.05, dmg: 1.05 }, boss: 'boss_elder' }
+        { battles: [2, 3], encounters: { hornet_trio: 2, wolf_hornet: 2, treant_single: 2 }, scale: { hp: 1.1, dmg: 1.1 } },
+        { battles: [2, 3], encounters: { treant_wolf: 2, spider_hornet: 2, wolf_hornet: 1 }, scale: { hp: 1.1, dmg: 1.1 } },
+        { battles: [2, 3], encounters: { treant_pair: 2, spider_hornet: 2, treant_wolf: 1 }, scale: { hp: 1.15, dmg: 1.15 } },
+        { battles: [1, 2], encounters: { treant_pair: 1, treant_wolf: 1 }, scale: { hp: 1.15, dmg: 1.15 }, boss: 'boss_elder' }
       ],
       rewards: { weights: { mining: 2, logging: 4, gathering: 3, treasure: 2, rest: 2 }, restHealRatio: 0.35 },
       gather: {
@@ -96,10 +96,10 @@
       name: '霧の沼', requires: ['cave'],
       recommend: '推奨ランク2・雷が有効',
       floors: [
-        { battles: [2, 3], encounters: { toad_pair: 2, slime_toad: 2, wisp_trio: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
-        { battles: [2, 3], encounters: { toad_wisp: 2, wisp_trio: 2, slime_toad: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
-        { battles: [2, 3], encounters: { toad_trio: 2, toad_wisp: 2 }, scale: { hp: 1.05, dmg: 1.05 } },
-        { battles: [1, 2], encounters: { toad_trio: 1, toad_wisp: 1 }, scale: { hp: 1.05, dmg: 1.05 }, boss: 'boss_queen' }
+        { battles: [2, 3], encounters: { toad_pair: 2, slime_toad: 2, wisp_trio: 1 }, scale: { hp: 1.1, dmg: 1.1 } },
+        { battles: [2, 3], encounters: { toad_wisp: 2, wisp_trio: 2, slime_toad: 1 }, scale: { hp: 1.1, dmg: 1.1 } },
+        { battles: [2, 3], encounters: { toad_trio: 2, toad_wisp: 2 }, scale: { hp: 1.15, dmg: 1.15 } },
+        { battles: [1, 2], encounters: { toad_trio: 1, toad_wisp: 1 }, scale: { hp: 1.15, dmg: 1.15 }, boss: 'boss_queen' }
       ],
       rewards: { weights: { mining: 2, logging: 2, gathering: 4, treasure: 2, rest: 2 }, restHealRatio: 0.35 },
       gather: {
@@ -134,10 +134,10 @@
       name: '星降る遺跡', requires: ['forest', 'marsh'],
       recommend: '推奨ランク3・雷が有効',
       floors: [
-        { battles: [2, 3], encounters: { gargoyle_single: 2, doll_pair: 2, phantom_single: 2 }, scale: { hp: 1.0, dmg: 1.0 } },
-        { battles: [2, 3], encounters: { gargoyle_phantom: 2, phantom_doll: 2, doll_pair: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
-        { battles: [2, 3], encounters: { gargoyle_pair: 2, gargoyle_phantom: 2, phantom_doll: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
-        { battles: [1, 2], encounters: { gargoyle_pair: 1, gargoyle_phantom: 1 }, scale: { hp: 1.05, dmg: 1.05 }, boss: 'boss_dragon' }
+        { battles: [2, 3], encounters: { gargoyle_single: 2, doll_pair: 2, phantom_single: 2 }, scale: { hp: 0.95, dmg: 0.95 } },
+        { battles: [2, 3], encounters: { gargoyle_phantom: 2, phantom_doll: 2, doll_pair: 1 }, scale: { hp: 0.95, dmg: 0.95 } },
+        { battles: [2, 3], encounters: { gargoyle_pair: 2, gargoyle_phantom: 2, phantom_doll: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
+        { battles: [1, 2], encounters: { gargoyle_pair: 1, gargoyle_phantom: 1 }, scale: { hp: 1.0, dmg: 1.0 }, boss: 'boss_dragon' }
       ],
       rewards: { weights: { mining: 4, logging: 2, gathering: 2, treasure: 3, rest: 2 }, restHealRatio: 0.35 },
       gather: {
@@ -223,8 +223,8 @@
   //   難易度Nは、同じダンジョンの難易度N−1をクリアすると開く
   R.DATA.difficulty = {
     max: 5,
-    hpPerLevel: 0.35,          // 難易度が1上がるごとの敵HPの増え方（難易度2で×1.35）
-    dmgPerLevel: 0.25,         // 難易度が1上がるごとの敵の攻撃力・ブロックの増え方
+    hpPerLevel: 0.3,           // 難易度が1上がるごとの敵HPの増え方（難易度2で×1.3）
+    dmgPerLevel: 0.2,          // 難易度が1上がるごとの敵の攻撃力・ブロックの増え方
     // 上位素材：戦闘勝利・採集・宝箱のたびに、この確率で上位素材が1つ追加で出る
     highDropPerLevel: 0.3,     // 難易度が1上がるごとの確率（難易度2で30%、上限90%）
     highDropMax: 0.9,
