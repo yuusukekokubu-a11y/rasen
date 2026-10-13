@@ -270,6 +270,8 @@
           this.party.hp -= d;
           this.counters.damageTaken += d;
           total += d;
+          // 画面の演出用：1発ずつの記録（hitLog が用意されているときだけ）
+          if (this.hitLog) this.hitLog.push({ enemy: e.index, dmg: d, guarded: blocked + warded, hp: Math.max(0, this.party.hp) });
         }
         this._log(`${e.name}の${mv.name}！ ${total}ダメージ`);
       } else {

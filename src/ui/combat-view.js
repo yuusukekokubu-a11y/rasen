@@ -80,6 +80,10 @@
     let fx = null;           // 直前の行動で起きたこと（数字を飛ばす・揺らす）
     let played = null;       // 直前に使ったカード（敵や味方へ飛ばす演出用）
     const reduceMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const HIT_GAP = 380;     // 別の敵の攻撃に移るときの間（ミリ秒）
+    const MULTI_GAP = 180;   // 同じ敵の連続攻撃（×2回など）の間
+    // 1発ずつの見せる時刻
+    const hitTimes = (list) => { let t = 0; return list.map((x, k) => (k === 0 ? 0 : (t += list[k - 1].enemy === x.enemy ? MULTI_GAP : HIT_GAP))); };
     let banner = { text: '戦闘開始' };
     let lastTurn = combat.turn;
     const sceneKind = opts.scene && R.UI.BACKDROPS.includes(opts.scene) ? opts.scene : 'cave';
@@ -92,12 +96,12 @@
         attackers: combat.enemies.filter(e => e.alive && e.intent && combat.intentInfo(e) && combat.intentInfo(e).kinds.includes('attack')).map(e => e.index)
       };
     }
-    function act(res, before, endedTurn) {
+    function act(res, before, endedTurn, hits) {
       message = res && !res.ok ? res.error : '';
       if (res && !res.ok) played = null;
       selection = [];
       if (before) {
-        fx = { enemyDmg: {}, partyDmg: 0, heal: 0, block: 0, ward: 0, lunge: endedTurn ? before.attackers : [] };
+        fx = { enemyDmg: {}, partyDmg: 0, heal: 0, block: 0, ward: 0, lunge: endedTurn ? before.attackers : [], hits: hits && hits.length ? hits : null, hpBefore: before.hp };
         combat.enemies.forEach((e, i) => { const d = before.enemies[i].hp - e.hp; if (d > 0) fx.enemyDmg[i] = d; });
         const dh = combat.party.hp - before.hp;
         if (dh < 0) fx.partyDmg = -dh; else if (dh > 0) fx.heal = dh;
@@ -109,7 +113,15 @@
       if (!combat.enemies[target] || !combat.enemies[target].alive) target = combat._firstAlive();
       render();
     }
-    const doAct = (fn, endedTurn) => { const before = snapshot(); const res = fn(); act(res, before, endedTurn); };
+    // ターン終了のときは、敵の攻撃を1発ずつ記録して、あとで順番に見せる
+    const doAct = (fn, endedTurn) => {
+      const before = snapshot();
+      if (endedTurn) combat.hitLog = [];
+      const res = fn();
+      const hits = combat.hitLog;
+      combat.hitLog = null;
+      act(res, before, endedTurn, hits);
+    };
 
     // 数字を要素の上に飛ばす
     function floatText(host, text, cls) {
@@ -291,9 +303,36 @@
       container.appendChild(root);
       log.scrollTop = log.scrollHeight;
 
+      // 敵の攻撃を1発ずつ：その敵が前に出る → パーティが揺れる → 数字 → HPの棒が減る
+      function playHits(list, hpBefore) {
+        const fill = partyEl.querySelector('.party-hp .bar-fill');
+        const text = partyEl.querySelector('.party-hp .bar-text');
+        const setHp = (v) => {
+          if (fill) fill.style.width = Math.max(0, Math.min(100, v / combat.party.maxHp * 100)) + '%';
+          if (text) text.textContent = `${v} / ${combat.party.maxHp}`;
+        };
+        setHp(hpBefore);
+        const times = hitTimes(list);
+        list.forEach((hit, k) => setTimeout(() => {
+          if (!partyEl.isConnected) return;
+          const en = enemyEls[hit.enemy];
+          if (en && (k === 0 || list[k - 1].enemy !== hit.enemy)) { en.classList.remove('lunge'); void en.offsetWidth; en.classList.add('lunge'); }
+          if (hit.dmg > 0) {
+            partyEl.classList.remove('quake'); void partyEl.offsetWidth; partyEl.classList.add('quake');
+            floatText(partyEl, `-${hit.dmg}`, 'party-dmg');
+            burst(partyEl, 'art_slash2', 'on-party enemy-claw');
+          } else floatText(partyEl, '防いだ', 'block-up');
+          setHp(hit.hp);
+        }, times[k]));
+      }
+
       // 演出：帯・飛び出す数字・揺れ
+      // 敵の攻撃を1発ずつ見せる間は、帯（ターン N・全滅など）を後に回す
+      const seqMs = fx && fx.hits && !reduceMotion ? hitTimes(fx.hits).pop() + 400 : 0;
       if (banner) {
-        stageEl.appendChild(h('div', { class: 'banner' + (banner.stay ? ' stay' : '') + (banner.lose ? ' lose' : '') }, banner.text));
+        const b = banner;
+        const showBanner = () => stageEl.appendChild(h('div', { class: 'banner' + (b.stay ? ' stay' : '') + (b.lose ? ' lose' : '') }, b.text));
+        if (seqMs) setTimeout(showBanner, seqMs); else showBanner();
         if (!banner.stay) banner = null;
       }
       if (fx) {
@@ -310,11 +349,14 @@
           }
           if (p && p.attack && !Object.keys(f.enemyDmg).length) burst(enemyEls[p.target], p.art);
           if (p && !p.attack) burst(partyEl, p.art, 'on-party');
-          for (const i of f.lunge) if (enemyEls[i]) enemyEls[i].classList.add('lunge');
-          if (f.partyDmg) {
-            partyEl.classList.add('quake');
-            floatText(partyEl, `-${f.partyDmg}`, 'party-dmg');
-            if (f.lunge.length) burst(partyEl, 'art_slash2', 'on-party enemy-claw');
+          if (f.hits && !reduceMotion) playHits(f.hits, f.hpBefore);
+          else {
+            for (const i of f.lunge) if (enemyEls[i]) enemyEls[i].classList.add('lunge');
+            if (f.partyDmg) {
+              partyEl.classList.add('quake');
+              floatText(partyEl, `-${f.partyDmg}`, 'party-dmg');
+              if (f.lunge.length) burst(partyEl, 'art_slash2', 'on-party enemy-claw');
+            }
           }
           if (f.heal) floatText(partyEl, `+${f.heal}`, 'heal');
           if (f.block) floatText(partyEl, `盾+${f.block}`, 'block-up');
