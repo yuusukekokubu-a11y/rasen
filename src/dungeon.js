@@ -43,10 +43,13 @@
 
     get def() { return R.DATA.dungeons[this.dungeonId]; }
     get endless() { return !!this.def.endless; }
+    // スペシャル（素材ダンジョンなど）：段（初級〜地獄級）ごとに敵・素材が丸ごと変わる
+    get stage() { return this.def.stages ? this.def.stages[(this.difficulty || 1) - 1] : null; }
 
     // 階の設定（無限階層では階数から作る）
     floorDef(i) {
       const d = this.def;
+      if (d.stages) return this.stage.floors[i];
       if (!d.endless) return d.floors[i];
       const E = d.endless;
       const tier = E.tiers.filter(t => i + 1 >= t.from).pop();
@@ -59,6 +62,7 @@
     }
     // 採集の表（無限階層では4階ごとにくり返す）
     gatherEntry(kind) {
+      if (this.stage) return this.stage.gather[kind];
       const list = this.def.gather[kind];
       return list[this.endless ? this.floor % list.length : this.floor];
     }
@@ -70,7 +74,7 @@
       if (f.boss) list.push(f.boss);
       return list;
     }
-    _makePlan() { return this.def.floors.map(f => this._floorPlan(f)); }
+    _makePlan() { return (this.stage ? this.stage.floors : this.def.floors).map(f => this._floorPlan(f)); }
     // 無限階層：次の4階分を作る
     _addSegment() {
       const start = this.plan.length;
@@ -80,6 +84,7 @@
     // 敵の強さの倍率（階ごとの倍率 × 難易度の倍率）
     currentScale() {
       const f = this.floorDef(this.floor).scale;
+      if (this.stage) return { hp: f.hp, dmg: f.dmg };   // スペシャルは段ごとの倍率だけ
       const D = R.DATA.difficulty;
       const lv = (this.difficulty || 1) - 1;
       return { hp: f.hp * (1 + D.hpPerLevel * lv), dmg: f.dmg * (1 + D.dmgPerLevel * lv) };
@@ -87,6 +92,7 @@
 
     // 上位素材の出る確率（難易度2以上、無限階層は深いほど）
     highDropChance() {
+      if (this.stage) return this.stage.extra ? this.stage.extra.chance : 0;
       if (this.endless) {
         const E = this.def.endless;
         return Math.min(E.highDropMax, E.highDropPerFloor * (this.floor + 1));
@@ -95,10 +101,12 @@
       return Math.min(D.highDropMax, D.highDropPerLevel * ((this.difficulty || 1) - 1));
     }
     _highDrop(bag) {
-      const table = this.endless ? this.def.endless.highDrops : highDropTable(this.dungeonId, this.difficulty || 1);
+      const table = this.stage ? (this.stage.extra && this.stage.extra.table)
+        : this.endless ? this.def.endless.highDrops : highDropTable(this.dungeonId, this.difficulty || 1);
       const p = this.highDropChance();
       if (p <= 0 || !table) return;
-      if (this.rng.chance(p)) R.Gather.addMat(bag, this.rng.weighted(table), 1);
+      const rolls = (this.stage && this.stage.extra && this.stage.extra.rolls) || 1;
+      for (let i = 0; i < rolls; i++) if (this.rng.chance(p)) R.Gather.addMat(bag, this.rng.weighted(table), 1);
     }
 
     totalBattles() { return this.plan.reduce((a, f) => a + f.length, 0); }

@@ -1375,6 +1375,217 @@
         '................'
       ]
     },
+    // ===== スペシャルダンジョンの敵 =====
+    ore_beetle: {
+      pal: { K: '#3a3448', k: '#24202e', S: '#8a8ea0', s: '#5a5e70', O: '#e8a85a', o: '#b87a3a', E: '#ffe07a', L: '#2a2430' },
+      rows: [
+        '................',
+        '................',
+        '................',
+        '......kkkk......',
+        '....kKSSSSKk....',
+        '...kKSOSSOSKk...',
+        '..kKSSSSSSSSKk..',
+        '..KSSOSSSSOSSK..',
+        '..KSSSSOOSSSSK..',
+        '..kKSSSSSSSSKk..',
+        '.EkkKKKKKKKKkk..',
+        '.E.L..L..L..L...',
+        '..L..L....L..L..',
+        '................',
+        '................',
+        '................'
+      ]
+    },
+    ore_king: {
+      pal: { K: '#5a4a1a', k: '#3a2e10', G: '#e8c25a', g: '#b8922a', Y: '#fff2a8', E: '#ff4a2a', L: '#3a2e10' },
+      rows: [
+        '.......YY.......',
+        '......YGGY......',
+        '.....YGGGGY.....',
+        '......gGGg......',
+        '....kKGGGGKk....',
+        '...kKGYGGYGKk...',
+        '..kKGGGGGGGGKk..',
+        '..KGGYGGGGYGGK..',
+        '..KGGGGYYGGGGK..',
+        '..kKGGGGGGGGKk..',
+        '.EkkKKKKKKKKkk..',
+        '.E.L..L..L..L...',
+        '..L..L....L..L..',
+        '.L...L....L...L.',
+        '................',
+        '................'
+      ]
+    },
+    wood_sprite: {
+      pal: { G: '#8ad86a', g: '#4a9a3a', W: '#f4ecd8', E: '#1a2a1a', B: '#7a5a3a', P: '#ffb0c8' },
+      rows: [
+        '................',
+        '.......P........',
+        '......PPP.......',
+        '.......P........',
+        '......GGG.......',
+        '....GGGGGGG.....',
+        '...GGWWGWWGG....',
+        '...GGWEGWEGG....',
+        '...GGGGGGGGG....',
+        '....GGGBGGG.....',
+        '.....gBBBg......',
+        '......BBB.......',
+        '.....B.B.B......',
+        '................',
+        '................',
+        '................'
+      ]
+    },
+    forest_guardian: {
+      pal: { B: '#6a4a2a', b: '#4a321a', G: '#5ab04a', g: '#3a7a2a', E: '#ffe07a', K: '#2a1a0a', M: '#a8e88a' },
+      rows: [
+        '....GGG..GGG....',
+        '...GGMGGGGMGG...',
+        '..GGGGGGGGGGGG..',
+        '..gGGGGMGGGGGg..',
+        '...gggBBBBggg...',
+        '.....BEBBEB.....',
+        '.....BBBBBB.....',
+        '..BB.BBKKBB.BB..',
+        '.BbBBBBBBBBBBbB.',
+        '.B..BBBBBBBB..B.',
+        '....BBBBBBBB....',
+        '....bBBBBBBb....',
+        '....BBB..BBB....',
+        '...bBB....BBb...',
+        '..bbb......bbb..',
+        '................'
+      ]
+    },
+    silk_moth: {
+      pal: { W: '#f4f0e6', w: '#c8c0ae', P: '#e8d0ff', p: '#b098d8', E: '#2a1a3a', A: '#8a7aa8' },
+      rows: [
+        '................',
+        '................',
+        '..ww......ww....',
+        '.wWWw....wWWw...',
+        '.WWPWw..wWPWW...',
+        '.WWWWWAAWWWWW...',
+        '..wWWWAAAWWWw...',
+        '...wWAEAEAWw....',
+        '....wWAAAWw.....',
+        '...wWW.A.WWw....',
+        '..wWPW...WPWw...',
+        '..wWWw...wWWw...',
+        '...ww.....ww....',
+        '................',
+        '................',
+        '................'
+      ]
+    },
+    moth_queen: {
+      pal: { P: '#b068e8', p: '#7a3ab8', Y: '#ffe07a', W: '#f4e0ff', E: '#ff4a8a', K: '#2a1a3a', G: '#e8c25a' },
+      rows: [
+        '.....G....G.....',
+        '......G..G......',
+        '.pp...GKKG...pp.',
+        'pPPp..KKKK..pPPp',
+        'PYPPp.KEEK.pPPYP',
+        'PPPPPpKKKKpPPPPP',
+        'PPWPPPKKKKPPPWPP',
+        '.PPPPPKKKKPPPPP.',
+        '.pPPPPKKKKPPPPp.',
+        '..pPPPpKKpPPPp..',
+        '.pPYPp.KK.pPYPp.',
+        '.PPPPp.KK.pPPPP.',
+        '..pPp..KK..pPp..',
+        '.......K........',
+        '................',
+        '................'
+      ]
+    },
+    gold_slime: {
+      pal: { Y: '#ffe07a', G: '#e8c25a', g: '#b8922a', W: '#fffbe0', E: '#5a3a0a' },
+      rows: [
+        '................',
+        '................',
+        '................',
+        '................',
+        '.......W........',
+        '......GGG.......',
+        '.....GYWGG......',
+        '....GGYYGGG.....',
+        '...GGEGGGEGG....',
+        '...GGEGGGEGG....',
+        '..GGGGGGGGGGG...',
+        '..GGGGGGGGGGG...',
+        '..gGGGGGGGGGg...',
+        '...ggggggggg....',
+        '................',
+        '................'
+      ]
+    },
+    mimic: {
+      pal: { B: '#8a5a2a', b: '#5a3a1a', G: '#e8c25a', K: '#1a0a0a', T: '#f4f0e6', R: '#d84a5a', E: '#ffe07a' },
+      rows: [
+        '................',
+        '................',
+        '...BBBBBBBBBB...',
+        '..BbbbbGbbbbbB..',
+        '..BBBBBGBBBBBB..',
+        '..GBBBBBBBBBBG..',
+        '..KTKTKTKTKTKK..',
+        '..KEKKKKKKKEKK..',
+        '..KKKRRRRKKKKK..',
+        '..KTKTKTKTKTKK..',
+        '..GBBBBGBBBBBG..',
+        '..BbbbbGbbbbbB..',
+        '..BBBBBBBBBBBB..',
+        '...bb......bb...',
+        '................',
+        '................'
+      ]
+    },
+    mimic_king: {
+      pal: { B: '#8a5a2a', b: '#5a3a1a', G: '#e8c25a', g: '#b8922a', K: '#1a0a0a', T: '#f4f0e6', R: '#d84a5a', E: '#ff4a2a', Y: '#fff2a8' },
+      rows: [
+        '..Y..Y...Y..Y...',
+        '..GGGGGGGGGGGG..',
+        '.GBBBBBBBBBBBBG.',
+        '.GBbbbbGGbbbbBG.',
+        '.GBBBBBGGBBBBBG.',
+        '.GGGGGGGGGGGGGG.',
+        '.KTKTKTKTKTKTKK.',
+        '.KEEKKKKKKKKEEK.',
+        '.KKKKRRRRRRKKKK.',
+        '.KKRRRRRRRRRRKK.',
+        '.KTKTKTKTKTKTKK.',
+        '.GBBBBBGGBBBBBG.',
+        '.GBbbbbGGbbbbBG.',
+        '.GGGGGGGGGGGGGG.',
+        '..bbb......bbb..',
+        '................'
+      ]
+    },
+    chimera: {
+      pal: { L: '#d8a84a', l: '#a87a2a', M: '#8a4a1a', G: '#5a8a3a', g: '#3a6a2a', R: '#d84a2a', E: '#ffe07a', K: '#1a0a0a', W: '#f4f0e6' },
+      rows: [
+        '................',
+        '..MMM...........',
+        '.MLLLM......G...',
+        'MLELLLM....GgG..',
+        'MLLLLLM...GEG...',
+        'MLLKLLLLLLLGG...',
+        '.MLWLLLLLLLLL...',
+        '..MLLLLLLLLLLL..',
+        '...LLLLLLLLLLL.R',
+        '...LLLLLLLLLLLRR',
+        '...LL.LL..LL.LR.',
+        '...LL.LL..LL....',
+        '...ll.ll..ll....',
+        '................',
+        '................',
+        '................'
+      ]
+    },
     // ===== カードの絵（モチーフ） =====
     art_slash: {
       pal: { W: '#ffffff', w: '#c8e0ff', b: '#6a9ad8' },

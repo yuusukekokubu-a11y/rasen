@@ -380,6 +380,532 @@
           { amount: [3, 5], table: { star_steel: 2, world_wood: 2, moon_silk: 2, dragon_scale: 1 } }
         ]
       }
+    },
+
+    // ===== スペシャル：素材ダンジョンとボスラッシュ =====
+    //   stages：初級〜地獄級（5段）。段ごとに敵・素材が丸ごと変わる（rank＝その段の推奨ランク）
+    //   extra ：戦闘に勝つたびの「おまけ素材」（chance の確率で rolls 回）
+    mine: {
+      special: true, rank: 1, name: '鉱石の坑道', scene: 'mine', requires: ['cave'],
+      recommend: '鉱石が集まる',
+      rewards: { weights: { mining: 6, treasure: 2, rest: 2, logging: 1 }, restHealRatio: 0.35 },
+      stages: [
+        { // 初級
+          rank: 1,
+          floors: [
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 1.2, dmg: 1.2 } },
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 1.2, dmg: 1.2 } },
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 1.2, dmg: 1.2 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.2, dmg: 1.2 }, boss: 'boss_ore' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { copper_ore: 3, iron_ore: 1, quartz: 1 } },
+          gather: {
+            mining: { hardness: 2, common: { copper_ore: 2, iron_ore: 1 }, rare: { quartz: 1 } },
+            logging: { hardness: 2, common: { oak: 2, maple: 1 }, rare: { maple: 1 } },
+            gathering: { amount: [2, 4], table: { flax: 2, spider_silk: 1, herb: 2 } },
+            treasure: { amount: [3, 5], table: { copper_ore: 2, oak: 2, flax: 1, quartz: 1, iron_ore: 1 } }
+          }
+        },
+        { // 中級
+          rank: 2,
+          floors: [
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 1.67, dmg: 1.67 } },
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 1.67, dmg: 1.67 } },
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 1.67, dmg: 1.67 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.67, dmg: 1.67 }, boss: 'boss_ore' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { iron_ore: 3, mithril_ore: 1, quartz: 1 } },
+          gather: {
+            mining: { hardness: 6, common: { iron_ore: 2, mithril_ore: 1 }, rare: { star_shard: 1 } },
+            logging: { hardness: 6, common: { maple: 2, ancient_wood: 1 }, rare: { ancient_wood: 1 } },
+            gathering: { amount: [2, 4], table: { spider_silk: 2, moon_silk: 1, herb: 2 } },
+            treasure: { amount: [3, 5], table: { iron_ore: 2, maple: 2, spider_silk: 1, quartz: 1, mithril_ore: 1 } }
+          }
+        },
+        { // 上級
+          rank: 3,
+          floors: [
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 1.89, dmg: 1.89 } },
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 1.89, dmg: 1.89 } },
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 1.89, dmg: 1.89 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.89, dmg: 1.89 }, boss: 'boss_ore' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { mithril_ore: 3, star_steel: 1, star_shard: 1 } },
+          gather: {
+            mining: { hardness: 12, common: { mithril_ore: 2, star_steel: 1 }, rare: { frost_crystal: 1 } },
+            logging: { hardness: 12, common: { ancient_wood: 2, world_wood: 1 }, rare: { world_wood: 1 } },
+            gathering: { amount: [2, 4], table: { moon_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { mithril_ore: 2, ancient_wood: 2, moon_silk: 1, star_shard: 1, star_steel: 1 } }
+          }
+        },
+        { // 超級
+          rank: 4,
+          floors: [
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 2.27, dmg: 2.27 } },
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 2.27, dmg: 2.27 } },
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 2.27, dmg: 2.27 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.27, dmg: 2.27 }, boss: 'boss_ore' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { star_steel: 3, orichalcum: 1, frost_crystal: 1 } },
+          gather: {
+            mining: { hardness: 18, common: { star_steel: 2, orichalcum: 1 }, rare: { sun_stone: 1 } },
+            logging: { hardness: 18, common: { world_wood: 2, sky_wood: 1 }, rare: { sky_wood: 1 } },
+            gathering: { amount: [2, 4], table: { moon_silk: 2, cloud_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { star_steel: 2, world_wood: 2, moon_silk: 1, frost_crystal: 1, orichalcum: 1 } }
+          }
+        },
+        { // 地獄級
+          rank: 5,
+          floors: [
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 2.9, dmg: 2.9 } },
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 2.9, dmg: 2.9 } },
+            { battles: [1, 1], encounters: { beetle_pair: 2, beetle_trio: 1 }, scale: { hp: 2.9, dmg: 2.9 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.9, dmg: 2.9 }, boss: 'boss_ore' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { orichalcum: 3, adamant: 1, sun_stone: 1 } },
+          gather: {
+            mining: { hardness: 24, common: { orichalcum: 2, adamant: 1 }, rare: { blood_gem: 1 } },
+            logging: { hardness: 24, common: { sky_wood: 2, ebony: 1 }, rare: { ebony: 1 } },
+            gathering: { amount: [2, 4], table: { cloud_silk: 2, void_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { orichalcum: 2, sky_wood: 2, cloud_silk: 1, sun_stone: 1, adamant: 1 } }
+          }
+        }
+      ]
+    },
+    grove: {
+      special: true, rank: 1, name: '精霊の樹海', scene: 'forest', requires: ['forest'],
+      recommend: '木材が集まる',
+      rewards: { weights: { logging: 6, treasure: 2, rest: 2, gathering: 1 }, restHealRatio: 0.35 },
+      stages: [
+        { // 初級
+          rank: 1,
+          floors: [
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 1.5, dmg: 1.5 } },
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 1.5, dmg: 1.5 } },
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 1.5, dmg: 1.5 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.5, dmg: 1.5 }, boss: 'boss_guardian' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { oak: 3, maple: 1, herb: 1 } },
+          gather: {
+            mining: { hardness: 2, common: { copper_ore: 2, iron_ore: 1 }, rare: { quartz: 1 } },
+            logging: { hardness: 2, common: { oak: 2, maple: 1 }, rare: { maple: 1 } },
+            gathering: { amount: [2, 4], table: { flax: 2, spider_silk: 1, herb: 2 } },
+            treasure: { amount: [3, 5], table: { copper_ore: 2, oak: 2, flax: 1, quartz: 1, iron_ore: 1 } }
+          }
+        },
+        { // 中級
+          rank: 2,
+          floors: [
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 1.9, dmg: 1.9 } },
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 1.9, dmg: 1.9 } },
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 1.9, dmg: 1.9 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.9, dmg: 1.9 }, boss: 'boss_guardian' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { maple: 3, ancient_wood: 1, herb: 1 } },
+          gather: {
+            mining: { hardness: 6, common: { iron_ore: 2, mithril_ore: 1 }, rare: { star_shard: 1 } },
+            logging: { hardness: 6, common: { maple: 2, ancient_wood: 1 }, rare: { ancient_wood: 1 } },
+            gathering: { amount: [2, 4], table: { spider_silk: 2, moon_silk: 1, herb: 2 } },
+            treasure: { amount: [3, 5], table: { iron_ore: 2, maple: 2, spider_silk: 1, quartz: 1, mithril_ore: 1 } }
+          }
+        },
+        { // 上級
+          rank: 3,
+          floors: [
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 2.21, dmg: 2.21 } },
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 2.21, dmg: 2.21 } },
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 2.21, dmg: 2.21 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.21, dmg: 2.21 }, boss: 'boss_guardian' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { ancient_wood: 3, world_wood: 1, glowcap: 1 } },
+          gather: {
+            mining: { hardness: 12, common: { mithril_ore: 2, star_steel: 1 }, rare: { frost_crystal: 1 } },
+            logging: { hardness: 12, common: { ancient_wood: 2, world_wood: 1 }, rare: { world_wood: 1 } },
+            gathering: { amount: [2, 4], table: { moon_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { mithril_ore: 2, ancient_wood: 2, moon_silk: 1, star_shard: 1, star_steel: 1 } }
+          }
+        },
+        { // 超級
+          rank: 4,
+          floors: [
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 2.72, dmg: 2.72 } },
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 2.72, dmg: 2.72 } },
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 2.72, dmg: 2.72 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.72, dmg: 2.72 }, boss: 'boss_guardian' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { world_wood: 3, sky_wood: 1, glowcap: 1 } },
+          gather: {
+            mining: { hardness: 18, common: { star_steel: 2, orichalcum: 1 }, rare: { sun_stone: 1 } },
+            logging: { hardness: 18, common: { world_wood: 2, sky_wood: 1 }, rare: { sky_wood: 1 } },
+            gathering: { amount: [2, 4], table: { moon_silk: 2, cloud_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { star_steel: 2, world_wood: 2, moon_silk: 1, frost_crystal: 1, orichalcum: 1 } }
+          }
+        },
+        { // 地獄級
+          rank: 5,
+          floors: [
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 3.4, dmg: 3.4 } },
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 3.4, dmg: 3.4 } },
+            { battles: [1, 1], encounters: { sprite_trio: 2, sprite_pair: 1 }, scale: { hp: 3.4, dmg: 3.4 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 3.4, dmg: 3.4 }, boss: 'boss_guardian' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { sky_wood: 3, ebony: 1, glowcap: 1 } },
+          gather: {
+            mining: { hardness: 24, common: { orichalcum: 2, adamant: 1 }, rare: { blood_gem: 1 } },
+            logging: { hardness: 24, common: { sky_wood: 2, ebony: 1 }, rare: { ebony: 1 } },
+            gathering: { amount: [2, 4], table: { cloud_silk: 2, void_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { orichalcum: 2, sky_wood: 2, cloud_silk: 1, sun_stone: 1, adamant: 1 } }
+          }
+        }
+      ]
+    },
+    cocoon: {
+      special: true, rank: 1, name: '繭の洞', scene: 'cocoon', requires: ['marsh'],
+      recommend: '布の素材が集まる',
+      rewards: { weights: { gathering: 6, treasure: 2, rest: 2, mining: 1 }, restHealRatio: 0.35 },
+      stages: [
+        { // 初級
+          rank: 1,
+          floors: [
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 1.25, dmg: 1.25 } },
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 1.25, dmg: 1.25 } },
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 1.25, dmg: 1.25 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.25, dmg: 1.25 }, boss: 'boss_moth' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { flax: 3, spider_silk: 1, herb: 1 } },
+          gather: {
+            mining: { hardness: 2, common: { copper_ore: 2, iron_ore: 1 }, rare: { quartz: 1 } },
+            logging: { hardness: 2, common: { oak: 2, maple: 1 }, rare: { maple: 1 } },
+            gathering: { amount: [2, 4], table: { flax: 2, spider_silk: 1, herb: 2 } },
+            treasure: { amount: [3, 5], table: { copper_ore: 2, oak: 2, flax: 1, quartz: 1, iron_ore: 1 } }
+          }
+        },
+        { // 中級
+          rank: 2,
+          floors: [
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 1.64, dmg: 1.64 } },
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 1.64, dmg: 1.64 } },
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 1.64, dmg: 1.64 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.64, dmg: 1.64 }, boss: 'boss_moth' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { spider_silk: 3, moon_silk: 1, herb: 1 } },
+          gather: {
+            mining: { hardness: 6, common: { iron_ore: 2, mithril_ore: 1 }, rare: { star_shard: 1 } },
+            logging: { hardness: 6, common: { maple: 2, ancient_wood: 1 }, rare: { ancient_wood: 1 } },
+            gathering: { amount: [2, 4], table: { spider_silk: 2, moon_silk: 1, herb: 2 } },
+            treasure: { amount: [3, 5], table: { iron_ore: 2, maple: 2, spider_silk: 1, quartz: 1, mithril_ore: 1 } }
+          }
+        },
+        { // 上級
+          rank: 3,
+          floors: [
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 1.9, dmg: 1.9 } },
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 1.9, dmg: 1.9 } },
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 1.9, dmg: 1.9 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.9, dmg: 1.9 }, boss: 'boss_moth' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { moon_silk: 1, glowcap: 1 } },
+          gather: {
+            mining: { hardness: 12, common: { mithril_ore: 2, star_steel: 1 }, rare: { frost_crystal: 1 } },
+            logging: { hardness: 12, common: { ancient_wood: 2, world_wood: 1 }, rare: { world_wood: 1 } },
+            gathering: { amount: [2, 4], table: { moon_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { mithril_ore: 2, ancient_wood: 2, moon_silk: 1, star_shard: 1, star_steel: 1 } }
+          }
+        },
+        { // 超級
+          rank: 4,
+          floors: [
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 2.25, dmg: 2.25 } },
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 2.25, dmg: 2.25 } },
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 2.25, dmg: 2.25 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.25, dmg: 2.25 }, boss: 'boss_moth' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { moon_silk: 3, cloud_silk: 1, glowcap: 1 } },
+          gather: {
+            mining: { hardness: 18, common: { star_steel: 2, orichalcum: 1 }, rare: { sun_stone: 1 } },
+            logging: { hardness: 18, common: { world_wood: 2, sky_wood: 1 }, rare: { sky_wood: 1 } },
+            gathering: { amount: [2, 4], table: { moon_silk: 2, cloud_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { star_steel: 2, world_wood: 2, moon_silk: 1, frost_crystal: 1, orichalcum: 1 } }
+          }
+        },
+        { // 地獄級
+          rank: 5,
+          floors: [
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 3, dmg: 3 } },
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 3, dmg: 3 } },
+            { battles: [1, 1], encounters: { moth_trio: 2, moth_pair: 1 }, scale: { hp: 3, dmg: 3 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 3, dmg: 3 }, boss: 'boss_moth' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { cloud_silk: 3, void_silk: 1, glowcap: 1 } },
+          gather: {
+            mining: { hardness: 24, common: { orichalcum: 2, adamant: 1 }, rare: { blood_gem: 1 } },
+            logging: { hardness: 24, common: { sky_wood: 2, ebony: 1 }, rare: { ebony: 1 } },
+            gathering: { amount: [2, 4], table: { cloud_silk: 2, void_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { orichalcum: 2, sky_wood: 2, cloud_silk: 1, sun_stone: 1, adamant: 1 } }
+          }
+        }
+      ]
+    },
+    nest: {
+      special: true, rank: 1, name: '魔物の巣', scene: 'marsh', requires: ['ruins'],
+      recommend: '魔物の素材が集まる',
+      rewards: { weights: { treasure: 3, rest: 3, gathering: 2, mining: 1, logging: 1 }, restHealRatio: 0.35 },
+      stages: [
+        { // 初級
+          rank: 1,
+          floors: [
+            { battles: [1, 1], encounters: { slime_pair: 1, bat_trio: 1, wolf_slime: 1, spider_bat: 1 }, scale: { hp: 1, dmg: 1 } },
+            { battles: [1, 1], encounters: { slime_pair: 1, bat_trio: 1, wolf_slime: 1, spider_bat: 1 }, scale: { hp: 1, dmg: 1 } },
+            { battles: [1, 1], encounters: { slime_pair: 1, bat_trio: 1, wolf_slime: 1, spider_bat: 1 }, scale: { hp: 1, dmg: 1 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.03, dmg: 1.03 }, boss: 'boss_chimera' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { slime_gel: 2, bat_wing: 2, wolf_pelt: 1 } },
+          gather: {
+            mining: { hardness: 2, common: { copper_ore: 2, iron_ore: 1 }, rare: { quartz: 1 } },
+            logging: { hardness: 2, common: { oak: 2, maple: 1 }, rare: { maple: 1 } },
+            gathering: { amount: [2, 4], table: { flax: 2, spider_silk: 1, herb: 2 } },
+            treasure: { amount: [3, 5], table: { copper_ore: 2, oak: 2, flax: 1, quartz: 1, iron_ore: 1 } }
+          }
+        },
+        { // 中級
+          rank: 2,
+          floors: [
+            { battles: [1, 1], encounters: { wolf_hornet: 1, treant_wolf: 1, toad_wisp: 1, spider_hornet: 1 }, scale: { hp: 1.1, dmg: 1.1 } },
+            { battles: [1, 1], encounters: { wolf_hornet: 1, treant_wolf: 1, toad_wisp: 1, spider_hornet: 1 }, scale: { hp: 1.1, dmg: 1.1 } },
+            { battles: [1, 1], encounters: { wolf_hornet: 1, treant_wolf: 1, toad_wisp: 1, spider_hornet: 1 }, scale: { hp: 1.1, dmg: 1.1 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.5, dmg: 1.5 }, boss: 'boss_chimera' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { wolf_pelt: 1, spider_silk: 1, treant_bark: 1, hornet_sting: 1, toad_skin: 1, wisp_flame: 1 } },
+          gather: {
+            mining: { hardness: 6, common: { iron_ore: 2, mithril_ore: 1 }, rare: { star_shard: 1 } },
+            logging: { hardness: 6, common: { maple: 2, ancient_wood: 1 }, rare: { ancient_wood: 1 } },
+            gathering: { amount: [2, 4], table: { spider_silk: 2, moon_silk: 1, herb: 2 } },
+            treasure: { amount: [3, 5], table: { iron_ore: 2, maple: 2, spider_silk: 1, quartz: 1, mithril_ore: 1 } }
+          }
+        },
+        { // 上級
+          rank: 3,
+          floors: [
+            { battles: [1, 1], encounters: { gargoyle_phantom: 1, phantom_doll: 1, gargoyle_pair: 1 }, scale: { hp: 1, dmg: 1 } },
+            { battles: [1, 1], encounters: { gargoyle_phantom: 1, phantom_doll: 1, gargoyle_pair: 1 }, scale: { hp: 1, dmg: 1 } },
+            { battles: [1, 1], encounters: { gargoyle_phantom: 1, phantom_doll: 1, gargoyle_pair: 1 }, scale: { hp: 1, dmg: 1 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.62, dmg: 1.62 }, boss: 'boss_chimera' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { golem_core: 1, elder_heart: 1, queen_scale: 1, gargoyle_stone: 1, phantom_cloth: 1, dragon_scale: 1 } },
+          gather: {
+            mining: { hardness: 12, common: { mithril_ore: 2, star_steel: 1 }, rare: { frost_crystal: 1 } },
+            logging: { hardness: 12, common: { ancient_wood: 2, world_wood: 1 }, rare: { world_wood: 1 } },
+            gathering: { amount: [2, 4], table: { moon_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { mithril_ore: 2, ancient_wood: 2, moon_silk: 1, star_shard: 1, star_steel: 1 } }
+          }
+        },
+        { // 超級
+          rank: 4,
+          floors: [
+            { battles: [1, 1], encounters: { salamander_imp: 1, golem_imp: 1, ice_wolf_fairy: 1, crystal_fairy: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
+            { battles: [1, 1], encounters: { salamander_imp: 1, golem_imp: 1, ice_wolf_fairy: 1, crystal_fairy: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
+            { battles: [1, 1], encounters: { salamander_imp: 1, golem_imp: 1, ice_wolf_fairy: 1, crystal_fairy: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.05, dmg: 2.05 }, boss: 'boss_chimera' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { fire_scale: 1, magma_core: 1, imp_horn: 1, ice_fang: 1, yeti_fur: 1, frost_crystal: 1 } },
+          gather: {
+            mining: { hardness: 18, common: { star_steel: 2, orichalcum: 1 }, rare: { sun_stone: 1 } },
+            logging: { hardness: 18, common: { world_wood: 2, sky_wood: 1 }, rare: { sky_wood: 1 } },
+            gathering: { amount: [2, 4], table: { moon_silk: 2, cloud_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { star_steel: 2, world_wood: 2, moon_silk: 1, frost_crystal: 1, orichalcum: 1 } }
+          }
+        },
+        { // 地獄級
+          rank: 5,
+          floors: [
+            { battles: [1, 1], encounters: { griffin_harpy: 1, knight_cloud: 1, vampire_mage: 1, knight_mage: 1 }, scale: { hp: 1, dmg: 1 } },
+            { battles: [1, 1], encounters: { griffin_harpy: 1, knight_cloud: 1, vampire_mage: 1, knight_mage: 1 }, scale: { hp: 1, dmg: 1 } },
+            { battles: [1, 1], encounters: { griffin_harpy: 1, knight_cloud: 1, vampire_mage: 1, knight_mage: 1 }, scale: { hp: 1, dmg: 1 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.65, dmg: 2.65 }, boss: 'boss_chimera' }
+          ],
+          extra: { chance: 1, rolls: 2, table: { harpy_feather: 1, griffin_claw: 1, shadow_cloth: 1, dark_bone: 1, blood_gem: 1 } },
+          gather: {
+            mining: { hardness: 24, common: { orichalcum: 2, adamant: 1 }, rare: { blood_gem: 1 } },
+            logging: { hardness: 24, common: { sky_wood: 2, ebony: 1 }, rare: { ebony: 1 } },
+            gathering: { amount: [2, 4], table: { cloud_silk: 2, void_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { orichalcum: 2, sky_wood: 2, cloud_silk: 1, sun_stone: 1, adamant: 1 } }
+          }
+        }
+      ]
+    },
+    vault: {
+      special: true, rank: 1, name: '宝物庫', scene: 'vault', requires: ['volcano', 'glacier'],
+      recommend: '宝石が集まる',
+      rewards: { weights: { treasure: 6, mining: 2, rest: 2 }, restHealRatio: 0.35 },
+      stages: [
+        { // 初級
+          rank: 1,
+          floors: [
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 1.11, dmg: 1.11 } },
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 1.11, dmg: 1.11 } },
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 1.11, dmg: 1.11 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.11, dmg: 1.11 }, boss: 'boss_mimic' }
+          ],
+          extra: { chance: 1, rolls: 3, table: { quartz: 1, copper_ore: 1 } },
+          gather: {
+            mining: { hardness: 2, common: { copper_ore: 2, iron_ore: 1 }, rare: { quartz: 1 } },
+            logging: { hardness: 2, common: { oak: 2, maple: 1 }, rare: { maple: 1 } },
+            gathering: { amount: [2, 4], table: { flax: 2, spider_silk: 1, herb: 2 } },
+            treasure: { amount: [3, 5], table: { copper_ore: 2, oak: 2, flax: 1, quartz: 1, iron_ore: 1 } }
+          }
+        },
+        { // 中級
+          rank: 2,
+          floors: [
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 1.54, dmg: 1.54 } },
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 1.54, dmg: 1.54 } },
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 1.54, dmg: 1.54 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.54, dmg: 1.54 }, boss: 'boss_mimic' }
+          ],
+          extra: { chance: 1, rolls: 3, table: { quartz: 2, star_shard: 1, iron_ore: 1 } },
+          gather: {
+            mining: { hardness: 6, common: { iron_ore: 2, mithril_ore: 1 }, rare: { star_shard: 1 } },
+            logging: { hardness: 6, common: { maple: 2, ancient_wood: 1 }, rare: { ancient_wood: 1 } },
+            gathering: { amount: [2, 4], table: { spider_silk: 2, moon_silk: 1, herb: 2 } },
+            treasure: { amount: [3, 5], table: { iron_ore: 2, maple: 2, spider_silk: 1, quartz: 1, mithril_ore: 1 } }
+          }
+        },
+        { // 上級
+          rank: 3,
+          floors: [
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 1.73, dmg: 1.73 } },
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 1.73, dmg: 1.73 } },
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 1.73, dmg: 1.73 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.73, dmg: 1.73 }, boss: 'boss_mimic' }
+          ],
+          extra: { chance: 1, rolls: 3, table: { star_shard: 2, frost_crystal: 1, mithril_ore: 1 } },
+          gather: {
+            mining: { hardness: 12, common: { mithril_ore: 2, star_steel: 1 }, rare: { frost_crystal: 1 } },
+            logging: { hardness: 12, common: { ancient_wood: 2, world_wood: 1 }, rare: { world_wood: 1 } },
+            gathering: { amount: [2, 4], table: { moon_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { mithril_ore: 2, ancient_wood: 2, moon_silk: 1, star_shard: 1, star_steel: 1 } }
+          }
+        },
+        { // 超級
+          rank: 4,
+          floors: [
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 2.09, dmg: 2.09 } },
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 2.09, dmg: 2.09 } },
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 2.09, dmg: 2.09 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.09, dmg: 2.09 }, boss: 'boss_mimic' }
+          ],
+          extra: { chance: 1, rolls: 3, table: { frost_crystal: 2, sun_stone: 1, star_steel: 1 } },
+          gather: {
+            mining: { hardness: 18, common: { star_steel: 2, orichalcum: 1 }, rare: { sun_stone: 1 } },
+            logging: { hardness: 18, common: { world_wood: 2, sky_wood: 1 }, rare: { sky_wood: 1 } },
+            gathering: { amount: [2, 4], table: { moon_silk: 2, cloud_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { star_steel: 2, world_wood: 2, moon_silk: 1, frost_crystal: 1, orichalcum: 1 } }
+          }
+        },
+        { // 地獄級
+          rank: 5,
+          floors: [
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 2.71, dmg: 2.71 } },
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 2.71, dmg: 2.71 } },
+            { battles: [1, 1], encounters: { mimic_single: 1, mimic_gold: 2, gold_pair: 1, mimic_pair: 1 }, scale: { hp: 2.71, dmg: 2.71 } },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.71, dmg: 2.71 }, boss: 'boss_mimic' }
+          ],
+          extra: { chance: 1, rolls: 3, table: { sun_stone: 2, blood_gem: 1, orichalcum: 1 } },
+          gather: {
+            mining: { hardness: 24, common: { orichalcum: 2, adamant: 1 }, rare: { blood_gem: 1 } },
+            logging: { hardness: 24, common: { sky_wood: 2, ebony: 1 }, rare: { ebony: 1 } },
+            gathering: { amount: [2, 4], table: { cloud_silk: 2, void_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { orichalcum: 2, sky_wood: 2, cloud_silk: 1, sun_stone: 1, adamant: 1 } }
+          }
+        }
+      ]
+    },
+    bossrush: {
+      special: true, rank: 3, name: 'ボスラッシュ', scene: 'arena', requires: ['abyss'],
+      recommend: 'ボスだけが続く',
+      rewards: { weights: { rest: 5, treasure: 3, gathering: 1 }, restHealRatio: 0.35 },
+      stages: [
+        { // 初級
+          rank: 3,
+          floors: [
+            { battles: [0, 0], encounters: {}, scale: { hp: 1, dmg: 1 }, boss: 'boss_golem' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1, dmg: 1 }, boss: 'boss_elder' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1, dmg: 1 }, boss: 'boss_queen' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1, dmg: 1 }, boss: 'boss_dragon' }
+          ],
+          extra: { chance: 1, rolls: 1, table: { mithril_ore: 1, ancient_wood: 1, moon_silk: 1, star_shard: 1 } },
+          gather: {
+            mining: { hardness: 12, common: { mithril_ore: 2, star_steel: 1 }, rare: { frost_crystal: 1 } },
+            logging: { hardness: 12, common: { ancient_wood: 2, world_wood: 1 }, rare: { world_wood: 1 } },
+            gathering: { amount: [2, 4], table: { moon_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { mithril_ore: 2, ancient_wood: 2, moon_silk: 1, star_shard: 1, star_steel: 1 } }
+          }
+        },
+        { // 中級
+          rank: 4,
+          floors: [
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.15, dmg: 2.15 }, boss: 'boss_ore' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.15, dmg: 2.15 }, boss: 'boss_guardian' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.15, dmg: 2.15 }, boss: 'boss_moth' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.15, dmg: 2.15 }, boss: 'boss_mimic' }
+          ],
+          extra: { chance: 1, rolls: 1, table: { star_steel: 1, world_wood: 1, moon_silk: 1, frost_crystal: 1 } },
+          gather: {
+            mining: { hardness: 18, common: { star_steel: 2, orichalcum: 1 }, rare: { sun_stone: 1 } },
+            logging: { hardness: 18, common: { world_wood: 2, sky_wood: 1 }, rare: { sky_wood: 1 } },
+            gathering: { amount: [2, 4], table: { moon_silk: 2, cloud_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { star_steel: 2, world_wood: 2, moon_silk: 1, frost_crystal: 1, orichalcum: 1 } }
+          }
+        },
+        { // 上級
+          rank: 5,
+          floors: [
+            { battles: [0, 0], encounters: {}, scale: { hp: 0.73, dmg: 0.73 }, boss: 'boss_flame' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 0.73, dmg: 0.73 }, boss: 'boss_ice' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 2.92, dmg: 2.92 }, boss: 'boss_chimera' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 0.73, dmg: 0.73 }, boss: 'boss_storm' }
+          ],
+          extra: { chance: 1, rolls: 1, table: { orichalcum: 1, sky_wood: 1, cloud_silk: 1, sun_stone: 1 } },
+          gather: {
+            mining: { hardness: 24, common: { orichalcum: 2, adamant: 1 }, rare: { blood_gem: 1 } },
+            logging: { hardness: 24, common: { sky_wood: 2, ebony: 1 }, rare: { ebony: 1 } },
+            gathering: { amount: [2, 4], table: { cloud_silk: 2, void_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { orichalcum: 2, sky_wood: 2, cloud_silk: 1, sun_stone: 1, adamant: 1 } }
+          }
+        },
+        { // 超級
+          rank: 6,
+          floors: [
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.27, dmg: 1.27 }, boss: 'boss_storm' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.32, dmg: 1.32 }, boss: 'boss_flame' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.32, dmg: 1.32 }, boss: 'boss_ice' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.15, dmg: 1.15 }, boss: 'boss_abyss' }
+          ],
+          extra: { chance: 1, rolls: 1, table: { adamant: 1, ebony: 1, void_silk: 1, blood_gem: 1 } },
+          gather: {
+            mining: { hardness: 24, common: { orichalcum: 2, adamant: 1 }, rare: { blood_gem: 1 } },
+            logging: { hardness: 24, common: { sky_wood: 2, ebony: 1 }, rare: { ebony: 1 } },
+            gathering: { amount: [2, 4], table: { cloud_silk: 2, void_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { orichalcum: 2, sky_wood: 2, cloud_silk: 1, sun_stone: 1, adamant: 1 } }
+          }
+        },
+        { // 地獄級
+          rank: 6,
+          floors: [
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.4, dmg: 1.4 }, boss: 'boss_storm' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.45, dmg: 1.45 }, boss: 'boss_flame' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.45, dmg: 1.45 }, boss: 'boss_ice' },
+            { battles: [0, 0], encounters: {}, scale: { hp: 1.27, dmg: 1.27 }, boss: 'boss_abyss' }
+          ],
+          extra: { chance: 1, rolls: 1, table: { adamant: 1, ebony: 1, void_silk: 1, blood_gem: 1 } },
+          gather: {
+            mining: { hardness: 24, common: { orichalcum: 2, adamant: 1 }, rare: { blood_gem: 1 } },
+            logging: { hardness: 24, common: { sky_wood: 2, ebony: 1 }, rare: { ebony: 1 } },
+            gathering: { amount: [2, 4], table: { cloud_silk: 2, void_silk: 1, glowcap: 2 } },
+            treasure: { amount: [3, 5], table: { orichalcum: 2, sky_wood: 2, cloud_silk: 1, sun_stone: 1, adamant: 1 } }
+          }
+        }
+      ]
     }
   };
 

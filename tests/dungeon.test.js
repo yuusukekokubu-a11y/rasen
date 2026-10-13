@@ -156,7 +156,8 @@ test('複数ダンジョン：前のダンジョンをクリアすると次が�
   G.newState();
   assert.deepStrictEqual(G.unlockedDungeons(), ['cave']);
   assert.throws(() => G.startRun('forest'));
-  const clear = (id) => { const run = G.startRun(id); run.phase = 'cleared'; return G.endRun(); };
+  const normalOnly = (r) => Object.assign(r, { newlyUnlocked: r.newlyUnlocked.filter(id => !R.DATA.dungeons[id].special) });
+  const clear = (id) => { const run = G.startRun(id); run.phase = 'cleared'; return normalOnly(G.endRun()); };
   const r1 = clear('cave');
   assert.deepStrictEqual(r1.newlyUnlocked.sort(), ['forest', 'marsh']);
   const r2 = clear('forest');
@@ -178,6 +179,30 @@ test('複数ダンジョン：前のダンジョンをクリアすると次が�
 test('すべてのダンジョンのデータが正しい（敵・素材・解禁条件）', () => {
   for (const [id, d] of Object.entries(R.DATA.dungeons)) {
     for (const r of d.requires || []) assert.ok(R.DATA.dungeons[r], `${id} の解禁条件 ${r}`);
+    if (d.stages) {
+      // スペシャル：5段それぞれに4階・採集の表・おまけ素材
+      assert.strictEqual(d.stages.length, R.DATA.difficulty.max, id);
+      for (const st of d.stages) {
+        assert.strictEqual(st.floors.length, 4, id);
+        for (const f of st.floors) {
+          for (const e of Object.keys(f.encounters)) assert.ok(R.DATA.encounters[e], `${id} の ${e}`);
+          if (f.boss) assert.ok(R.DATA.encounters[f.boss].boss, `${id} のボス ${f.boss}`);
+        }
+        for (const k of ['mining', 'logging', 'gathering', 'treasure']) {
+          const t = st.gather[k];
+          for (const m of Object.keys(t.common || t.table).concat(Object.keys(t.rare || {}))) assert.ok(R.DATA.materials[m], `${id} の素材 ${m}`);
+        }
+        for (const m of Object.keys(st.extra.table)) assert.ok(R.DATA.materials[m], `${id} のおまけ ${m}`);
+      }
+      for (let lv = 1; lv <= R.DATA.difficulty.max; lv++) {
+        const run = new R.DungeonRun({ dungeonId: id, difficulty: lv, members: R.Sim.presetMembers('starter'), rng: R.createRng(lv) });
+        assert.strictEqual(run.plan.length, 4, id);
+        assert.ok(R.DATA.encounters[run.plan[3][run.plan[3].length - 1]].boss, id);
+        const bag = {}; run._highDrop(bag);
+        assert.ok(Object.keys(bag).length >= 1, `${id} のおまけ素材`);
+      }
+      continue;
+    }
     const floors = d.endless ? d.endless.tiers : d.floors;
     if (!d.endless) assert.strictEqual(d.floors.length, 4, id);
     else for (const b of d.endless.bosses) assert.ok(R.DATA.encounters[b].boss, `${id} のボス ${b}`);
@@ -227,7 +252,7 @@ test('ステージ：前の段をクリアすると次の段が開く（ダン�
 
 test('上位素材の表：全ダンジョンにあり、素材がデータにある', () => {
   for (const [id, d] of Object.entries(R.DATA.dungeons)) {
-    if (d.endless) continue;
+    if (d.endless || d.special) continue;
     const list = R.DATA.difficulty.highDrops[id];
     assert.ok(list && list.length && list[0].from === 2, id);
     for (const t of list) for (const m of Object.keys(t.table)) assert.ok(R.DATA.materials[m], `${id} の ${m}`);
@@ -282,4 +307,19 @@ test('テスト用機能：全クリア済み・素材・Lv', () => {
   assert.ok(Object.keys(R.DATA.materials).every(m => G.state.materials[m] >= 3));
   G.debugLifeUp(5);
   assert.strictEqual(G.state.life.smith.lv, 6);
+});
+
+test('スペシャル：ノーマルのクリアで開き、段ごとに敵と素材が変わる（敵の倍率は段の値だけ）', () => {
+  const G = R.Game;
+  G.newState();
+  assert.ok(!G.isUnlocked('mine'));
+  const run0 = G.startRun('cave'); run0.phase = 'cleared'; G.endRun();
+  assert.ok(G.isUnlocked('mine'));
+  assert.strictEqual(G.maxUnlockedDifficulty('mine'), 1);
+  const r1 = new R.DungeonRun({ dungeonId: 'mine', difficulty: 1, members: R.Sim.presetMembers('starter'), rng: R.createRng(1) });
+  const r5 = new R.DungeonRun({ dungeonId: 'mine', difficulty: 5, members: R.Sim.presetMembers('starter'), rng: R.createRng(1) });
+  assert.deepStrictEqual(r5.currentScale(), R.DATA.dungeons.mine.stages[4].floors[0].scale);
+  assert.ok(r5.currentScale().hp > r1.currentScale().hp);
+  assert.notDeepStrictEqual(r1.gatherEntry('mining'), r5.gatherEntry('mining'));
+  assert.ok(!G.allCleared(), 'スペシャルは全クリアの条件に入らない');
 });

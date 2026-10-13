@@ -74,7 +74,7 @@
       el.appendChild(area);
       const scene = Object.keys(R.DATA.dungeons).find(id => {
         const d = R.DATA.dungeons[id];
-        const fl = d.endless ? d.endless.tiers.map(t => ({ encounters: t.encounters })) : d.floors;
+        const fl = d.endless ? d.endless.tiers.map(t => ({ encounters: t.encounters })) : d.stages ? [].concat(...d.stages.map(st => st.floors)) : d.floors;
         return fl.some(f => f.encounters[encounter] !== undefined || f.boss === encounter);
       }) || 'cave';
       R.UI.mountCombat(area, combat, { scene, onFinish: () => show(practiceScreen) });

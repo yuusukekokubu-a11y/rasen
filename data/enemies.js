@@ -427,6 +427,121 @@
       pattern: { type: 'cycle', opening: 'dark', seq: ['storm', 'smite', 'curse', 'devour', 'smite', 'storm', 'dark'] },
       elementMult: { fire: 1.25, thunder: 1.25 },
       drops: { abyss_heart: 1, blood_gem: 2 }
+    },
+
+    // ===== スペシャルダンジョンの敵（強さはダンジョンの段ごとの倍率で上がる。素材は段ごとの「おまけ」で出る） =====
+    ore_beetle: {
+      name: '鉱石甲虫', hp: [40, 46],
+      moves: {
+        bite:   { name: '大あご', dmg: 10 },
+        harden: { name: '甲羅にこもる', block: 14 },
+        ram:    { name: '体当たり', dmg: 6, hits: 2 }
+      },
+      pattern: { type: 'cycle', seq: ['bite', 'ram', 'harden'] },
+      elementMult: { thunder: 1.25, fire: 0.75 },
+      drops: {}
+    },
+    ore_king: {
+      name: '甲虫王', hp: [230, 230], boss: true,
+      moves: {
+        horn:  { name: '角の一撃', dmg: 18 },
+        shell: { name: '金の甲羅', block: 30, str: 2 },
+        quake: { name: '地響き', dmg: 8, hits: 2 },
+        dust:  { name: '金粉', dmg: 6, debuff: { s: 'weak', v: 2 } }
+      },
+      pattern: { type: 'cycle', opening: 'shell', seq: ['horn', 'quake', 'dust', 'horn', 'shell'] },
+      elementMult: { thunder: 1.25, fire: 0.75 },
+      drops: {}
+    },
+    wood_sprite: {
+      name: '木霊', hp: [34, 38],
+      moves: {
+        leaf:  { name: '葉の刃', dmg: 5, hits: 2 },
+        bloom: { name: '花の守り', allyBlock: 9 },
+        sap:   { name: '樹液', heal: 8, dmg: 6 }
+      },
+      pattern: { type: 'random', weights: { leaf: 3, bloom: 2, sap: 1 }, maxRepeat: 1 },
+      elementMult: { fire: 1.5 },
+      drops: {}
+    },
+    forest_guardian: {
+      name: '森の番人', hp: [240, 240], boss: true,
+      moves: {
+        branch: { name: '大枝', dmg: 20 },
+        roots:  { name: '根しばり', dmg: 8, debuff: { s: 'weak', v: 2 } },
+        bark:   { name: '樹皮の鎧', block: 28 },
+        grow:   { name: '芽吹き', str: 3, heal: 20 }
+      },
+      pattern: { type: 'cycle', opening: 'bark', seq: ['branch', 'roots', 'grow', 'branch', 'bark'] },
+      elementMult: { fire: 1.5, ice: 0.75 },
+      drops: {}
+    },
+    silk_moth: {
+      name: '絹蛾', hp: [36, 40],
+      moves: {
+        dust:    { name: '鱗粉', dmg: 6, debuff: { s: 'weak', v: 1 } },
+        flutter: { name: 'はばたき', dmg: 4, hits: 3 }
+      },
+      pattern: { type: 'random', weights: { dust: 2, flutter: 3 }, maxRepeat: 2 },
+      elementMult: { fire: 1.5, thunder: 1.25 },
+      drops: {}
+    },
+    moth_queen: {
+      name: '蛾の女王', hp: [220, 220], boss: true,
+      moves: {
+        scales: { name: '毒の鱗粉', dmg: 7, hits: 3 },
+        cocoon: { name: '繭ごもり', block: 26, heal: 15 },
+        sting:  { name: '毒針', dmg: 10, debuff: { s: 'vulnerable', v: 2 } },
+        gale:   { name: '羽ばたき', dmg: 16 }
+      },
+      pattern: { type: 'cycle', opening: 'cocoon', seq: ['scales', 'sting', 'gale', 'cocoon'] },
+      elementMult: { fire: 1.5, thunder: 1.25 },
+      drops: {}
+    },
+    gold_slime: {
+      name: '黄金スライム', hp: [30, 30],
+      moves: {
+        harden: { name: '金色に光る', block: 22 },
+        tackle: { name: '体当たり', dmg: 7 }
+      },
+      pattern: { type: 'cycle', seq: ['harden', 'tackle'] },
+      elementMult: { thunder: 1.5, fire: 0.5, ice: 0.5 },
+      drops: {}
+    },
+    mimic: {
+      name: 'ミミック', hp: [50, 56],
+      moves: {
+        chomp: { name: 'かみつき', dmg: 15 },
+        lure:  { name: 'おびき寄せ', block: 10, debuff: { s: 'vulnerable', v: 1 }, dmg: 4 },
+        gnash: { name: '歯ぎしり', dmg: 7, hits: 2 }
+      },
+      pattern: { type: 'cycle', seq: ['lure', 'chomp', 'gnash'] },
+      elementMult: { fire: 1.25, thunder: 1.25 },
+      drops: {}
+    },
+    mimic_king: {
+      name: '大ミミック', hp: [250, 250], boss: true,
+      moves: {
+        devour: { name: '丸のみ', dmg: 24 },
+        coins:  { name: '金貨の雨', dmg: 5, hits: 4 },
+        lid:    { name: 'ふたを閉じる', block: 30, str: 2 },
+        greed:  { name: '強欲', dmg: 10, debuff: { s: 'weak', v: 2 } }
+      },
+      pattern: { type: 'cycle', opening: 'lid', seq: ['devour', 'coins', 'greed', 'devour', 'lid'] },
+      elementMult: { fire: 1.25, thunder: 1.25 },
+      drops: {}
+    },
+    chimera: {
+      name: 'キメラ', hp: [260, 260], boss: true,
+      moves: {
+        flame: { name: '火炎の息', dmg: 9, hits: 2 },
+        bite:  { name: '獅子の牙', dmg: 22 },
+        roar:  { name: '三つの咆哮', str: 3, debuff: { s: 'vulnerable', v: 1 } },
+        tail:  { name: '蛇の尾', dmg: 12, debuff: { s: 'weak', v: 1 } }
+      },
+      pattern: { type: 'cycle', opening: 'roar', seq: ['bite', 'flame', 'tail', 'roar', 'bite'] },
+      elementMult: { ice: 1.25 },
+      drops: {}
     }
   };
 
@@ -498,6 +613,25 @@
     knight_single:     { name: '死の騎士', enemies: ['death_knight'] },
     knight_mage:       { name: '死の騎士＋闇の魔導士', enemies: ['death_knight', 'dark_mage'] },
     shadow_trio:       { name: '影の兵×3', enemies: ['shadow_soldier', 'shadow_soldier', 'shadow_soldier'] },
-    boss_abyss:        { name: '【ボス】深淵の王', enemies: ['abyss_lord'], boss: true }
+    boss_abyss:        { name: '【ボス】深淵の王', enemies: ['abyss_lord'], boss: true },
+    // スペシャルダンジョン
+    beetle_pair:       { name: '鉱石甲虫×2', enemies: ['ore_beetle', 'ore_beetle'] },
+    beetle_trio:       { name: '鉱石甲虫×3', enemies: ['ore_beetle', 'ore_beetle', 'ore_beetle'] },
+    beetle_doll:       { name: '鉱石甲虫＋岩人形', enemies: ['ore_beetle', 'rock_doll'] },
+    boss_ore:          { name: '【ボス】甲虫王', enemies: ['ore_king'], boss: true },
+    sprite_trio:       { name: '木霊×3', enemies: ['wood_sprite', 'wood_sprite', 'wood_sprite'] },
+    sprite_treant:     { name: '木霊＋トレント', enemies: ['wood_sprite', 'treant'] },
+    sprite_pair:       { name: '木霊×2', enemies: ['wood_sprite', 'wood_sprite'] },
+    boss_guardian:     { name: '【ボス】森の番人', enemies: ['forest_guardian'], boss: true },
+    moth_trio:         { name: '絹蛾×3', enemies: ['silk_moth', 'silk_moth', 'silk_moth'] },
+    moth_spider:       { name: '絹蛾＋大蜘蛛', enemies: ['silk_moth', 'spider'] },
+    moth_pair:         { name: '絹蛾×2', enemies: ['silk_moth', 'silk_moth'] },
+    boss_moth:         { name: '【ボス】蛾の女王', enemies: ['moth_queen'], boss: true },
+    gold_pair:         { name: '黄金スライム×2', enemies: ['gold_slime', 'gold_slime'] },
+    mimic_single:      { name: 'ミミック', enemies: ['mimic'] },
+    mimic_gold:        { name: 'ミミック＋黄金スライム', enemies: ['mimic', 'gold_slime'] },
+    mimic_pair:        { name: 'ミミック×2', enemies: ['mimic', 'mimic'] },
+    boss_mimic:        { name: '【ボス】大ミミック', enemies: ['mimic_king'], boss: true },
+    boss_chimera:      { name: '【ボス】キメラ', enemies: ['chimera'], boss: true }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

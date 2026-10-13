@@ -462,6 +462,92 @@
         for (let k = 0; k < 3; k++) { const off = ((t * (k % 2 ? 1 : -1) + k * 60) % W + W) % W; for (let x = -W; x < W; x += 90) T.haze(x + off, 112 + k * 9, 76, 8, '#6a3a9a', 0.35); }
       }
     },
+    // 鉱石の坑道（木の支柱・線路・ランタン・壁の鉱石）
+    mine: {
+      base(T, r, s) {
+        T.vgrad(0, 104, ['#14100c', '#1c1610', '#241c14', '#2c2218']);
+        T.speckle(r, 0, 0, W, 104, ['#3a2e22', '#100c08', '#2a2018'], 600);
+        // 壁の鉱石（色つきの粒）
+        for (let i = 0; i < 40; i++) { const x = r() * W, y = 10 + r() * 86, c = ['#c87a3a', '#9aa4b8', '#5ac8e8', '#e8c25a'][Math.floor(r() * 4)]; T.rect(x, y, 2, 2, c); T.dot(x, y, '#ffffff'); }
+        // 木の支柱と梁
+        for (const x of [30, 128, 226]) { T.rect(x - 4, 20, 8, 84, '#5a3a20'); T.rect(x - 4, 20, 2, 84, '#7a5230'); }
+        T.rect(0, 18, W, 8, '#5a3a20'); T.rect(0, 18, W, 2, '#7a5230');
+        s.lamps = [[60, 30], [196, 30]];
+        for (const [x, y] of s.lamps) { T.rect(x, y - 4, 1, 4, '#3a2a1a'); T.rect(x - 3, y, 7, 8, '#3a3e48'); }
+        // 床と線路
+        T.vgrad(104, H, ['#2e241a', '#261e16', '#1c1610']);
+        for (let x = 0; x < W; x += 10) T.rect(x, 120, 6, 3, '#4a3420');
+        T.rect(0, 118, W, 2, '#8a8e98'); T.rect(0, 124, W, 2, '#8a8e98');
+        // トロッコ
+        T.rect(150, 104, 34, 14, '#4a4e58'); T.rect(150, 104, 34, 2, '#6a6e78'); T.rect(154, 98, 26, 6, '#c87a3a'); T.dot(160, 99, '#ffd27a'); T.dot(170, 100, '#9aa4b8');
+        T.rect(154, 116, 6, 6, '#24262e'); T.rect(174, 116, 6, 6, '#24262e');
+      },
+      anim(T, t, s) {
+        s.lamps.forEach(([x, y], i) => { T.glow(x, y + 4, 26 + ((t + i) % 3), '#ffb04a', 0.9); T.rect(x - 2, y + 1, 5, 6, (t + i) % 4 ? '#ffd27a' : '#fff0b0'); });
+      }
+    },
+    // 繭の洞（白い繭と糸）
+    cocoon: {
+      base(T, r, s) {
+        T.vgrad(0, 104, ['#14101c', '#1c1626', '#241c30', '#2c2238']);
+        // 糸の網
+        for (let i = 0; i < 26; i++) { const x0 = r() * W, y0 = r() * 40, x1 = r() * W, y1 = 30 + r() * 70; for (let k = 0; k <= 40; k++) T.dot(x0 + (x1 - x0) * k / 40, y0 + (y1 - y0) * k / 40 + Math.sin(k / 6) * 2, '#5a5070'); }
+        // ぶら下がる繭
+        s.cocoons = [];
+        for (const [x, len] of [[34, 30], [86, 46], [150, 24], [204, 40], [240, 18]]) {
+          T.rect(x, 0, 1, len, '#8a8098');
+          for (let y = 0; y < 18; y++) { const w = Math.round(Math.sin(y / 17 * Math.PI) * 6); T.rect(x - w, len + y, w * 2 + 1, 1, y < 6 ? '#f4f0e6' : '#d8d0c8'); }
+          s.cocoons.push([x, len + 9]);
+        }
+        T.vgrad(104, H, ['#2a2234', '#221c2c', '#1a1422']);
+        for (let i = 0; i < 50; i++) T.rect(r() * W, 106 + r() * 36, 4 + r() * 8, 1, '#3a3048');
+      },
+      anim(T, t, s) {
+        s.cocoons.forEach(([x, y], i) => { if ((t + i * 4) % 16 < 3) T.glow(x, y, 12, '#e8d0ff', 0.7); });
+        for (let i = 0; i < 10; i++) { const y = (t * 0.8 + i * 23) % 104; T.dot((i * 47 + Math.sin((t + i) * 0.3) * 5 + W) % W, y, '#e8e0f4'); }
+      }
+    },
+    // 宝物庫（金貨の山と宝箱）
+    vault: {
+      base(T, r, s) {
+        for (let y = 0; y < 104; y += 8) for (let x = (y % 16 ? 0 : 8); x < W; x += 16) { T.rect(x, y, 15, 7, '#2a2230'); T.rect(x, y, 15, 1, '#3a3044'); }
+        // 柱
+        for (const x of [20, 236]) { T.rect(x - 8, 0, 16, 104, '#3a3044'); T.rect(x - 8, 0, 3, 104, '#5a4a66'); T.rect(x - 10, 96, 20, 8, '#4a3e56'); }
+        // 金貨の山
+        s.coins = [];
+        for (const [cx, w, h] of [[70, 70, 22], [180, 90, 30], [128, 50, 14]]) {
+          for (let y = 0; y < h; y++) { const ww = w * (1 - y / h); T.rect(cx - ww / 2, 104 - y, ww, 1, y % 3 ? '#c9a24a' : '#e8c25a'); }
+          for (let i = 0; i < w / 3; i++) { const x = cx - w / 2 + r() * w, y = 104 - r() * h * 0.8; s.coins.push([x, y]); T.dot(x, y, '#fff2a8'); }
+        }
+        // 宝箱
+        T.rect(110, 82, 36, 22, '#8a5a2a'); T.rect(110, 82, 36, 3, '#a87a3a'); T.rect(126, 82, 4, 22, '#e8c25a'); T.rect(110, 92, 36, 2, '#e8c25a');
+        T.vgrad(104, H, ['#3a2e1a', '#2a2214', '#1c160e']);
+        for (let i = 0; i < 60; i++) T.dot(r() * W, 106 + r() * 38, r() < 0.5 ? '#e8c25a' : '#8a6a2a');
+      },
+      anim(T, t, s) {
+        // 金貨のきらめき
+        s.coins.forEach(([x, y], i) => { if ((t + i * 3) % 19 === 0) { T.dot(x, y - 1, '#ffffff'); T.dot(x - 1, y, '#ffffff'); T.dot(x + 1, y, '#ffffff'); T.dot(x, y + 1, '#ffffff'); } });
+        T.glow(128, 92, 34 + (t % 3), '#ffe07a', 0.5);
+      }
+    },
+    // 闘技場（ボスラッシュ）
+    arena: {
+      base(T, r, s) {
+        T.vgrad(0, 70, ['#1a0a10', '#2a1018', '#3a1820', '#4a2028']);
+        // 観客席（段々）
+        for (let k = 0; k < 6; k++) { const y = 40 + k * 8; T.rect(0, y, W, 8, k % 2 ? '#2a1a20' : '#24161c'); for (let x = (k * 5) % 9; x < W; x += 9) T.rect(x, y + 2, 3, 3, ['#4a3a40', '#3a2a30', '#5a4048'][(x + k) % 3]); }
+        // 旗
+        for (const x of [40, 128, 216]) { T.rect(x, 6, 2, 34, '#5a4a3a'); for (let y = 0; y < 14; y++) T.rect(x + 2, 8 + y, 14 - y, 1, '#a82a3a'); }
+        // 砂の床
+        T.vgrad(88, H, ['#8a6a4a', '#7a5a3a', '#6a4a2e']);
+        T.rect(0, 88, W, 2, '#3a2a1a');
+        T.speckle(r, 0, 90, W, 54, ['#9a7a54', '#6a4a2e', '#a88a62'], 400);
+        s.torches = [[14, 70], [242, 70]];
+      },
+      anim(T, t, s) {
+        for (const [x, y] of s.torches) { T.glow(x, y - 6, 28 + (t % 2) * 2, '#ff9a3a', 0.9); torch(T, x, y, t + x); }
+      }
+    },
     // 工房（生産）
     workshop: {
       base(T, r, s) {
@@ -540,6 +626,8 @@
 
   // 場所の絵を canvas で返す（CSSで枠いっぱいに拡大）
   function backdrop(kind, extraClass) {
+    // 専用の絵がない場所は、ダンジョンのデータの scene（別の場所の絵）を使う
+    if (!painters[kind]) kind = (R.DATA.dungeons && R.DATA.dungeons[kind] && R.DATA.dungeons[kind].scene) || 'cave';
     if (!painters[kind]) kind = 'cave';
     const c = document.createElement('canvas');
     c.width = W; c.height = H;

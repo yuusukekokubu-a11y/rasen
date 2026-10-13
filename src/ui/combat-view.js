@@ -86,7 +86,7 @@
     const hitTimes = (list) => { let t = 0; return list.map((x, k) => (k === 0 ? 0 : (t += list[k - 1].enemy === x.enemy ? MULTI_GAP : HIT_GAP))); };
     let banner = { text: '戦闘開始' };
     let lastTurn = combat.turn;
-    const sceneKind = opts.scene && R.UI.BACKDROPS.includes(opts.scene) ? opts.scene : 'cave';
+    const sceneKind = opts.scene || 'cave';
 
     // 行動の前後を比べて、ダメージ・回復・ブロックの増減を調べる
     function snapshot() {

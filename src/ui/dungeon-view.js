@@ -33,7 +33,8 @@
   // ダンジョンの顔になるドット絵（最後のボス）
   function dungeonSprite(d) {
     if (d.endless) return d.endless.bosses.length ? R.DATA.encounters[d.endless.bosses[d.endless.bosses.length - 1]].enemies[0] : 'icon_dungeon';
-    const last = d.floors[d.floors.length - 1];
+    const floors = d.stages ? d.stages[d.stages.length - 1].floors : d.floors;
+    const last = floors[floors.length - 1];
     return last.boss ? R.DATA.encounters[last.boss].enemies[0] : 'icon_dungeon';
   }
 
@@ -48,12 +49,12 @@
       el.appendChild(h('div', { class: 'tabs' }, [['normal', 'ノーマル'], ['special', 'スペシャル']].map(([k, label]) =>
         h('button', { class: 'tab' + (listTab === k ? ' on' : ''), onclick: () => { listTab = k; render(); } }, label))));
       const ids = Object.keys(R.DATA.dungeons)
-        .filter(id => !!R.DATA.dungeons[id].endless === (listTab === 'special') && G().isUnlocked(id))
+        .filter(id => { const d = R.DATA.dungeons[id]; return !!(d.endless || d.special) === (listTab === 'special') && G().isUnlocked(id); })
         .reverse();
       if (!ids.length) {
         el.appendChild(h('div', { class: 'panel dungeon-card locked' },
-          R.UI.stage(listTab === 'special' ? 'spiral' : 'cave', '', h('div', { class: 'locked-label' }, '？？？')),
-          h('div', { class: 'dungeon-body muted' }, 'ノーマルをすべてクリアすると開く')));
+          R.UI.stage(listTab === 'special' ? 'mine' : 'cave', '', h('div', { class: 'locked-label' }, '？？？')),
+          h('div', { class: 'dungeon-body muted' }, '岩窟の洞をクリアすると開く')));
         return;
       }
       for (const id of ids) {
@@ -91,13 +92,17 @@
     const done = s.maxDifficulty[id] || 0;
     for (let lv = max; lv >= 1; lv--) {
       const info = stageInfo(lv);
-      const rank = Math.min(R.DATA.equipment.rankStats.weapon.main.length, (d.rank || 1) + lv - 1);
+      const st = d.stages ? d.stages[lv - 1] : null;
+      const rank = st ? st.rank : Math.min(R.DATA.equipment.rankStats.weapon.main.length, (d.rank || 1) + lv - 1);
+      // スペシャルは「主に出る素材」を出す（敵の強さ・上位素材の確率は段の中身に含まれるので出さない）
+      const mainMats = st ? Object.keys(st.extra.table).slice(0, 2).map(m => R.DATA.materials[m].name) : [];
       el.appendChild(h('button', { class: 'stage-row' + (lv <= done ? ' cleared' : ''), 'data-lv': lv, onclick: () => R.UI.show((e2) => partyScreen(e2, id, lv)) },
         h('span', { class: 'stage-name' }, stageName(lv)),
         h('span', { class: 'stage-chips' },
           h('span', { class: 'chip' }, `推奨R${rank}`),
-          lv > 1 ? h('span', { class: 'chip' }, `敵×${info.hp.toFixed(1)}`) : null,
-          lv > 1 ? h('span', { class: 'chip rare' }, `上位素材${info.high}%`) : null),
+          !st && lv > 1 ? h('span', { class: 'chip' }, `敵×${info.hp.toFixed(1)}`) : null,
+          !st && lv > 1 ? h('span', { class: 'chip rare' }, `上位素材${info.high}%`) : null,
+          mainMats.map(n => h('span', { class: 'chip rare' }, n))),
         lv <= done ? h('span', { class: 'stage-clear' }, 'CLEAR') : h('span', { class: 'badge-new' }, 'NEW')));
     }
   }
