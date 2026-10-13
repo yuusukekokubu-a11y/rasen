@@ -169,8 +169,160 @@
     },
 
     // 無限階層（エンドコンテンツ）：4階ごとにボス。倒すたびに「帰還／さらに潜る」を選ぶ。毎回1階から
+    volcano: {
+      name: '灼熱の火山', requires: ['ruins'],
+      recommend: '推奨ランク4・氷が有効',
+      floors: [
+        { battles: [2, 3], encounters: { salamander_single: 2, imp_trio: 2, magma_pair: 1 }, scale: { hp: 0.99, dmg: 0.99 } },
+        { battles: [2, 3], encounters: { salamander_imp: 2, magma_pair: 2, lava_golem_single: 1 }, scale: { hp: 0.99, dmg: 0.99 } },
+        { battles: [2, 3], encounters: { golem_imp: 2, salamander_pair: 2, salamander_imp: 1 }, scale: { hp: 1.04, dmg: 1.04 } },
+        { battles: [1, 2], encounters: { golem_imp: 1, salamander_pair: 1 }, scale: { hp: 1.04, dmg: 1.04 }, boss: 'boss_flame' }
+      ],
+      rewards: { weights: { mining: 4, logging: 2, gathering: 2, treasure: 3, rest: 2 }, restHealRatio: 0.35 },
+      gather: {
+        mining: [
+          { hardness: 14, common: { mithril_ore: 2, star_steel: 1 }, rare: { star_shard: 1 } },
+          { hardness: 16, common: { star_steel: 2 },                 rare: { star_shard: 1 } },
+          { hardness: 18, common: { star_steel: 2, mithril_ore: 1 }, rare: { magma_core: 1 } },
+          { hardness: 20, common: { star_steel: 2 },                 rare: { orichalcum: 1 } }
+        ],
+        logging: [
+          { hardness: 14, common: { ancient_wood: 2, world_wood: 1 }, rare: { glowcap: 1 } },
+          { hardness: 16, common: { world_wood: 2 },                  rare: { star_shard: 1 } },
+          { hardness: 18, common: { world_wood: 2 },                  rare: { world_wood: 1 } },
+          { hardness: 20, common: { world_wood: 2 },                  rare: { sky_wood: 1 } }
+        ],
+        gathering: [
+          { amount: [2, 3], table: { herb: 2, glowcap: 2, quartz: 1 } },
+          { amount: [2, 3], table: { glowcap: 2, quartz: 2, moon_silk: 1 } },
+          { amount: [2, 4], table: { glowcap: 1, moon_silk: 2, star_shard: 1 } },
+          { amount: [2, 4], table: { moon_silk: 2, star_shard: 1, imp_horn: 1 } }
+        ],
+        treasure: [
+          { amount: [3, 4], table: { star_steel: 2, world_wood: 1, quartz: 2, fire_scale: 1 } },
+          { amount: [3, 4], table: { star_steel: 2, moon_silk: 1, star_shard: 1, imp_horn: 1 } },
+          { amount: [3, 4], table: { star_steel: 2, world_wood: 2, magma_core: 1, star_shard: 1 } },
+          { amount: [3, 5], table: { star_steel: 2, world_wood: 1, moon_silk: 1, orichalcum: 1 } }
+        ]
+      }
+    },
+
+    glacier: {
+      name: '氷晶の洞', requires: ['ruins'],
+      recommend: '推奨ランク4・炎が有効',
+      floors: [
+        { battles: [2, 3], encounters: { ice_wolf_single: 2, fairy_trio: 2, ice_wolf_fairy: 1 }, scale: { hp: 1.07, dmg: 1.07 } },
+        { battles: [2, 3], encounters: { ice_wolf_fairy: 2, yeti_single: 2, crystal_fairy: 1 }, scale: { hp: 1.07, dmg: 1.07 } },
+        { battles: [2, 3], encounters: { crystal_fairy: 2, ice_wolf_pair: 2, yeti_single: 1 }, scale: { hp: 1.12, dmg: 1.12 } },
+        { battles: [1, 2], encounters: { yeti_crystal: 1, ice_wolf_pair: 1 }, scale: { hp: 1.12, dmg: 1.12 }, boss: 'boss_ice' }
+      ],
+      rewards: { weights: { mining: 3, logging: 2, gathering: 3, treasure: 3, rest: 2 }, restHealRatio: 0.35 },
+      gather: {
+        mining: [
+          { hardness: 14, common: { mithril_ore: 2, star_steel: 1 }, rare: { frost_crystal: 1 } },
+          { hardness: 16, common: { star_steel: 2 },                 rare: { frost_crystal: 1 } },
+          { hardness: 18, common: { star_steel: 2, quartz: 1 },      rare: { star_shard: 1 } },
+          { hardness: 20, common: { star_steel: 2 },                 rare: { orichalcum: 1 } }
+        ],
+        logging: [
+          { hardness: 14, common: { ancient_wood: 2, world_wood: 1 }, rare: { glowcap: 1 } },
+          { hardness: 16, common: { world_wood: 2 },                  rare: { frost_crystal: 1 } },
+          { hardness: 18, common: { world_wood: 2 },                  rare: { world_wood: 1 } },
+          { hardness: 20, common: { world_wood: 2 },                  rare: { sky_wood: 1 } }
+        ],
+        gathering: [
+          { amount: [2, 3], table: { herb: 2, glowcap: 2, moon_silk: 1 } },
+          { amount: [2, 3], table: { glowcap: 1, moon_silk: 2, quartz: 1 } },
+          { amount: [2, 4], table: { moon_silk: 2, frost_crystal: 1, glowcap: 1 } },
+          { amount: [2, 4], table: { moon_silk: 2, star_shard: 1, cloud_silk: 1 } }
+        ],
+        treasure: [
+          { amount: [3, 4], table: { star_steel: 1, moon_silk: 2, quartz: 2, ice_fang: 1 } },
+          { amount: [3, 4], table: { moon_silk: 2, world_wood: 1, frost_crystal: 1, yeti_fur: 1 } },
+          { amount: [3, 4], table: { moon_silk: 2, star_steel: 1, star_shard: 1, frost_crystal: 1 } },
+          { amount: [3, 5], table: { moon_silk: 2, star_steel: 1, world_wood: 1, cloud_silk: 1 } }
+        ]
+      }
+    },
+
+    skygarden: {
+      name: '天空の庭', requires: ['volcano', 'glacier'],
+      recommend: '推奨ランク4〜5・雷が有効',
+      floors: [
+        { battles: [2, 3], encounters: { harpy_pair: 2, griffin_single: 2, cloud_harpy: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
+        { battles: [2, 3], encounters: { cloud_harpy: 2, knight_cloud: 2, harpy_trio: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
+        { battles: [2, 3], encounters: { griffin_harpy: 2, knight_cloud: 2, harpy_trio: 1 }, scale: { hp: 1.1, dmg: 1.1 } },
+        { battles: [1, 2], encounters: { knight_pair: 1, griffin_harpy: 1 }, scale: { hp: 1.1, dmg: 1.1 }, boss: 'boss_storm' }
+      ],
+      rewards: { weights: { mining: 3, logging: 3, gathering: 3, treasure: 3, rest: 2 }, restHealRatio: 0.35 },
+      gather: {
+        mining: [
+          { hardness: 18, common: { star_steel: 2, orichalcum: 1 }, rare: { sun_stone: 1 } },
+          { hardness: 20, common: { orichalcum: 2 },                rare: { sun_stone: 1 } },
+          { hardness: 22, common: { orichalcum: 2, star_steel: 1 }, rare: { sun_stone: 1 } },
+          { hardness: 24, common: { orichalcum: 2 },                rare: { adamant: 1 } }
+        ],
+        logging: [
+          { hardness: 18, common: { world_wood: 2, sky_wood: 1 }, rare: { harpy_feather: 1 } },
+          { hardness: 20, common: { sky_wood: 2 },                rare: { sun_stone: 1 } },
+          { hardness: 22, common: { sky_wood: 2, world_wood: 1 }, rare: { sky_wood: 1 } },
+          { hardness: 24, common: { sky_wood: 2 },                rare: { ebony: 1 } }
+        ],
+        gathering: [
+          { amount: [2, 3], table: { glowcap: 2, moon_silk: 2, cloud_silk: 1 } },
+          { amount: [2, 3], table: { moon_silk: 1, cloud_silk: 2, quartz: 1 } },
+          { amount: [2, 4], table: { cloud_silk: 2, sun_stone: 1, glowcap: 1 } },
+          { amount: [2, 4], table: { cloud_silk: 2, sun_stone: 1, void_silk: 1 } }
+        ],
+        treasure: [
+          { amount: [3, 4], table: { orichalcum: 1, sky_wood: 1, cloud_silk: 1, sun_stone: 1, harpy_feather: 1 } },
+          { amount: [3, 4], table: { orichalcum: 2, sky_wood: 1, cloud_silk: 1, griffin_claw: 1 } },
+          { amount: [3, 4], table: { orichalcum: 1, sky_wood: 2, cloud_silk: 2, sun_stone: 1 } },
+          { amount: [3, 5], table: { orichalcum: 2, sky_wood: 2, cloud_silk: 1, adamant: 1 } }
+        ]
+      }
+    },
+
+    abyss: {
+      name: '深淵の城', requires: ['skygarden'],
+      recommend: '推奨ランク5〜6・炎と雷が有効',
+      floors: [
+        { battles: [2, 3], encounters: { shadow_pair: 2, vampire_single: 2, mage_shadow: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
+        { battles: [2, 3], encounters: { mage_shadow: 2, vampire_mage: 2, knight_single: 1 }, scale: { hp: 1.0, dmg: 1.0 } },
+        { battles: [2, 3], encounters: { knight_mage: 2, shadow_trio: 2, vampire_mage: 1 }, scale: { hp: 1.05, dmg: 1.05 } },
+        { battles: [1, 2], encounters: { knight_mage: 1, shadow_trio: 1 }, scale: { hp: 1.05, dmg: 1.05 }, boss: 'boss_abyss' }
+      ],
+      rewards: { weights: { mining: 3, logging: 3, gathering: 2, treasure: 4, rest: 2 }, restHealRatio: 0.35 },
+      gather: {
+        mining: [
+          { hardness: 22, common: { orichalcum: 2, adamant: 1 }, rare: { blood_gem: 1 } },
+          { hardness: 24, common: { adamant: 2 },                rare: { blood_gem: 1 } },
+          { hardness: 26, common: { adamant: 2, orichalcum: 1 }, rare: { sun_stone: 1 } },
+          { hardness: 28, common: { adamant: 2 },                rare: { blood_gem: 1 } }
+        ],
+        logging: [
+          { hardness: 22, common: { sky_wood: 2, ebony: 1 }, rare: { dark_bone: 1 } },
+          { hardness: 24, common: { ebony: 2 },              rare: { blood_gem: 1 } },
+          { hardness: 26, common: { ebony: 2, sky_wood: 1 }, rare: { ebony: 1 } },
+          { hardness: 28, common: { ebony: 2 },              rare: { shadow_cloth: 1 } }
+        ],
+        gathering: [
+          { amount: [2, 3], table: { glowcap: 2, cloud_silk: 2, void_silk: 1 } },
+          { amount: [2, 3], table: { cloud_silk: 1, void_silk: 2, quartz: 1 } },
+          { amount: [2, 4], table: { void_silk: 2, blood_gem: 1, glowcap: 1 } },
+          { amount: [2, 4], table: { void_silk: 2, blood_gem: 1, shadow_cloth: 1 } }
+        ],
+        treasure: [
+          { amount: [3, 4], table: { adamant: 1, ebony: 1, void_silk: 1, blood_gem: 1, shadow_cloth: 1 } },
+          { amount: [3, 4], table: { adamant: 2, ebony: 1, void_silk: 1, dark_bone: 1 } },
+          { amount: [3, 4], table: { adamant: 1, ebony: 2, void_silk: 2, blood_gem: 1 } },
+          { amount: [3, 5], table: { adamant: 2, ebony: 2, void_silk: 2, blood_gem: 1 } }
+        ]
+      }
+    },
+
     spiral: {
-      name: '螺旋の塔', requires: ['cave', 'forest', 'marsh', 'ruins'],
+      name: '螺旋の塔', requires: ['cave', 'forest', 'marsh', 'ruins', 'volcano', 'glacier', 'skygarden', 'abyss'],
       recommend: '4階ごとに帰還できる',
       endless: {
         segment: 4,              // 何階ごとにボス（＝帰還できる区切り）
@@ -181,12 +333,15 @@
         tiers: [
           { from: 1,  encounters: { wolf_hornet: 1, treant_single: 1, toad_pair: 1, toad_wisp: 1, spider_hornet: 1, wolf_pair: 1 } },
           { from: 5,  encounters: { treant_pair: 1, toad_trio: 1, gargoyle_single: 1, doll_pair: 1, phantom_single: 1, treant_wolf: 1 } },
-          { from: 9,  encounters: { gargoyle_phantom: 2, phantom_doll: 2, gargoyle_pair: 1, treant_pair: 1, toad_trio: 1 } }
+          { from: 9,  encounters: { gargoyle_phantom: 2, phantom_doll: 2, gargoyle_pair: 1, treant_pair: 1, toad_trio: 1 } },
+          { from: 13, encounters: { salamander_imp: 2, golem_imp: 1, ice_wolf_fairy: 2, crystal_fairy: 1, yeti_single: 1 } },
+          { from: 17, encounters: { griffin_harpy: 2, knight_cloud: 2, harpy_trio: 1, yeti_crystal: 1 } },
+          { from: 21, encounters: { knight_mage: 2, vampire_mage: 2, shadow_trio: 1, knight_pair: 1 } }
         ],
-        bosses: ['boss_golem', 'boss_elder', 'boss_queen', 'boss_dragon'], // 4階・8階・12階・16階…の順にくり返す
+        bosses: ['boss_golem', 'boss_elder', 'boss_queen', 'boss_dragon', 'boss_flame', 'boss_ice', 'boss_storm', 'boss_abyss'], // 4階・8階・12階…の順にくり返す
         highDropPerFloor: 0.05,  // 1階深くなるごとの上位素材の確率（上限 highDropMax）
         highDropMax: 0.9,
-        highDrops: { star_steel: 3, world_wood: 3, moon_silk: 3, dragon_scale: 1, gargoyle_stone: 1, phantom_cloth: 1, star_shard: 2 }
+        highDrops: { star_steel: 3, world_wood: 3, moon_silk: 3, orichalcum: 2, sky_wood: 2, cloud_silk: 2, adamant: 1, ebony: 1, void_silk: 1, star_shard: 2 }
       },
       rewards: { weights: { mining: 3, logging: 3, gathering: 2, treasure: 3, rest: 3 }, restHealRatio: 0.35 },
       // 採集の表は4階ごとにくり返す
@@ -233,7 +388,11 @@
       cave:   { star_steel: 3, world_wood: 1, moon_silk: 1 },
       forest: { world_wood: 3, star_steel: 1, moon_silk: 1 },
       marsh:  { moon_silk: 3, world_wood: 1, star_steel: 1 },
-      ruins:  { star_steel: 2, world_wood: 2, moon_silk: 2, dragon_scale: 1, gargoyle_stone: 1, phantom_cloth: 1 }
+      ruins:  { star_steel: 2, world_wood: 2, moon_silk: 2, dragon_scale: 1, gargoyle_stone: 1, phantom_cloth: 1 },
+      volcano:   { orichalcum: 3, sky_wood: 1, cloud_silk: 1, flame_heart: 1 },
+      glacier:   { cloud_silk: 3, orichalcum: 1, sky_wood: 1, ice_heart: 1 },
+      skygarden: { adamant: 2, ebony: 2, void_silk: 2, storm_horn: 1 },
+      abyss:     { adamant: 2, ebony: 2, void_silk: 2, abyss_heart: 1, blood_gem: 1 }
     }
   };
 

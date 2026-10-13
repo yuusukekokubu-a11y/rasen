@@ -19,18 +19,18 @@
 
   // ランク（素材の格）ごとの固定ステータス（index 0 = ランク1）
   const rankStats = {
-    weapon:    { main: [3, 5, 8, 11] },
-    head:      { hp: [5, 8, 12, 16], def: [1, 2, 3, 4] },
-    body:      { hp: [8, 12, 18, 24], def: [2, 3, 4, 5] },
+    weapon:    { main: [3, 5, 8, 11, 14, 17] },
+    head:      { hp: [5, 8, 12, 16, 20, 24], def: [1, 2, 3, 4, 5, 6] },
+    body:      { hp: [8, 12, 18, 24, 30, 36], def: [2, 3, 4, 5, 6, 7] },
     accessory: {}
   };
 
   // ランダム枠「ステータス上昇」の値（ランクごと）。良い枠（grade）ほど倍率が上がる
   const statRolls = {
-    atk: [1, 2, 3, 4],
-    def: [1, 1, 2, 2],
-    mag: [1, 2, 3, 4],
-    hp:  [3, 5, 7, 9]
+    atk: [1, 2, 3, 4, 5, 6],
+    def: [1, 1, 2, 2, 3, 3],
+    mag: [1, 2, 3, 4, 5, 6],
+    hp:  [3, 5, 7, 9, 11, 13]
   };
   // grade（ランダム枠の良さ）：0=並 1=良 2=極
   const gradeMult = [1, 1.5, 2];
@@ -111,6 +111,40 @@
     dragon_amulet: { name: '竜玉の首飾り', type: 'accessory', slot: 'accessory', rank: 4, fixedCard: 'acc_second', mats: { dragon_scale: 1, star_steel: 1, quartz: 2 }, difficulty: 16 }
   });
 
+  // --- ランク5（灼熱の火山・氷晶の洞・天空の庭の素材で作る） ---
+  Object.assign(bases, {
+    ori_sword:     { name: 'オリハルコンの剣',   type: 'sword',     slot: 'weapon', rank: 5, fixedCard: 'sword_finisher',   mats: { orichalcum: 3, griffin_claw: 1 },               difficulty: 22 },
+    ori_dagger:    { name: 'オリハルコンの短剣', type: 'dagger',    slot: 'weapon', rank: 5, fixedCard: 'dagger_backstab',  mats: { orichalcum: 2, harpy_feather: 1, imp_horn: 1 }, difficulty: 22 },
+    ori_helm:      { name: 'オリハルコンの兜',   type: 'heavy',     slot: 'head',   rank: 5, fixedCard: 'heavy_roar',       mats: { orichalcum: 2, yeti_fur: 1 },                   difficulty: 21 },
+    ori_armor:     { name: 'オリハルコンの鎧',   type: 'heavy',     slot: 'body',   rank: 5, fixedCard: 'heavy_charge',     mats: { orichalcum: 4, magma_core: 1 },                 difficulty: 23 },
+    sky_staff:     { name: '天空樹の杖',         type: 'staff',     slot: 'weapon', rank: 5, fixedCard: 'staff_spark',      mats: { sky_wood: 3, flame_heart: 1 },                  difficulty: 22 },
+    sky_board:     { name: '天空樹の星盤',       type: 'starboard', slot: 'weapon', rank: 5, fixedCard: 'star_nova',        mats: { sky_wood: 2, sun_stone: 1, frost_crystal: 1 },  difficulty: 22 },
+    sky_bow:       { name: '天空樹の弓',         type: 'bow',       slot: 'weapon', rank: 5, fixedCard: 'bow_pierce',       mats: { sky_wood: 3, harpy_feather: 1 },                difficulty: 22 },
+    sky_scepter:   { name: '天空樹の錫杖',       type: 'scepter',   slot: 'weapon', rank: 5, fixedCard: 'scep_sanctuary',   mats: { sky_wood: 2, ice_heart: 1 },                    difficulty: 22 },
+    cloud_hat:     { name: '雲絹の帽子',         type: 'robe',      slot: 'head',   rank: 5, fixedCard: 'robe_calm',        mats: { cloud_silk: 2, frost_crystal: 1 },              difficulty: 21 },
+    cloud_robe:    { name: '雲絹のローブ',       type: 'robe',      slot: 'body',   rank: 5, fixedCard: 'robe_shroud',      mats: { cloud_silk: 3, fire_scale: 1 },                 difficulty: 23 },
+    cloud_hood:    { name: '雲絹の頭巾',         type: 'light',     slot: 'head',   rank: 5, fixedCard: 'light_shadowstep', mats: { cloud_silk: 2, ice_fang: 1 },                   difficulty: 21 },
+    cloud_garb:    { name: '雲絹の装束',         type: 'light',     slot: 'body',   rank: 5, fixedCard: 'light_vanish',     mats: { cloud_silk: 3, harpy_feather: 1 },              difficulty: 23 },
+    sun_ring:      { name: '陽光の指輪',         type: 'accessory', slot: 'accessory', rank: 5, fixedCard: 'acc_guard',    mats: { sun_stone: 1, orichalcum: 1, quartz: 2 },       difficulty: 21 }
+  });
+
+  // --- ランク6（深淵の城の素材で作る） ---
+  Object.assign(bases, {
+    ada_sword:     { name: 'アダマントの剣',     type: 'sword',     slot: 'weapon', rank: 6, fixedCard: 'sword_rally',      mats: { adamant: 3, storm_horn: 1 },                    difficulty: 27 },
+    ada_dagger:    { name: 'アダマントの短剣',   type: 'dagger',    slot: 'weapon', rank: 6, fixedCard: 'dagger_juggle',    mats: { adamant: 2, shadow_cloth: 1 },                  difficulty: 27 },
+    ada_helm:      { name: 'アダマントの兜',     type: 'heavy',     slot: 'head',   rank: 6, fixedCard: 'heavy_fortress',   mats: { adamant: 2, dark_bone: 1 },                     difficulty: 26 },
+    ada_armor:     { name: 'アダマントの鎧',     type: 'heavy',     slot: 'body',   rank: 6, fixedCard: 'heavy_ironwall',   mats: { adamant: 4, dark_bone: 1 },                     difficulty: 28 },
+    ebony_staff:   { name: '黒檀の杖',           type: 'staff',     slot: 'weapon', rank: 6, fixedCard: 'staff_chain',      mats: { ebony: 3, blood_gem: 1 },                       difficulty: 27 },
+    ebony_board:   { name: '黒檀の星盤',         type: 'starboard', slot: 'weapon', rank: 6, fixedCard: 'star_lines',       mats: { ebony: 2, blood_gem: 1, sun_stone: 1 },         difficulty: 27 },
+    ebony_bow:     { name: '黒檀の弓',           type: 'bow',       slot: 'weapon', rank: 6, fixedCard: 'bow_triple',       mats: { ebony: 3, storm_horn: 1 },                      difficulty: 27 },
+    ebony_scepter: { name: '黒檀の錫杖',         type: 'scepter',   slot: 'weapon', rank: 6, fixedCard: 'scep_blessing',    mats: { ebony: 2, abyss_heart: 1 },                     difficulty: 27 },
+    void_hat:      { name: '虚無の帽子',         type: 'robe',      slot: 'head',   rank: 6, fixedCard: 'robe_aura',        mats: { void_silk: 2, shadow_cloth: 1 },                difficulty: 26 },
+    void_robe:     { name: '虚無のローブ',       type: 'robe',      slot: 'body',   rank: 6, fixedCard: 'robe_restore',     mats: { void_silk: 3, dark_bone: 1 },                   difficulty: 28 },
+    void_hood:     { name: '虚無の頭巾',         type: 'light',     slot: 'head',   rank: 6, fixedCard: 'light_camo',       mats: { void_silk: 2, shadow_cloth: 1 },                difficulty: 26 },
+    void_garb:     { name: '虚無の装束',         type: 'light',     slot: 'body',   rank: 6, fixedCard: 'light_tailwind',   mats: { void_silk: 3, blood_gem: 1 },                   difficulty: 28 },
+    abyss_crown:   { name: '深淵の冠',           type: 'accessory', slot: 'accessory', rank: 6, fixedCard: 'acc_whistle',  mats: { abyss_heart: 1, adamant: 1, blood_gem: 1 },     difficulty: 26 }
+  });
+
   // 採集道具（良い道具ほど採集ミニゲームが楽になる）
   const tools = {
     copper_pick:  { name: '銅のツルハシ',     kind: 'pick', power: 1.0, craft: 'smith',     mats: { copper_ore: 2, oak: 1 },        difficulty: 1 },
@@ -120,7 +154,11 @@
     iron_axe:     { name: '鉄のオノ',         kind: 'axe',  power: 1.5, craft: 'carpenter', mats: { maple: 2, iron_ore: 1 },        difficulty: 6 },
     mithril_axe:  { name: 'ミスリルのオノ',   kind: 'axe',  power: 2.0, craft: 'carpenter', mats: { ancient_wood: 2, mithril_ore: 1 }, difficulty: 12 },
     star_pick:    { name: '星鋼のツルハシ',   kind: 'pick', power: 2.5, craft: 'smith',     mats: { star_steel: 2, world_wood: 1 },    difficulty: 16 },
-    star_axe:     { name: '星鋼のオノ',       kind: 'axe',  power: 2.5, craft: 'carpenter', mats: { world_wood: 2, star_steel: 1 },    difficulty: 16 }
+    star_axe:     { name: '星鋼のオノ',       kind: 'axe',  power: 2.5, craft: 'carpenter', mats: { world_wood: 2, star_steel: 1 },    difficulty: 16 },
+    ori_pick:     { name: 'オリハルコンのツルハシ', kind: 'pick', power: 3.0, craft: 'smith', mats: { orichalcum: 2, sky_wood: 1 },  difficulty: 21 },
+    ori_axe:      { name: 'オリハルコンのオノ', kind: 'axe',  power: 3.0, craft: 'carpenter', mats: { sky_wood: 2, orichalcum: 1 },  difficulty: 21 },
+    ada_pick:     { name: 'アダマントのツルハシ', kind: 'pick', power: 3.5, craft: 'smith',   mats: { adamant: 2, ebony: 1 },        difficulty: 26 },
+    ada_axe:      { name: 'アダマントのオノ', kind: 'axe',  power: 3.5, craft: 'carpenter',   mats: { ebony: 2, adamant: 1 },        difficulty: 26 }
   };
 
   R.DATA.equipment = { types, rankStats, statRolls, gradeMult, slotNames, bases, tools };

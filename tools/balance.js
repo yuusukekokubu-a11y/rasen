@@ -23,7 +23,9 @@ console.log(`  最高 ${combos[0][0]} ${pct(combos[0][1])} ／ 最低 ${combos[c
 // 2) ダンジョンごとの難しさ
 console.log(`■ ダンジョンのクリア率（各${n}回）`);
 const rows = [['cave', 'starter', 1], ['forest', 'rank2_plain', 1], ['marsh', 'rank2_plain', 1], ['ruins', 'rank3_plain', 1], ['ruins', 'rank2_enchanted', 1],
-  ['cave', 'rank4_plain', 3], ['forest', 'rank4_plain', 3], ['ruins', 'rank4_plain', 2]];
+  ['cave', 'rank4_plain', 3], ['forest', 'rank4_plain', 3], ['ruins', 'rank4_plain', 2],
+  ['volcano', 'rank4_plain', 1], ['glacier', 'rank4_plain', 1], ['skygarden', 'rank4_plain', 1], ['skygarden', 'rank5_plain', 1],
+  ['abyss', 'rank5_plain', 1], ['abyss', 'rank6_plain', 1], ['volcano', 'rank6_plain', 2]];
 for (const [d, p, diff] of rows) {
   const r = R.Sim.runDungeons({ members: R.Sim.presetMembers(p), n, seed: 1, dungeonId: d, difficulty: diff });
   console.log(`  ${R.DATA.dungeons[d].name}（難易度${diff}）× ${R.DATA.loadouts.presets[p].name}：${pct(r.clearRate)}`);

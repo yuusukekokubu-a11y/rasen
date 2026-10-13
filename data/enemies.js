@@ -192,6 +192,241 @@
       pattern: { type: 'cycle', opening: 'roar', seq: ['breath', 'claw', 'wing', 'devour', 'claw'] },
       elementMult: { ice: 1.25 },
       drops: { dragon_scale: 1, star_shard: 2 }
+    },
+    // ===== 灼熱の火山（氷が有効・炎に強い） =====
+    salamander: {
+      name: '火蜥蜴', hp: [92, 100],
+      moves: {
+        bite:  { name: '噛みつき', dmg: 19 },
+        flame: { name: '火炎', dmg: 9, hits: 2 },
+        bask:  { name: '日向ぼっこ', block: 16, str: 2 }
+      },
+      pattern: { type: 'cycle', seq: ['bite', 'flame', 'bask'] },
+      elementMult: { ice: 1.5, fire: 0.5 },
+      drops: { fire_scale: 1 }
+    },
+    magma_slime: {
+      name: '溶岩スライム', hp: [104, 112],
+      moves: {
+        tackle: { name: '体当たり', dmg: 17 },
+        erupt:  { name: '噴出', dmg: 11, debuff: { s: 'weak', v: 1 } },
+        harden: { name: '冷え固まる', block: 22 }
+      },
+      pattern: { type: 'random', weights: { tackle: 3, erupt: 2, harden: 1 }, maxRepeat: 2 },
+      elementMult: { ice: 1.5, fire: 0.5 },
+      drops: { magma_core: 1 }
+    },
+    fire_imp: {
+      name: '火の小鬼', hp: [52, 58],
+      moves: {
+        jab:  { name: '小突き', dmg: 7, hits: 2 },
+        hex:  { name: 'いたずら', dmg: 6, debuff: { s: 'vulnerable', v: 2 } },
+        cheer:{ name: 'はやし立てる', allyBlock: 10 }
+      },
+      pattern: { type: 'random', weights: { jab: 3, hex: 2, cheer: 1 }, maxRepeat: 1 },
+      elementMult: { ice: 1.5, fire: 0.5 },
+      drops: { imp_horn: 1 }
+    },
+    lava_golem: {
+      name: '溶岩巨人', hp: [146, 156],
+      moves: {
+        punch: { name: '溶岩の拳', dmg: 25 },
+        guard: { name: '岩の守り', block: 24, str: 2 },
+        quake: { name: '地揺れ', dmg: 9, hits: 2 }
+      },
+      pattern: { type: 'cycle', seq: ['punch', 'quake', 'guard'] },
+      elementMult: { ice: 1.5, fire: 0.5, thunder: 0.75 },
+      drops: { magma_core: 1, star_steel: 1 }
+    },
+    flame_lord: {
+      name: '炎帝イフリート', hp: [640, 640], boss: true,
+      moves: {
+        ignite:  { name: '点火', str: 3, block: 20 },
+        inferno: { name: '業火', dmg: 13, hits: 2 },
+        fist:    { name: '灼熱の拳', dmg: 32 },
+        rain:    { name: '火の雨', dmg: 7, hits: 4 },
+        brand:   { name: '烙印', dmg: 12, debuff: { s: 'vulnerable', v: 2 } }
+      },
+      pattern: { type: 'cycle', opening: 'ignite', seq: ['inferno', 'fist', 'brand', 'rain', 'ignite', 'fist'] },
+      elementMult: { ice: 1.5, fire: 0.5 },
+      drops: { flame_heart: 1, star_steel: 2 }
+    },
+
+    // ===== 氷晶の洞（炎が有効・氷に強い） =====
+    ice_wolf: {
+      name: '氷狼', hp: [88, 96],
+      moves: {
+        fang:  { name: '氷の牙', dmg: 20 },
+        howl:  { name: '凍える遠吠え', str: 3, block: 10 },
+        rend:  { name: '噛み裂き', dmg: 10, hits: 2 }
+      },
+      pattern: { type: 'cycle', seq: ['fang', 'rend', 'howl'] },
+      elementMult: { fire: 1.5, ice: 0.5 },
+      drops: { ice_fang: 1 }
+    },
+    frost_fairy: {
+      name: '氷の妖精', hp: [54, 60],
+      moves: {
+        shards: { name: '氷のつぶて', dmg: 6, hits: 3 },
+        chill:  { name: '冷気', dmg: 6, debuff: { s: 'weak', v: 2 } },
+        shield: { name: '氷の盾', allyBlock: 12 }
+      },
+      pattern: { type: 'random', weights: { shards: 3, chill: 2, shield: 2 }, maxRepeat: 1 },
+      elementMult: { fire: 1.5, ice: 0.5 },
+      drops: { frost_crystal: 1 }
+    },
+    yeti: {
+      name: '雪男', hp: [136, 146],
+      moves: {
+        smash: { name: '叩きつけ', dmg: 27 },
+        roar:  { name: '雄たけび', str: 4, debuff: { s: 'vulnerable', v: 1 } },
+        maul:  { name: '殴打', dmg: 12, hits: 2 }
+      },
+      pattern: { type: 'cycle', seq: ['maul', 'smash', 'roar', 'smash'] },
+      elementMult: { fire: 1.5, ice: 0.5 },
+      drops: { yeti_fur: 1 }
+    },
+    crystal_golem: {
+      name: '水晶兵', hp: [112, 120],
+      moves: {
+        guard: { name: '結晶化', block: 28 },
+        beam:  { name: '屈折光線', dmg: 21 },
+        burst: { name: '破片散弾', dmg: 8, hits: 3 }
+      },
+      pattern: { type: 'cycle', seq: ['beam', 'guard', 'burst'] },
+      elementMult: { fire: 1.25, thunder: 1.5, ice: 0.5 },
+      drops: { frost_crystal: 1, moon_silk: 1 }
+    },
+    ice_queen: {
+      name: '氷晶の女王', hp: [620, 620], boss: true,
+      moves: {
+        veil:     { name: '氷のとばり', block: 30, debuff: { s: 'weak', v: 2 } },
+        lance:    { name: '氷槍', dmg: 30 },
+        blizzard: { name: '吹雪', dmg: 8, hits: 3, debuff: { s: 'vulnerable', v: 1 } },
+        mirror:   { name: '氷鏡', str: 3, heal: 30 },
+        shatter:  { name: '砕氷', dmg: 14, hits: 2 }
+      },
+      pattern: { type: 'cycle', opening: 'veil', seq: ['lance', 'blizzard', 'shatter', 'mirror', 'lance', 'veil'] },
+      elementMult: { fire: 1.5, ice: 0.5 },
+      drops: { ice_heart: 1, moon_silk: 2 }
+    },
+
+    // ===== 天空の庭（雷と氷が有効） =====
+    harpy: {
+      name: 'ハーピー', hp: [96, 104],
+      moves: {
+        talon: { name: '爪', dmg: 11, hits: 2 },
+        gust:  { name: '突風', dmg: 9, debuff: { s: 'weak', v: 2 } },
+        soar:  { name: '舞い上がる', block: 18 }
+      },
+      pattern: { type: 'random', weights: { talon: 3, gust: 2, soar: 1 }, maxRepeat: 2 },
+      elementMult: { thunder: 1.5, ice: 1.25 },
+      drops: { harpy_feather: 1 }
+    },
+    griffin: {
+      name: 'グリフォン', hp: [150, 162],
+      moves: {
+        dive:  { name: '急降下', dmg: 30 },
+        wing:  { name: '翼打ち', dmg: 10, hits: 3 },
+        screech: { name: '威嚇', str: 3, block: 14 }
+      },
+      pattern: { type: 'cycle', seq: ['wing', 'dive', 'screech'] },
+      elementMult: { thunder: 1.5 },
+      drops: { griffin_claw: 1 }
+    },
+    cloud_spirit: {
+      name: '雲の精', hp: [84, 92],
+      moves: {
+        mist:  { name: '霧雲', allyBlock: 16 },
+        zap:   { name: '小さな雷', dmg: 15 },
+        drizzle: { name: '冷たい雨', dmg: 6, hits: 2, debuff: { s: 'vulnerable', v: 1 } }
+      },
+      pattern: { type: 'random', weights: { mist: 2, zap: 3, drizzle: 2 }, maxRepeat: 1 },
+      elementMult: { fire: 1.5, thunder: 0.5 },
+      drops: { cloud_silk: 1 }
+    },
+    sky_knight: {
+      name: '天空騎士', hp: [160, 172],
+      moves: {
+        lance: { name: '天槍', dmg: 32 },
+        guard: { name: '大盾', block: 28 },
+        rally: { name: '鼓舞', str: 3, allyBlock: 12 }
+      },
+      pattern: { type: 'cycle', seq: ['lance', 'guard', 'rally', 'lance'] },
+      elementMult: { thunder: 1.25, ice: 1.25 },
+      drops: { orichalcum: 1 }
+    },
+    storm_dragon: {
+      name: '嵐の竜王', hp: [860, 860], boss: true,
+      moves: {
+        roar:    { name: '雷鳴', str: 4, debuff: { s: 'vulnerable', v: 2 } },
+        lightning: { name: '落雷', dmg: 36 },
+        gale:    { name: '暴風', dmg: 10, hits: 4 },
+        coil:    { name: '嵐をまとう', block: 40, heal: 30 },
+        tail:    { name: '尾の薙ぎ払い', dmg: 18, hits: 2, debuff: { s: 'weak', v: 1 } }
+      },
+      pattern: { type: 'cycle', opening: 'roar', seq: ['gale', 'lightning', 'tail', 'coil', 'lightning', 'gale'] },
+      elementMult: { ice: 1.25, thunder: 0.75 },
+      drops: { storm_horn: 1, sun_stone: 2 }
+    },
+
+    // ===== 深淵の城（炎と雷が有効） =====
+    shadow_soldier: {
+      name: '影の兵', hp: [123, 133],
+      moves: {
+        slash: { name: '影斬り', dmg: 26 },
+        fade:  { name: '影にまぎれる', block: 24 },
+        twin:  { name: '二連斬', dmg: 13, hits: 2 }
+      },
+      pattern: { type: 'cycle', seq: ['slash', 'twin', 'fade'] },
+      elementMult: { fire: 1.25, thunder: 1.25 },
+      drops: { shadow_cloth: 1 }
+    },
+    vampire: {
+      name: '吸血鬼', hp: [145, 155],
+      moves: {
+        drain: { name: '吸血', dmg: 20, heal: 15 },
+        bats:  { name: '蝙蝠の群れ', dmg: 8, hits: 3 },
+        charm: { name: '魅了', dmg: 8, debuff: { s: 'weak', v: 2 } }
+      },
+      pattern: { type: 'random', weights: { drain: 3, bats: 2, charm: 1 }, maxRepeat: 1 },
+      elementMult: { fire: 1.5, ice: 0.75 },
+      drops: { blood_gem: 1 }
+    },
+    dark_mage: {
+      name: '闇の魔導士', hp: [103, 111],
+      moves: {
+        curse: { name: '呪詛', dmg: 9, debuff: { s: 'vulnerable', v: 2 } },
+        bolt:  { name: '闇の雷', dmg: 28 },
+        ward:  { name: '闇の結界', allyBlock: 18 }
+      },
+      pattern: { type: 'cycle', seq: ['curse', 'bolt', 'ward'] },
+      elementMult: { thunder: 1.5, fire: 1.25 },
+      drops: { dark_bone: 1 }
+    },
+    death_knight: {
+      name: '死の騎士', hp: [195, 208],
+      moves: {
+        cleave: { name: '死の剣', dmg: 35 },
+        guard:  { name: '黒鉄の構え', block: 30, str: 3 },
+        reap:   { name: '刈り取り', dmg: 14, hits: 2, debuff: { s: 'weak', v: 1 } }
+      },
+      pattern: { type: 'cycle', seq: ['reap', 'cleave', 'guard'] },
+      elementMult: { fire: 1.25, thunder: 1.25 },
+      drops: { dark_bone: 1, adamant: 1 }
+    },
+    abyss_lord: {
+      name: '深淵の王', hp: [1031, 1031], boss: true,
+      moves: {
+        dark:    { name: '闇の帳', block: 40, debuff: { s: 'weak', v: 2 } },
+        smite:   { name: '深淵の一撃', dmg: 41 },
+        storm:   { name: '闇の嵐', dmg: 11, hits: 4 },
+        devour:  { name: '魂喰い', str: 5, heal: 40 },
+        curse:   { name: '滅びの呪い', dmg: 15, hits: 2, debuff: { s: 'vulnerable', v: 2 } }
+      },
+      pattern: { type: 'cycle', opening: 'dark', seq: ['storm', 'smite', 'curse', 'devour', 'smite', 'storm', 'dark'] },
+      elementMult: { fire: 1.25, thunder: 1.25 },
+      drops: { abyss_heart: 1, blood_gem: 2 }
     }
   };
 
@@ -227,6 +462,42 @@
     gargoyle_phantom: { name: 'ガーゴイル＋亡霊騎士', enemies: ['gargoyle', 'phantom'] },
     phantom_doll:     { name: '亡霊騎士＋岩人形', enemies: ['phantom', 'rock_doll'] },
     gargoyle_pair:    { name: 'ガーゴイル×2', enemies: ['gargoyle', 'gargoyle'] },
-    boss_dragon:      { name: '【ボス】星喰いの竜', enemies: ['star_dragon'], boss: true }
+    boss_dragon:      { name: '【ボス】星喰いの竜', enemies: ['star_dragon'], boss: true },
+    // 灼熱の火山
+    salamander_single: { name: '火蜥蜴', enemies: ['salamander'] },
+    imp_trio:          { name: '火の小鬼×3', enemies: ['fire_imp', 'fire_imp', 'fire_imp'] },
+    magma_pair:        { name: '溶岩スライム×2', enemies: ['magma_slime', 'magma_slime'] },
+    salamander_imp:    { name: '火蜥蜴＋火の小鬼', enemies: ['salamander', 'fire_imp'] },
+    golem_imp:         { name: '溶岩巨人＋火の小鬼', enemies: ['lava_golem', 'fire_imp'] },
+    salamander_pair:   { name: '火蜥蜴×2', enemies: ['salamander', 'salamander'] },
+    lava_golem_single: { name: '溶岩巨人', enemies: ['lava_golem'] },
+    boss_flame:        { name: '【ボス】炎帝イフリート', enemies: ['flame_lord'], boss: true },
+    // 氷晶の洞
+    ice_wolf_single:   { name: '氷狼', enemies: ['ice_wolf'] },
+    fairy_trio:        { name: '氷の妖精×3', enemies: ['frost_fairy', 'frost_fairy', 'frost_fairy'] },
+    ice_wolf_fairy:    { name: '氷狼＋氷の妖精', enemies: ['ice_wolf', 'frost_fairy'] },
+    yeti_single:       { name: '雪男', enemies: ['yeti'] },
+    crystal_fairy:     { name: '水晶兵＋氷の妖精', enemies: ['crystal_golem', 'frost_fairy'] },
+    ice_wolf_pair:     { name: '氷狼×2', enemies: ['ice_wolf', 'ice_wolf'] },
+    yeti_crystal:      { name: '雪男＋水晶兵', enemies: ['yeti', 'crystal_golem'] },
+    boss_ice:          { name: '【ボス】氷晶の女王', enemies: ['ice_queen'], boss: true },
+    // 天空の庭
+    harpy_pair:        { name: 'ハーピー×2', enemies: ['harpy', 'harpy'] },
+    griffin_single:    { name: 'グリフォン', enemies: ['griffin'] },
+    cloud_harpy:       { name: '雲の精＋ハーピー', enemies: ['cloud_spirit', 'harpy'] },
+    knight_cloud:      { name: '天空騎士＋雲の精', enemies: ['sky_knight', 'cloud_spirit'] },
+    harpy_trio:        { name: 'ハーピー×3', enemies: ['harpy', 'harpy', 'harpy'] },
+    griffin_harpy:     { name: 'グリフォン＋ハーピー', enemies: ['griffin', 'harpy'] },
+    knight_pair:       { name: '天空騎士×2', enemies: ['sky_knight', 'sky_knight'] },
+    boss_storm:        { name: '【ボス】嵐の竜王', enemies: ['storm_dragon'], boss: true },
+    // 深淵の城
+    shadow_pair:       { name: '影の兵×2', enemies: ['shadow_soldier', 'shadow_soldier'] },
+    vampire_single:    { name: '吸血鬼', enemies: ['vampire'] },
+    mage_shadow:       { name: '闇の魔導士＋影の兵', enemies: ['dark_mage', 'shadow_soldier'] },
+    vampire_mage:      { name: '吸血鬼＋闇の魔導士', enemies: ['vampire', 'dark_mage'] },
+    knight_single:     { name: '死の騎士', enemies: ['death_knight'] },
+    knight_mage:       { name: '死の騎士＋闇の魔導士', enemies: ['death_knight', 'dark_mage'] },
+    shadow_trio:       { name: '影の兵×3', enemies: ['shadow_soldier', 'shadow_soldier', 'shadow_soldier'] },
+    boss_abyss:        { name: '【ボス】深淵の王', enemies: ['abyss_lord'], boss: true }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

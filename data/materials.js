@@ -32,6 +32,31 @@
     // ランク4（難易度2以上のダンジョンで出る上位素材）
     star_steel:   { name: '星鋼',         kind: 'ore',     rank: 4 },
     world_wood:   { name: '世界樹の枝',   kind: 'wood',    rank: 4 },
-    moon_silk:    { name: '月光の絹',     kind: 'plant',   rank: 4 }
+    moon_silk:    { name: '月光の絹',     kind: 'plant',   rank: 4 },
+    // 灼熱の火山・氷晶の洞（ランク4）
+    fire_scale:   { name: '火蜥蜴の鱗',   kind: 'monster', rank: 4 },
+    magma_core:   { name: '溶岩の核',     kind: 'monster', rank: 4 },
+    imp_horn:     { name: '小鬼の角',     kind: 'monster', rank: 4 },
+    flame_heart:  { name: '炎帝の心臓',   kind: 'monster', rank: 5 },
+    ice_fang:     { name: '氷狼の牙',     kind: 'monster', rank: 4 },
+    frost_crystal:{ name: '氷晶',         kind: 'gem',     rank: 4 },
+    yeti_fur:     { name: '雪男の毛皮',   kind: 'monster', rank: 4 },
+    ice_heart:    { name: '氷晶の心臓',   kind: 'monster', rank: 5 },
+    // 天空の庭（ランク5）
+    orichalcum:   { name: 'オリハルコン', kind: 'ore',     rank: 5 },
+    sky_wood:     { name: '天空樹の枝',   kind: 'wood',    rank: 5 },
+    cloud_silk:   { name: '雲絹',         kind: 'plant',   rank: 5 },
+    sun_stone:    { name: '陽光石',       kind: 'gem',     rank: 5 },
+    harpy_feather:{ name: '風切り羽',     kind: 'monster', rank: 5 },
+    griffin_claw: { name: 'グリフォンの爪', kind: 'monster', rank: 5 },
+    storm_horn:   { name: '嵐竜の角',     kind: 'monster', rank: 6 },
+    // 深淵の城（ランク6）
+    adamant:      { name: 'アダマント',   kind: 'ore',     rank: 6 },
+    ebony:        { name: '黒檀',         kind: 'wood',    rank: 6 },
+    void_silk:    { name: '虚無の糸',     kind: 'plant',   rank: 6 },
+    blood_gem:    { name: '血晶',         kind: 'gem',     rank: 6 },
+    shadow_cloth: { name: '影布',         kind: 'monster', rank: 6 },
+    dark_bone:    { name: '闇の骨',       kind: 'monster', rank: 6 },
+    abyss_heart:  { name: '深淵の核',     kind: 'monster', rank: 6 }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

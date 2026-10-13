@@ -24,6 +24,16 @@
     ward_charm:  { name: '守りの護符', desc: 'ブロック25',               mats: { phantom_cloth: 1, quartz: 1 }, difficulty: 11,
       effects: [{ t: 'block', v: 25, scale: 'none' }] },
     dragon_tonic:{ name: '竜の秘薬',   desc: '味方全員の攻撃力・魔力+3（この戦闘中）', mats: { dragon_scale: 1, glowcap: 1 }, difficulty: 13,
-      effects: [{ t: 'buff', stat: 'atk', v: 3, who: 'party' }, { t: 'buff', stat: 'mag', v: 3, who: 'party' }] }
+      effects: [{ t: 'buff', stat: 'atk', v: 3, who: 'party' }, { t: 'buff', stat: 'mag', v: 3, who: 'party' }] },
+    fire_bomb:   { name: '火炎瓶',     desc: '敵全体に20ダメージ・燃焼2', mats: { fire_scale: 1, herb: 1 }, difficulty: 15,
+      effects: [{ t: 'dmg', v: 20, scale: 'none', target: 'all' }, { t: 'status', s: 'burn', v: 2, target: 'all' }] },
+    frost_bomb:  { name: '氷結弾',     desc: '敵全体に18ダメージ・凍結1', mats: { frost_crystal: 1, quartz: 1 }, difficulty: 15,
+      effects: [{ t: 'dmg', v: 18, scale: 'none', target: 'all' }, { t: 'status', s: 'freeze', v: 1, target: 'all' }] },
+    great_elixir:{ name: '秘薬',       desc: 'HPを50回復',               mats: { glowcap: 2, cloud_silk: 1 }, difficulty: 20,
+      effects: [{ t: 'heal', v: 50 }] },
+    sun_charm:   { name: '陽光の護符', desc: 'ブロック40',               mats: { sun_stone: 1, cloud_silk: 1 }, difficulty: 21,
+      effects: [{ t: 'block', v: 40, scale: 'none' }] },
+    void_tonic:  { name: '深淵の秘薬', desc: '味方全員の攻撃力・魔力+5（この戦闘中）', mats: { blood_gem: 1, void_silk: 1 }, difficulty: 26,
+      effects: [{ t: 'buff', stat: 'atk', v: 5, who: 'party' }, { t: 'buff', stat: 'mag', v: 5, who: 'party' }] }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

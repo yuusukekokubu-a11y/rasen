@@ -164,9 +164,15 @@ test('複数ダンジョン：前のダンジョンをクリアすると次が�
   assert.ok(!G.isUnlocked('ruins'));
   const r3 = clear('marsh');
   assert.deepStrictEqual(r3.newlyUnlocked, ['ruins']);
-  assert.ok(!G.allCleared());
   const r4 = clear('ruins');
-  assert.ok(r4.allClearedNow && G.allCleared());
+  assert.deepStrictEqual(r4.newlyUnlocked.sort(), ['glacier', 'volcano']);
+  clear('volcano');
+  assert.ok(!G.isUnlocked('skygarden'));
+  assert.deepStrictEqual(clear('glacier').newlyUnlocked, ['skygarden']);
+  assert.deepStrictEqual(clear('skygarden').newlyUnlocked, ['abyss']);
+  assert.ok(!G.allCleared());
+  const r8 = clear('abyss');
+  assert.ok(r8.allClearedNow && G.allCleared());
 });
 
 test('すべてのダンジョンのデータが正しい（敵・素材・解禁条件）', () => {
@@ -196,7 +202,7 @@ test('難易度段階：全クリア後に開き、1つずつ上がる・敵が�
   clear('cave');
   assert.strictEqual(G.maxUnlockedDifficulty('cave'), 1, '全クリア前は難易度1だけ');
   assert.throws(() => G.startRun('cave', 2));
-  clear('forest'); clear('marsh'); clear('ruins');
+  ['forest', 'marsh', 'ruins', 'volcano', 'glacier', 'skygarden', 'abyss'].forEach(id => clear(id));
   assert.strictEqual(G.maxUnlockedDifficulty('cave'), 2);
   clear('cave', 2);
   assert.strictEqual(G.maxUnlockedDifficulty('cave'), 3);
@@ -218,7 +224,9 @@ test('無限階層：4階ごとにボス→帰還か続行を選ぶ・深いほ�
   G.newState();
   const clear = (id) => { const run = G.startRun(id); run.phase = 'cleared'; return G.endRun(); };
   assert.ok(!G.isUnlocked('spiral'));
-  ['cave', 'forest', 'marsh', 'ruins'].forEach(clear);
+  ['cave', 'forest', 'marsh', 'ruins', 'volcano', 'glacier', 'skygarden'].forEach(clear);
+  assert.ok(!G.isUnlocked('spiral'));
+  clear('abyss');
   assert.ok(G.isUnlocked('spiral'));
   assert.strictEqual(G.maxUnlockedDifficulty('spiral'), 1, '塔に難易度段階はない');
   const run = G.startRun('spiral');

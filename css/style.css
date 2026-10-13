@@ -428,6 +428,7 @@ button.primary .menu-desc { color: #4a3610; }
 .hand-grid .card { min-height: 112px; font-size: 10.5px; }
 .hand-grid .card-type { display: none; }
 .combat > .battle-stage { height: 196px; }
+.battle-stage .enemy.boss .enemy-sprite { width: 84px !important; height: 84px !important; }
 .hand-grid .card-art { height: 36px; }
 .hand-grid .card-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hand-grid .choice-card .card { height: 100%; }
@@ -539,3 +540,5 @@ button.primary .menu-desc { color: #4a3610; }
 .vein-cell.found.just { animation: dig-found .45s ease-out; }
 @keyframes dig { 0% { transform: scale(.6); filter: brightness(2); } 100% { transform: none; } }
 @keyframes dig-found { 0% { transform: scale(.5); filter: brightness(3); } 50% { transform: scale(1.2); } 100% { transform: none; } }
+/* 明るい背景（天空の庭など）でも名前とHPが読めるよう、敵の足元を少し暗くする */
+.battle-stage .enemies { background: linear-gradient(transparent, #0a0c1488 45%, #0a0c14bb); padding-top: 8px; }

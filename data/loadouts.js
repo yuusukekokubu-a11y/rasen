@@ -133,6 +133,46 @@
           accessory: { base: 'dragon_amulet', randomCard: 'acc_quick', power: 'pw_as_stargaze' } } }
       ]
     },
+    rank5_plain: {
+      name: 'ランク5・ふつう・付与なし',
+      party: [
+        { job: 'swordsman', gear: {
+          weapon: { base: 'ori_sword', randomCard: 'sword_heavy' },
+          head: { base: 'ori_helm', randomCard: 'heavy_defend' },
+          body: { base: 'ori_armor', randomCard: 'heavy_endure' },
+          accessory: { base: 'sun_ring', randomCard: 'acc_charm', power: 'pw_sw_fighting' } } },
+        { job: 'mage', gear: {
+          weapon: { base: 'sky_staff', randomCard: 'staff_fire' },
+          head: { base: 'cloud_hat', randomCard: 'robe_ward' },
+          body: { base: 'cloud_robe', randomCard: 'robe_barrier' },
+          accessory: { base: 'sun_ring', randomCard: 'acc_spark', power: 'pw_mg_cycle' } } },
+        { job: 'astrologer', gear: {
+          weapon: { base: 'sky_board', randomCard: 'star_beam' },
+          head: { base: 'cloud_hat', randomCard: 'robe_meditate' },
+          body: { base: 'cloud_robe', randomCard: 'robe_ward' },
+          accessory: { base: 'sun_ring', randomCard: 'acc_quick', power: 'pw_as_stargaze' } } }
+      ]
+    },
+    rank6_plain: {
+      name: 'ランク6・ふつう・付与なし',
+      party: [
+        { job: 'swordsman', gear: {
+          weapon: { base: 'ada_sword', randomCard: 'sword_heavy' },
+          head: { base: 'ada_helm', randomCard: 'heavy_defend' },
+          body: { base: 'ada_armor', randomCard: 'heavy_endure' },
+          accessory: { base: 'abyss_crown', randomCard: 'acc_charm', power: 'pw_sw_fighting' } } },
+        { job: 'mage', gear: {
+          weapon: { base: 'ebony_staff', randomCard: 'staff_fire' },
+          head: { base: 'void_hat', randomCard: 'robe_ward' },
+          body: { base: 'void_robe', randomCard: 'robe_barrier' },
+          accessory: { base: 'abyss_crown', randomCard: 'acc_spark', power: 'pw_mg_cycle' } } },
+        { job: 'astrologer', gear: {
+          weapon: { base: 'ebony_board', randomCard: 'star_beam' },
+          head: { base: 'void_hat', randomCard: 'robe_meditate' },
+          body: { base: 'void_robe', randomCard: 'robe_ward' },
+          accessory: { base: 'abyss_crown', randomCard: 'acc_quick', power: 'pw_as_stargaze' } } }
+      ]
+    },
     rank2_enchanted: {
       name: 'ランク2・上質・付与あり（厳選済みの例）',
       party: [
