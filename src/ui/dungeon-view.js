@@ -223,48 +223,55 @@
     const G2 = R.DATA.gatherGame;
     const total = board.cells.filter(c => c.vein).length;
     const word = gn.kind === 'mining' ? { tool: 'ツルハシ', vein: '鉱脈', target: '岩' } : { tool: 'オノ', vein: '良い木目', target: '木' };
-    const rareFound = board.found.filter(v => v === 'rare').length;
 
-    area.appendChild(h('div', { class: 'panel gather' },
-      h('div', null, h('b', null, `${R.Dungeon.REWARD_NAMES[gn.kind]}`),
-        h('span', { class: 'muted' }, `（${word.target}の硬さ${gn.node.hardness}・${R.Life.LIVES[gn.life]}Lv${run.lives[gn.life].lv}）`)),
-      (() => {
-        const lv = run.lives[gn.life].lv;
-        const diff = lv - gn.node.hardness;
-        const base = R.Gather.gatherParams(gn.node, gn.node.hardness, 1);
-        const noTool = R.Gather.gatherParams(gn.node, lv, 1);
-        const lvSw = noTool.swings - base.swings;
-        const toolSw = gn.params.swings - noTool.swings;
-        const sign = (n) => (n > 0 ? '+' : n < 0 ? '−' : '±') + Math.abs(n);
-        return h('div', { class: 'lv-bonus ' + (diff > 0 ? 'good' : diff < 0 ? 'bad' : 'muted') },
-          `Lv差${diff > 0 ? '+' : ''}${diff}：回数${sign(lvSw)}・開始マス${gn.params.hints}／道具：回数${sign(toolSw)}`);
-      })(),
-      h('div', { class: 'muted' }, `${word.vein}${total}つ（★${G2.rareVeins}）・数字＝まわりの${word.vein}の数`),
-      h('div', { class: 'row' },
-        h('span', { class: 'energy', title: '残り回数' }, h('b', null, String(board.swingsLeft)), `/${board.swings}`),
-        h('span', null, `見つけた ${board.found.length} / ${total}`),
-        rareFound ? h('span', { class: 'good' }, `★レア ${rareFound}`) : null),
-      h('div', { class: 'vein-grid', style: { gridTemplateColumns: `repeat(${G2.size}, 1fr)` } }, board.cells.map((c, i) => {
-        if (!c.open) {
-          return h('button', { class: 'vein-cell closed', disabled: board.done, 'aria-label': `マス${i + 1}を掘る`, onclick: () => {
-            run.gatherStrike(i);
-            G().saveRun();
-            R.UI.show(runScreen);
-          } }, '');
-        }
-        if (c.vein) return h('div', { class: 'vein-cell found' + (c.vein === 'rare' ? ' rare' : '') }, c.vein === 'rare' ? '★' : '◆');
-        return h('div', { class: 'vein-cell empty hint-' + c.hint }, c.hint ? String(c.hint) : '');
-      })),
-      board.done ? h('button', { class: 'primary', onclick: () => {
-        const res = run.finishGather();
-        G().saveRun();
-        const lines = [
-          h('div', null, res.allFound ? `${word.vein}を全部見つけた！（${res.left}回残し・おまけ付き）` : res.found ? `${word.vein}を${res.found}つ見つけた` : `${word.vein}は見つからなかった…（拾い物だけ）`),
-          h('div', null, '手に入れた素材：' + matText(res.bag)),
-          res.levelUps ? h('div', { class: 'good' }, `${R.Life.LIVES[res.life]}Lvが上がった！（Lv${run.lives[res.life].lv}）`) : null
-        ];
-        R.UI.modal(h('div', null, lines), [{ label: 'OK', primary: true, onClick: () => R.UI.show(runScreen) }]);
-      } }, '結果を見る') : null));
+    // 1マス掘るたびに、画面全体ではなくこの盤面だけを描き直す（画面の切り替え演出やスクロールが起きないように）
+    function draw(justOpened) {
+      clear(area);
+      const rareFound = board.found.filter(v => v === 'rare').length;
+      area.appendChild(h('div', { class: 'panel gather' },
+        h('div', null, h('b', null, `${R.Dungeon.REWARD_NAMES[gn.kind]}`),
+          h('span', { class: 'muted' }, `（${word.target}の硬さ${gn.node.hardness}・${R.Life.LIVES[gn.life]}Lv${run.lives[gn.life].lv}）`)),
+        (() => {
+          const lv = run.lives[gn.life].lv;
+          const diff = lv - gn.node.hardness;
+          const base = R.Gather.gatherParams(gn.node, gn.node.hardness, 1);
+          const noTool = R.Gather.gatherParams(gn.node, lv, 1);
+          const lvSw = noTool.swings - base.swings;
+          const toolSw = gn.params.swings - noTool.swings;
+          const sign = (n) => (n > 0 ? '+' : n < 0 ? '−' : '±') + Math.abs(n);
+          return h('div', { class: 'lv-bonus ' + (diff > 0 ? 'good' : diff < 0 ? 'bad' : 'muted') },
+            `Lv差${diff > 0 ? '+' : ''}${diff}：回数${sign(lvSw)}・開始マス${gn.params.hints}／道具：回数${sign(toolSw)}`);
+        })(),
+        h('div', { class: 'muted' }, `${word.vein}${total}つ（★${G2.rareVeins}）・数字＝まわりの${word.vein}の数`),
+        h('div', { class: 'row' },
+          h('span', { class: 'energy', title: '残り回数' }, h('b', null, String(board.swingsLeft)), `/${board.swings}`),
+          h('span', null, `見つけた ${board.found.length} / ${total}`),
+          rareFound ? h('span', { class: 'good' }, `★レア ${rareFound}`) : null),
+        h('div', { class: 'vein-grid', style: { gridTemplateColumns: `repeat(${G2.size}, 1fr)` } }, board.cells.map((c, i) => {
+          if (!c.open) {
+            return h('button', { class: 'vein-cell closed', disabled: board.done, 'aria-label': `マス${i + 1}を掘る`, onclick: () => {
+              const was = board.cells.map(x => x.open);
+              run.gatherStrike(i);
+              G().saveRun();
+              draw(new Set(board.cells.map((x, k) => (x.open && !was[k] ? k : -1)).filter(k => k >= 0)));
+            } }, '');
+          }
+          const just = justOpened && justOpened.has(i) ? ' just' : '';
+          if (c.vein) return h('div', { class: 'vein-cell found' + (c.vein === 'rare' ? ' rare' : '') + just }, c.vein === 'rare' ? '★' : '◆');
+          return h('div', { class: 'vein-cell empty hint-' + c.hint + just }, c.hint ? String(c.hint) : '');
+        })),
+        board.done ? h('button', { class: 'primary', onclick: () => {
+          const res = run.finishGather();
+          G().saveRun();
+          const lines = [
+            h('div', null, res.allFound ? `${word.vein}を全部見つけた！（${res.left}回残し・おまけ付き）` : res.found ? `${word.vein}を${res.found}つ見つけた` : `${word.vein}は見つからなかった…（拾い物だけ）`),
+            h('div', null, '手に入れた素材：' + matText(res.bag)),
+            res.levelUps ? h('div', { class: 'good' }, `${R.Life.LIVES[res.life]}Lvが上がった！（Lv${run.lives[res.life].lv}）`) : null
+          ];
+          R.UI.modal(h('div', null, lines), [{ label: 'OK', primary: true, onClick: () => R.UI.show(runScreen) }]);
+        } }, '結果を見る') : null));
+    }
+    draw();
   }
 
   R.UI.extraMenu = R.UI.extraMenu || [];
