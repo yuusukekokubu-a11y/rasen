@@ -45,14 +45,23 @@
       clear(el);
       el.appendChild(header('練習戦闘', () => show(homeScreen)));
       el.appendChild(h('p', { class: 'muted' }, '記録は残りません'));
+      // 仲間を選んでも画面は作り直さず、ボタンだけ書き換える（画面が動かないように）
+      const startBtn = h('button', { class: 'primary', onclick: start });
+      const refresh = () => {
+        startBtn.disabled = picked.length !== 3;
+        startBtn.textContent = picked.length === 3 ? '戦闘開始' : `あと${3 - picked.length}人選んでください`;
+      };
       el.appendChild(R.UI.jobPicker(jobs, picked, (j, on) => {
-        if (on) picked.push(j); else picked = picked.filter(x => x !== j);
-        render();
+        if (on) { if (picked.length >= 3) return false; picked.push(j); }
+        else picked = picked.filter(x => x !== j);
+        refresh();
+        return true;
       }));
       el.appendChild(h('div', null, '敵：',
         h('select', { onchange: (ev) => { encounter = ev.target.value; } },
           Object.entries(R.DATA.encounters).map(([id, enc]) => h('option', { value: id, selected: id === encounter }, enc.name)))));
-      el.appendChild(h('button', { class: 'primary', disabled: picked.length !== 3, onclick: start }, picked.length === 3 ? '戦闘開始' : `あと${3 - picked.length}人選んでください`));
+      el.appendChild(startBtn);
+      refresh();
     }
 
     function start() {

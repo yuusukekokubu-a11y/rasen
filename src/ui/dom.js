@@ -59,9 +59,13 @@
   }
 
   // 職業を選ぶタイル（ドット絵＋名前＋説明）。picked は選ばれている職業の配列
+  //   onToggle(job, on) が false を返したら、その操作は取り消す（3人選んだあとに4人目を選んだときなど）
+  //   タイルは作り直さず、チェックの見た目だけが変わる（画面が動かないように）
   function jobPicker(jobs, picked, onToggle) {
     return h('div', { class: 'job-picker' }, jobs.map(j => h('label', { class: 'job-option' },
-      h('input', { type: 'checkbox', checked: picked.includes(j), onchange: (ev) => onToggle(j, ev.target.checked) }),
+      h('input', { type: 'checkbox', checked: picked.includes(j), onchange: (ev) => {
+        if (onToggle(j, ev.target.checked) === false) ev.target.checked = !ev.target.checked;
+      } }),
       R.UI.sprite ? R.UI.sprite(j, 48) : null,
       h('span', { class: 'job-name' }, R.DATA.jobs[j].name),
       h('span', { class: 'job-desc' }, R.DATA.jobs[j].desc))));

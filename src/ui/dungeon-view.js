@@ -108,40 +108,53 @@
     const d = R.DATA.dungeons[id];
     const jobs = Object.keys(R.DATA.jobs).filter(j => R.DATA.jobs[j].enabled);
     const back = () => R.UI.show(d.endless ? departScreen : (e2) => stageScreen(e2, id));
-    function render() {
-      clear(el);
-      el.appendChild(R.UI.header(d.name, back, d.endless ? `最高 ${s.bestFloor[id] || 0}階` : stageName(lv)));
-      el.appendChild(h('h2', null, 'パーティ（3人）'));
-      el.appendChild(R.UI.jobPicker(jobs, s.party, (j, on) => {
-        if (on) { if (s.party.length < 3) s.party.push(j); }
-        else s.party = s.party.filter(x => x !== j);
-        G().save();
-        render();
-      }));
-      if (s.party.length === 3) el.appendChild(partySummary(G().currentMembers()));
-
-      // 持ち込みアイテム
-      const slots = R.DATA.config.combat.itemSlots;
-      if (R.DATA.items) {
-        el.appendChild(h('h2', null, `持ち込みアイテム（${s.bring.length}/${slots}）`));
-        if (!s.consumables.length) el.appendChild(h('div', { class: 'muted' }, 'なし'));
-        el.appendChild(h('div', { class: 'items-pick' }, s.consumables.map(c => {
-          const it = R.DATA.items[c.id];
-          const on = s.bring.includes(c.uid);
-          return h('label', null,
-            h('input', { type: 'checkbox', checked: on, disabled: !on && s.bring.length >= slots, onchange: (ev) => {
-              if (ev.target.checked) s.bring.push(c.uid); else s.bring = s.bring.filter(u => u !== c.uid);
-              render();
-            } }),
-            `${it.name}（${R.DATA.config.quality[c.quality || 'normal'].name}）：${it.desc}`);
-        })));
-      }
-      el.appendChild(h('div', { class: 'action-bar' },
-        h('div', { class: 'muted center' }, '全滅すると素材と持ち込みを失う'),
-        h('button', { class: 'primary', disabled: s.party.length !== 3, onclick: () => { G().startRun(id, lv); R.UI.show(runScreen); } },
-          s.party.length === 3 ? '出発' : 'パーティを3人選んでください')));
+    // 仲間を選んでも画面全体は作り直さない。変わる所（能力の枠・出発ボタン）だけを書き換える
+    clear(el);
+    el.appendChild(R.UI.header(d.name, back, d.endless ? `最高 ${s.bestFloor[id] || 0}階` : stageName(lv)));
+    el.appendChild(h('h2', null, 'パーティ（3人）'));
+    const summarySlot = h('div', { class: 'summary-slot' });
+    const goBtn = h('button', { class: 'primary', onclick: () => { G().startRun(id, lv); R.UI.show(runScreen); } });
+    function refresh() {
+      clear(summarySlot);
+      summarySlot.appendChild(s.party.length === 3 ? partySummary(G().currentMembers())
+        : h('div', { class: 'panel summary-wait' }, `あと${3 - s.party.length}人`));
+      goBtn.disabled = s.party.length !== 3;
+      goBtn.textContent = s.party.length === 3 ? '出発' : 'パーティを3人選んでください';
     }
-    render();
+    el.appendChild(R.UI.jobPicker(jobs, s.party, (j, on) => {
+      if (on) { if (s.party.length >= 3) return false; s.party.push(j); }
+      else s.party = s.party.filter(x => x !== j);
+      G().save();
+      refresh();
+      return true;
+    }));
+    el.appendChild(summarySlot);
+
+    // 持ち込みアイテム
+    const slots = R.DATA.config.combat.itemSlots;
+    if (R.DATA.items) {
+      const title = h('h2', null, '');
+      const setTitle = () => { title.textContent = `持ち込みアイテム（${s.bring.length}/${slots}）`; };
+      setTitle();
+      el.appendChild(title);
+      if (!s.consumables.length) el.appendChild(h('div', { class: 'muted' }, 'なし'));
+      const boxes = [];
+      const syncBoxes = () => { for (const b of boxes) b.disabled = !b.checked && s.bring.length >= slots; };
+      el.appendChild(h('div', { class: 'items-pick' }, s.consumables.map(c => {
+        const it = R.DATA.items[c.id];
+        const box = h('input', { type: 'checkbox', checked: s.bring.includes(c.uid), onchange: (ev) => {
+          if (ev.target.checked) s.bring.push(c.uid); else s.bring = s.bring.filter(u => u !== c.uid);
+          setTitle(); syncBoxes();
+        } });
+        boxes.push(box);
+        return h('label', null, box, `${it.name}（${R.DATA.config.quality[c.quality || 'normal'].name}）：${it.desc}`);
+      })));
+      syncBoxes();
+    }
+    el.appendChild(h('div', { class: 'action-bar' },
+      h('div', { class: 'muted center' }, '全滅すると素材と持ち込みを失う'),
+      goBtn));
+    refresh();
   }
 
   // 進行中の題名（例：岩窟の洞・中級）
