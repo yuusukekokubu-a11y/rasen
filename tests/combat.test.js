@@ -231,3 +231,16 @@ test('ドット絵のデータが正しい（16×16か32×32・使っている�
   for (const id of Object.keys(R.DATA.jobs)) assert.ok(R.DATA.sprites[id], id);
   for (const id of Object.keys(R.DATA.enemies)) assert.ok(R.DATA.sprites[id], id);
 });
+
+test('全カード（強化版も）：自動で戦わせてもエラーにならず、戦闘が終わる', () => {
+  for (const id of Object.keys(R.DATA.cards)) {
+    for (const upgraded of [false, true]) {
+      const party = starterParty();
+      // 各キャラのデッキにそのカードを3枚ずつ足す
+      for (const ch of party.chars) for (let k = 0; k < 3; k++) ch.cards.push({ cardId: id, upgraded, enchants: [] });
+      const c = new R.Combat({ party, encounter: ['wolf', 'slime'], rng: R.createRng(id.length * 7 + (upgraded ? 1 : 0)) }).start();
+      R.AI.playCombat(c);
+      assert.ok(c.result, `${id}${upgraded ? '+' : ''} の戦闘が終わらない`);
+    }
+  }
+});

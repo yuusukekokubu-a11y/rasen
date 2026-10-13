@@ -72,6 +72,32 @@
     pr_grace:    { name: '不朽の結界', desc: '結界が時間で減らなくなる',
       wardNoDecay: true },
     pr_faith:    { name: '信仰', desc: 'このキャラの魔力+3',
-      onPlay: [{ t: 'buff', stat: 'mag', v: 3, who: 'self' }] }
+      onPlay: [{ t: 'buff', stat: 'mag', v: 3, who: 'self' }] },
+
+    // ===== 追加（ボリューム1） =====
+    sw_counter:  { name: '反撃の心得', desc: '毎ターン終了時、ランダムな敵に5ダメージ',
+      turnEnd: [{ t: 'dmg', v: 5, scale: 'none', target: 'random' }] },
+    sw_iron:     { name: '鉄の意志', desc: 'このキャラがスキルを使うたび、ブロック2',
+      cardPlayed: { filter: { type: 'skill', owner: 'self' }, effects: [{ t: 'block', v: 2, scale: 'none' }] } },
+    mg_frost:    { name: '氷結の陣', desc: '毎ターン開始時、敵全体に凍結1',
+      turnStart: [{ t: 'status', s: 'freeze', v: 1, target: 'all' }] },
+    mg_torrent:  { name: '魔力の奔流', desc: '味方全員の魔力+2',
+      onPlay: [{ t: 'buff', stat: 'mag', v: 2, who: 'party' }] },
+    as_foresee:  { name: '予知', desc: '毎ターン開始時、山札の上2枚を見て並べ替える',
+      turnStart: [{ t: 'scry', v: 2 }] },
+    as_meteor:   { name: '流星群', desc: '毎ターン終了時、ランダムな敵に3ダメージを2回',
+      turnEnd: [{ t: 'dmg', v: 3, hits: 2, scale: 'none', target: 'random' }] },
+    th_ambush:   { name: '奇襲', desc: 'エネルギー+1、2枚引く（1回だけ）',
+      onPlay: [{ t: 'energy', v: 1 }, { t: 'draw', v: 2 }] },
+    th_tricks:   { name: '投げ技', desc: 'このキャラが攻撃カードを使うたび、ランダムな敵に2ダメージ',
+      cardPlayed: { filter: { type: 'attack', owner: 'self' }, effects: [{ t: 'dmg', v: 2, scale: 'none', target: 'random' }] } },
+    ar_barrage:  { name: '一斉射撃', desc: '毎ターン終了時、ランダムな敵に2ダメージを3回',
+      turnEnd: [{ t: 'dmg', v: 2, hits: 3, scale: 'none', target: 'random' }] },
+    ar_trueshot: { name: '必中', desc: '敵全体に弱体3（1回だけ）',
+      onPlay: [{ t: 'status', s: 'vulnerable', v: 3, target: 'all' }] },
+    pr_spring:   { name: '聖なる泉', desc: '毎ターン終了時、HPを2回復（魔力の半分が乗る）',
+      turnEnd: [{ t: 'heal', v: 2, magRate: 0.5 }] },
+    pr_wrath:    { name: '神罰', desc: 'カードが廃棄されるたび、ランダムな敵に6ダメージ',
+      cardExhausted: [{ t: 'dmg', v: 6, scale: 'none', target: 'random' }] }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

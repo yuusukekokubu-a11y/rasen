@@ -30,7 +30,7 @@
       expBase: 10,
       expPerLv: 6,
       // 細工Lvがこの値に達するごとに全職業のパワーが1つずつ解禁（初期は各職1つ）
-      powerUnlockLvs: [1, 5, 10, 15]
+      powerUnlockLvs: [1, 5, 10, 15, 20, 25]
     }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});
