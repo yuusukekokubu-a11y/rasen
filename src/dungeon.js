@@ -90,6 +90,13 @@
       return { hp: f.hp * (1 + D.hpPerLevel * lv), dmg: f.dmg * (1 + D.dmgPerLevel * lv) };
     }
 
+    // ボスの魂が出る確率：スペシャルは段ごとの値、塔は深い階だけ、ノーマルは段（超級・地獄級）で決まる
+    soulChance() {
+      if (this.stage) return this.stage.soulChance || 0;
+      if (this.endless) { const E = this.def.endless; return this.floor + 1 >= (E.soulFrom || Infinity) ? (E.soulChance || 0) : 0; }
+      return R.DATA.difficulty.soulChance[(this.difficulty || 1) - 1] || 0;
+    }
+
     // 上位素材の出る確率（難易度2以上、無限階層は深いほど）
     highDropChance() {
       if (this.stage) return this.stage.extra ? this.stage.extra.chance : 0;
@@ -140,6 +147,8 @@
       const drops = {};
       for (const e of combat.enemies) {
         for (const [m, n] of Object.entries(e.def.drops || {})) R.Gather.addMat(drops, m, n);
+        // ボスの魂（専用装備の素材）
+        if (e.def.soul && this.rng.chance(this.soulChance())) R.Gather.addMat(drops, e.def.soul, 1);
       }
       this._highDrop(drops);
       for (const [m, n] of Object.entries(drops)) R.Gather.addMat(this.bag, m, n);

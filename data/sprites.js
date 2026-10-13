@@ -848,6 +848,27 @@
     },
 
     // ===== 素材の種類 =====
+    mat_soul: {
+      pal: { W: '#ffffff', P: '#8a5ae8', p: '#c8a0ff', E: '#5ad8ff' },
+      rows: [
+        '................',
+        '.......W........',
+        '......WPW.......',
+        '......PPP.......',
+        '.....PPpPP......',
+        '....PPpWpPP.....',
+        '...PPpWWWpPP....',
+        '...PpWWWWWpP....',
+        '..PPpWWEWWpPP...',
+        '..PpWWEEEWWpP...',
+        '..PpWWWEWWWpP...',
+        '..PPpWWWWWpPP...',
+        '...PPppppppP....',
+        '....PPPPPPP.....',
+        '......PPP.......',
+        '................'
+      ]
+    },
     mat_ore: {
       pal: { R: '#7a7480', r: '#55505a', C: '#d88a4a', B: '#8ad0ff' },
       rows: [

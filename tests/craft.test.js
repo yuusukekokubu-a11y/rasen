@@ -194,3 +194,21 @@ test('生産の固有スキル：Lv差で2択が発動（ランダムカード�
   const none = R.Craft.equipmentChoices(R.Craft.makeEquipment('copper_sword', { lv: 1, quality: 'normal', rng }), 1, { cardChoice: false, slotChoice: false }, rng);
   assert.deepStrictEqual(none, {});
 });
+
+test('専用装備：ボスの魂で作るランク7。固有カードはランダムカードに出ない', () => {
+  const uniques = Object.entries(R.DATA.equipment.bases).filter(([, b]) => b.unique);
+  assert.ok(uniques.length >= 8);
+  for (const [id, b] of uniques) {
+    assert.strictEqual(b.rank, 7, id);
+    assert.ok(Object.keys(b.mats).some(m => R.DATA.materials[m].kind === 'soul'), `${id} に魂がいる`);
+    assert.strictEqual(R.DATA.cards[b.fixedCard].pool, 'unique', id);
+    const item = R.Craft.makeEquipment(id, { lv: 30, quality: 'best', rng: R.createRng(1) });
+    assert.notStrictEqual(R.DATA.cards[item.randomCard].pool, 'unique', id);
+    assert.ok(R.Gear.fixedStats(item), id);
+  }
+  // 魂はすべて、どれかのボスが落とし、どれかの専用装備に使う
+  for (const [m, d] of Object.entries(R.DATA.materials).filter(([, d]) => d.kind === 'soul')) {
+    assert.ok(Object.values(R.DATA.enemies).some(e => e.soul === m), `${m} を落とすボス`);
+    assert.ok(uniques.some(([, b]) => b.mats[m]), `${m} を使う装備`);
+  }
+});

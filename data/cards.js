@@ -22,6 +22,7 @@
 //     { t:'power', id:'...' }    パワーを発動（data/powers.js）
 //   exhaust: true  → 使うと廃棄
 //   upgrade: 強化版（＋）で上書きする項目
+//   art    : カードの絵（省略すると効果から自動で決まる）
 (function (R) {
   R.DATA = R.DATA || {};
   R.DATA.cards = {
@@ -285,6 +286,34 @@
     // 錫杖
     scep_blessing:  { name: '祝福', pool: 'scepter', type: 'skill', cost: 1, tags: ['magic'],
       effects: [{ t: 'heal', v: 2 }, { t: 'ward', v: 3 }], upgrade: { effects: [{ t: 'heal', v: 3 }, { t: 'ward', v: 5 }] } },
+
+    // ===== 専用装備の固有カード（ボスの魂で作るランク7の装備にだけ付く。ランダムカードには出ない） =====
+    u_earthwall:   { name: '大地の守り', pool: 'unique', type: 'skill', cost: 2, art: 'art_shield',
+      effects: [{ t: 'block', v: 18 }, { t: 'status', s: 'weak', v: 2, target: 'all' }],
+      upgrade: { effects: [{ t: 'block', v: 24 }, { t: 'status', s: 'weak', v: 2, target: 'all' }] } },
+    u_lifebloom:   { name: '生命の開花', pool: 'unique', type: 'skill', cost: 1, tags: ['magic'], art: 'art_heal',
+      effects: [{ t: 'heal', v: 6 }, { t: 'ward', v: 8 }], upgrade: { effects: [{ t: 'heal', v: 8 }, { t: 'ward', v: 11 }] } },
+    u_venomstorm:  { name: '毒嵐', pool: 'unique', type: 'attack', cost: 1, art: 'art_dagger',
+      effects: [{ t: 'dmg', v: 3, hits: 4, target: 'random' }, { t: 'status', s: 'vulnerable', v: 1, target: 'all' }],
+      upgrade: { effects: [{ t: 'dmg', v: 4, hits: 4, target: 'random' }, { t: 'status', s: 'vulnerable', v: 1, target: 'all' }] } },
+    u_starfall:    { name: '星降り', pool: 'unique', type: 'attack', cost: 2, art: 'art_arrows',
+      effects: [{ t: 'dmg', v: 3, hits: 6, target: 'random' }], upgrade: { effects: [{ t: 'dmg', v: 4, hits: 6, target: 'random' }] } },
+    u_inferno:     { name: '炎帝の剣技', pool: 'unique', type: 'attack', cost: 2, art: 'art_fire',
+      effects: [{ t: 'dmg', v: 14, element: 'fire' }, { t: 'status', s: 'burn', v: 3, target: 'all' }],
+      upgrade: { effects: [{ t: 'dmg', v: 18, element: 'fire' }, { t: 'status', s: 'burn', v: 4, target: 'all' }] } },
+    u_frozen:      { name: '時の凍結', pool: 'unique', type: 'skill', cost: 2, tags: ['magic'], art: 'art_ice',
+      effects: [{ t: 'status', s: 'freeze', v: 1, target: 'all' }, { t: 'block', v: 8, scale: 'mag' }],
+      upgrade: { effects: [{ t: 'status', s: 'freeze', v: 1, target: 'all' }, { t: 'block', v: 12, scale: 'mag' }] } },
+    u_tempest:     { name: '天嵐', pool: 'unique', type: 'attack', cost: 2, tags: ['magic'], art: 'art_bolt',
+      effects: [{ t: 'dmg', v: 6, scale: 'mag', element: 'thunder', target: 'all' }, { t: 'status', s: 'shock', v: 1, target: 'all' }],
+      upgrade: { effects: [{ t: 'dmg', v: 8, scale: 'mag', element: 'thunder', target: 'all' }, { t: 'status', s: 'shock', v: 1, target: 'all' }] } },
+    u_pact:        { name: '深淵の契約', pool: 'unique', type: 'skill', cost: 0, exhaust: true, art: 'art_gem',
+      effects: [{ t: 'energy', v: 2 }, { t: 'draw', v: 2 }], upgrade: { effects: [{ t: 'energy', v: 3 }, { t: 'draw', v: 2 }] } },
+    u_sanctum:     { name: '聖王の祈り', pool: 'unique', type: 'skill', cost: 2, tags: ['magic'], art: 'art_ward',
+      effects: [{ t: 'ward', v: 14 }, { t: 'draw', v: 2 }], upgrade: { effects: [{ t: 'ward', v: 18 }, { t: 'draw', v: 2 }] } },
+    u_shadowdance: { name: '影舞', pool: 'unique', type: 'skill', cost: 1, art: 'art_wind',
+      effects: [{ t: 'block', v: 8 }, { t: 'draw', v: 2 }, { t: 'discard', v: 1 }],
+      upgrade: { effects: [{ t: 'block', v: 11 }, { t: 'draw', v: 2 }, { t: 'discard', v: 1 }] } },
 
     // ===== パワー（職業ごと） =====
     pw_sw_fighting: { name: '闘気', pool: 'power_swordsman', type: 'power', cost: 1, effects: [{ t: 'power', id: 'sw_fighting' }] },

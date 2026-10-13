@@ -591,3 +591,5 @@ button.primary .menu-desc { color: #4a3610; }
 .q-chip.fine { background: linear-gradient(#a8c4f0, #5a86d8); color: #0c1a33; }
 .q-chip.off { filter: grayscale(1) brightness(.5); }
 .deck-diff > div > .bad, .deck-diff > div > .good { margin-bottom: 10px; font-weight: 800; }
+/* 専用装備（ボスの魂で作るランク7）の名前 */
+.unique-name { color: var(--gold-hi); text-shadow: 0 0 6px #e2bd6688, var(--outline); }

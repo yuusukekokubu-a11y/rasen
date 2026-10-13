@@ -40,7 +40,7 @@
         }
         return h('div', { class: 'recipe' + (ok && !owned ? '' : ' unavailable') },
           h('div', { class: 'recipe-main' },
-            h('div', null, h('b', null, rc.name), h('span', { class: 'muted' }, `　難${rc.difficulty}`),
+            h('div', null, h('b', { class: rc.base && rc.base.unique ? 'unique-name' : null }, rc.name), h('span', { class: 'muted' }, `　難${rc.difficulty}`),
               skills && skills.cardChoice ? h('span', { class: 'skill-chip' }, 'カード2択') : null,
               skills && skills.slotChoice ? h('span', { class: 'skill-chip' }, '枠2択') : null),
             h('div', { class: 'muted recipe-info' }, info),

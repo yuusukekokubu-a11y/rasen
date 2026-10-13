@@ -14,6 +14,7 @@
 //     opening : 最初のターンだけ使う行動
 //   elementMult: 属性ごとの被ダメージ倍率（1.5=弱点 0.5=耐性）
 //   drops   : 倒すと確定で手に入る素材
+//   soul    : ボスの魂（超級・地獄級・ボスラッシュ・塔の深い階で、確率で手に入る）
 (function (R) {
   R.DATA = R.DATA || {};
   R.DATA.enemies = {
@@ -61,7 +62,7 @@
       drops: { spider_silk: 1 }
     },
     golem: {
-      name: '岩窟の主', hp: [240, 240], boss: true,
+      name: '岩窟の主', hp: [240, 240], boss: true, soul: 'golem_soul',
       moves: {
         smash:   { name: '岩砕き', dmg: 22 },
         quake:   { name: '地響き', dmg: 10, hits: 2, debuff: { s: 'vulnerable', v: 1 } },
@@ -96,7 +97,7 @@
       drops: { hornet_sting: 1 }
     },
     elder_tree: {
-      name: '森の古樹', hp: [380, 380], boss: true,
+      name: '森の古樹', hp: [380, 380], boss: true, soul: 'elder_soul',
       moves: {
         awaken: { name: '目覚め', str: 2, block: 20 },
         whip:   { name: '枝鞭', dmg: 8, hits: 3 },
@@ -134,7 +135,7 @@
       drops: { wisp_flame: 1 }
     },
     marsh_queen: {
-      name: '沼の女王', hp: [400, 400], boss: true,
+      name: '沼の女王', hp: [400, 400], boss: true, soul: 'queen_soul',
       moves: {
         mist:  { name: '霧', block: 20, debuff: { s: 'weak', v: 2 } },
         lash:  { name: '尾の一撃', dmg: 24 },
@@ -181,7 +182,7 @@
       drops: { mithril_ore: 1 }
     },
     star_dragon: {
-      name: '星喰いの竜', hp: [470, 470], boss: true,
+      name: '星喰いの竜', hp: [470, 470], boss: true, soul: 'dragon_soul',
       moves: {
         roar:   { name: '咆哮', str: 3, debuff: { s: 'vulnerable', v: 2 } },
         breath: { name: '星の息吹', dmg: 12, hits: 2 },
@@ -239,7 +240,7 @@
       drops: { magma_core: 1, star_steel: 1 }
     },
     flame_lord: {
-      name: '炎帝イフリート', hp: [640, 640], boss: true,
+      name: '炎帝イフリート', hp: [640, 640], boss: true, soul: 'flame_soul',
       moves: {
         ignite:  { name: '点火', str: 3, block: 20 },
         inferno: { name: '業火', dmg: 13, hits: 2 },
@@ -298,7 +299,7 @@
       drops: { frost_crystal: 1, moon_silk: 1 }
     },
     ice_queen: {
-      name: '氷晶の女王', hp: [620, 620], boss: true,
+      name: '氷晶の女王', hp: [620, 620], boss: true, soul: 'ice_soul',
       moves: {
         veil:     { name: '氷のとばり', block: 30, debuff: { s: 'weak', v: 2 } },
         lance:    { name: '氷槍', dmg: 30 },
@@ -357,7 +358,7 @@
       drops: { orichalcum: 1 }
     },
     storm_dragon: {
-      name: '嵐の竜王', hp: [860, 860], boss: true,
+      name: '嵐の竜王', hp: [860, 860], boss: true, soul: 'storm_soul',
       moves: {
         roar:    { name: '雷鳴', str: 4, debuff: { s: 'vulnerable', v: 2 } },
         lightning: { name: '落雷', dmg: 36 },
@@ -416,7 +417,7 @@
       drops: { dark_bone: 1, adamant: 1 }
     },
     abyss_lord: {
-      name: '深淵の王', hp: [1031, 1031], boss: true,
+      name: '深淵の王', hp: [1031, 1031], boss: true, soul: 'abyss_soul',
       moves: {
         dark:    { name: '闇の帳', block: 40, debuff: { s: 'weak', v: 2 } },
         smite:   { name: '深淵の一撃', dmg: 41 },

@@ -57,6 +57,15 @@
     blood_gem:    { name: '血晶',         kind: 'gem',     rank: 6 },
     shadow_cloth: { name: '影布',         kind: 'monster', rank: 6 },
     dark_bone:    { name: '闇の骨',       kind: 'monster', rank: 6 },
-    abyss_heart:  { name: '深淵の核',     kind: 'monster', rank: 6 }
+    abyss_heart:  { name: '深淵の核',     kind: 'monster', rank: 6 },
+    // ボスの魂（ランク7・専用装備の素材）。超級・地獄級のボスやボスラッシュでまれに出る
+    golem_soul:   { name: '岩窟の主の魂', kind: 'soul', rank: 7 },
+    elder_soul:   { name: '古樹の魂',     kind: 'soul', rank: 7 },
+    queen_soul:   { name: '沼の女王の魂', kind: 'soul', rank: 7 },
+    dragon_soul:  { name: '星竜の魂',     kind: 'soul', rank: 7 },
+    flame_soul:   { name: '炎帝の魂',     kind: 'soul', rank: 7 },
+    ice_soul:     { name: '氷晶の魂',     kind: 'soul', rank: 7 },
+    storm_soul:   { name: '嵐竜の魂',     kind: 'soul', rank: 7 },
+    abyss_soul:   { name: '深淵の魂',     kind: 'soul', rank: 7 }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

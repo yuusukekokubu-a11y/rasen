@@ -350,6 +350,7 @@
         bosses: ['boss_golem', 'boss_elder', 'boss_queen', 'boss_dragon', 'boss_flame', 'boss_ice', 'boss_storm', 'boss_abyss'], // 4階・8階・12階…の順にくり返す
         highDropPerFloor: 0.05,  // 1階深くなるごとの上位素材の確率（上限 highDropMax）
         highDropMax: 0.9,
+        soulFrom: 16, soulChance: 0.25,  // 16階より深いボスは魂を落とすことがある
         highDrops: { star_steel: 3, world_wood: 3, moon_silk: 3, orichalcum: 2, sky_wood: 2, cloud_silk: 2, adamant: 1, ebony: 1, void_silk: 1, star_shard: 2 }
       },
       rewards: { weights: { mining: 3, logging: 3, gathering: 2, treasure: 3, rest: 3 }, restHealRatio: 0.35 },
@@ -826,7 +827,7 @@
       rewards: { weights: { rest: 5, treasure: 3, gathering: 1 }, restHealRatio: 0.35 },
       stages: [
         { // 初級
-          rank: 3,
+          rank: 3, soulChance: 0.25,
           floors: [
             { battles: [0, 0], encounters: {}, scale: { hp: 1, dmg: 1 }, boss: 'boss_golem' },
             { battles: [0, 0], encounters: {}, scale: { hp: 1, dmg: 1 }, boss: 'boss_elder' },
@@ -842,7 +843,7 @@
           }
         },
         { // 中級
-          rank: 4,
+          rank: 4, soulChance: 0.35,
           floors: [
             { battles: [0, 0], encounters: {}, scale: { hp: 2.15, dmg: 2.15 }, boss: 'boss_ore' },
             { battles: [0, 0], encounters: {}, scale: { hp: 2.15, dmg: 2.15 }, boss: 'boss_guardian' },
@@ -858,7 +859,7 @@
           }
         },
         { // 上級
-          rank: 5,
+          rank: 5, soulChance: 0.5,
           floors: [
             { battles: [0, 0], encounters: {}, scale: { hp: 0.73, dmg: 0.73 }, boss: 'boss_flame' },
             { battles: [0, 0], encounters: {}, scale: { hp: 0.73, dmg: 0.73 }, boss: 'boss_ice' },
@@ -874,7 +875,7 @@
           }
         },
         { // 超級
-          rank: 6,
+          rank: 6, soulChance: 0.75,
           floors: [
             { battles: [0, 0], encounters: {}, scale: { hp: 1.27, dmg: 1.27 }, boss: 'boss_storm' },
             { battles: [0, 0], encounters: {}, scale: { hp: 1.32, dmg: 1.32 }, boss: 'boss_flame' },
@@ -890,7 +891,7 @@
           }
         },
         { // 地獄級
-          rank: 6,
+          rank: 6, soulChance: 1.0,
           floors: [
             { battles: [0, 0], encounters: {}, scale: { hp: 1.4, dmg: 1.4 }, boss: 'boss_storm' },
             { battles: [0, 0], encounters: {}, scale: { hp: 1.45, dmg: 1.45 }, boss: 'boss_flame' },
@@ -918,6 +919,8 @@
     // 上位素材：戦闘勝利・採集・宝箱のたびに、この確率で上位素材が1つ追加で出る
     highDropPerLevel: 0.3,     // 1段上がるごとの確率（中級で30%、上限90%）
     highDropMax: 0.9,
+    // ボスの魂が出る確率（段ごと：初級・中級・上級・超級・地獄級）
+    soulChance: [0, 0, 0, 0.2, 0.4],
     // ダンジョンごとの上位素材。そのダンジョンの1つ上のランクの素材が出る（超級からはさらに良い物も）
     //   from：この段以上で使う表
     highDrops: {

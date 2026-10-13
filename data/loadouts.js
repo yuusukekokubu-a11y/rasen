@@ -173,6 +173,26 @@
           accessory: { base: 'abyss_crown', randomCard: 'acc_quick', power: 'pw_as_stargaze' } } }
       ]
     },
+    rank7_unique: {
+      name: 'ランク7（専用装備）・ふつう・付与なし',
+      party: [
+        { job: 'swordsman', gear: {
+          weapon: { base: 'flame_sword', randomCard: 'sword_heavy' },
+          head: { base: 'ada_helm', randomCard: 'heavy_defend' },
+          body: { base: 'golem_armor', randomCard: 'heavy_endure' },
+          accessory: { base: 'abyss_ring', randomCard: 'acc_charm', power: 'pw_sw_fighting' } } },
+        { job: 'mage', gear: {
+          weapon: { base: 'elder_staff', randomCard: 'staff_fire' },
+          head: { base: 'ice_crown', randomCard: 'robe_ward' },
+          body: { base: 'void_robe', randomCard: 'robe_barrier' },
+          accessory: { base: 'abyss_ring', randomCard: 'acc_spark', power: 'pw_mg_cycle' } } },
+        { job: 'astrologer', gear: {
+          weapon: { base: 'storm_board', randomCard: 'star_beam' },
+          head: { base: 'ice_crown', randomCard: 'robe_meditate' },
+          body: { base: 'void_robe', randomCard: 'robe_ward' },
+          accessory: { base: 'abyss_ring', randomCard: 'acc_quick', power: 'pw_as_stargaze' } } }
+      ]
+    },
     rank2_enchanted: {
       name: 'ランク2・上質・付与あり（厳選済みの例）',
       party: [

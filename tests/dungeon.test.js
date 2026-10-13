@@ -323,3 +323,25 @@ test('スペシャル：ノーマルのクリアで開き、段ごとに敵と�
   assert.notDeepStrictEqual(r1.gatherEntry('mining'), r5.gatherEntry('mining'));
   assert.ok(!G.allCleared(), 'スペシャルは全クリアの条件に入らない');
 });
+
+test('ボスの魂：超級・地獄級とボスラッシュで出る（初級では出ない）', () => {
+  const members = R.Sim.presetMembers('starter');
+  const r1 = new R.DungeonRun({ dungeonId: 'cave', difficulty: 1, members, rng: R.createRng(1) });
+  const r5 = new R.DungeonRun({ dungeonId: 'cave', difficulty: 5, members, rng: R.createRng(1) });
+  const br = new R.DungeonRun({ dungeonId: 'bossrush', difficulty: 5, members, rng: R.createRng(1) });
+  assert.strictEqual(r1.soulChance(), 0);
+  assert.ok(r5.soulChance() > 0);
+  assert.strictEqual(br.soulChance(), 1);
+  // 地獄級の岩窟の主を倒すと、何回かに1回は魂が出る
+  let souls = 0;
+  for (let i = 0; i < 40; i++) {
+    const run = new R.DungeonRun({ dungeonId: 'cave', difficulty: 5, members, rng: R.createRng(100 + i) });
+    run.floor = 3; run.index = 0;
+    const c = run.createCombat();
+    for (const e of c.enemies) { e.hp = 0; e.alive = false; }
+    c._checkEnd();
+    run.finishCombat(c);
+    souls += run.bag.golem_soul || 0;
+  }
+  assert.ok(souls > 5 && souls < 35, `魂 ${souls}`);
+});

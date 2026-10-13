@@ -20,7 +20,7 @@
     const fixedText = R.Gear.STATS.filter(k => fixed[k]).map(k => `${STAT_LABEL[k]}${fixed[k]}`).join(' ') || 'なし';
     const powerJob = item.power ? Object.keys(R.DATA.jobs).find(j => R.DATA.jobs[j].powers.includes(item.power)) : null;
     return h('div', { class: 'panel item-detail' },
-      h('div', null, h('b', null, R.Gear.itemName(item)),
+      h('div', null, h('b', { class: base.unique ? 'unique-name' : null }, R.Gear.itemName(item)),
         h('span', { class: 'muted' }, `　${type.name}・R${base.rank}`),
         powerJob ? h('span', { class: 'muted' }, `・${R.DATA.jobs[powerJob].name}専用`) : null),
       h('div', null, fixedText),

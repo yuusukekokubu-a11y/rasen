@@ -19,18 +19,18 @@
 
   // ランク（素材の格）ごとの固定ステータス（index 0 = ランク1）
   const rankStats = {
-    weapon:    { main: [3, 5, 8, 11, 14, 17] },
-    head:      { hp: [5, 8, 12, 16, 20, 24], def: [1, 2, 3, 4, 5, 6] },
-    body:      { hp: [8, 12, 18, 24, 30, 36], def: [2, 3, 4, 5, 6, 7] },
+    weapon:    { main: [3, 5, 8, 11, 14, 17, 19] },
+    head:      { hp: [5, 8, 12, 16, 20, 24, 26], def: [1, 2, 3, 4, 5, 6, 6] },
+    body:      { hp: [8, 12, 18, 24, 30, 36, 39], def: [2, 3, 4, 5, 6, 7, 7] },
     accessory: {}
   };
 
   // ランダム枠「ステータス上昇」の値（ランクごと）。良い枠（grade）ほど倍率が上がる
   const statRolls = {
-    atk: [1, 2, 3, 4, 5, 6],
-    def: [1, 1, 2, 2, 3, 3],
-    mag: [1, 2, 3, 4, 5, 6],
-    hp:  [3, 5, 7, 9, 11, 13]
+    atk: [1, 2, 3, 4, 5, 6, 7],
+    def: [1, 1, 2, 2, 3, 3, 4],
+    mag: [1, 2, 3, 4, 5, 6, 7],
+    hp:  [3, 5, 7, 9, 11, 13, 15]
   };
   // grade（ランダム枠の良さ）：0=並 1=良 2=極
   const gradeMult = [1, 1.5, 2];
@@ -143,6 +143,20 @@
     void_hood:     { name: '虚無の頭巾',         type: 'light',     slot: 'head',   rank: 6, fixedCard: 'light_camo',       mats: { void_silk: 2, shadow_cloth: 1 },                difficulty: 26 },
     void_garb:     { name: '虚無の装束',         type: 'light',     slot: 'body',   rank: 6, fixedCard: 'light_tailwind',   mats: { void_silk: 3, blood_gem: 1 },                   difficulty: 28 },
     abyss_crown:   { name: '深淵の冠',           type: 'accessory', slot: 'accessory', rank: 6, fixedCard: 'acc_whistle',  mats: { abyss_heart: 1, adamant: 1, blood_gem: 1 },     difficulty: 26 }
+  });
+
+  // --- ランク7：専用装備（ボスの魂で作る。固定カードはその装備だけの固有カード） ---
+  Object.assign(bases, {
+    golem_armor:   { name: '大地の鎧',     unique: true, type: 'heavy',     slot: 'body',   rank: 7, fixedCard: 'u_earthwall',   mats: { golem_soul: 1, adamant: 3, dark_bone: 1 },        difficulty: 30 },
+    elder_staff:   { name: '古樹の大杖',   unique: true, type: 'staff',     slot: 'weapon', rank: 7, fixedCard: 'u_lifebloom',   mats: { elder_soul: 1, ebony: 3, blood_gem: 1 },          difficulty: 30 },
+    queen_dagger:  { name: '女王の毒牙',   unique: true, type: 'dagger',    slot: 'weapon', rank: 7, fixedCard: 'u_venomstorm',  mats: { queen_soul: 1, adamant: 2, shadow_cloth: 1 },     difficulty: 30 },
+    dragon_bow:    { name: '星竜の弓',     unique: true, type: 'bow',       slot: 'weapon', rank: 7, fixedCard: 'u_starfall',    mats: { dragon_soul: 1, ebony: 3, storm_horn: 1 },        difficulty: 30 },
+    flame_sword:   { name: '炎帝の剣',     unique: true, type: 'sword',     slot: 'weapon', rank: 7, fixedCard: 'u_inferno',     mats: { flame_soul: 1, adamant: 3, abyss_heart: 1 },      difficulty: 30 },
+    ice_crown:     { name: '氷晶の冠',     unique: true, type: 'robe',      slot: 'head',   rank: 7, fixedCard: 'u_frozen',      mats: { ice_soul: 1, void_silk: 2, blood_gem: 1 },        difficulty: 30 },
+    storm_board:   { name: '嵐の星盤',     unique: true, type: 'starboard', slot: 'weapon', rank: 7, fixedCard: 'u_tempest',     mats: { storm_soul: 1, ebony: 2, sun_stone: 2 },          difficulty: 30 },
+    abyss_ring:    { name: '深淵の指輪',   unique: true, type: 'accessory', slot: 'accessory', rank: 7, fixedCard: 'u_pact',    mats: { abyss_soul: 1, blood_gem: 2 },                    difficulty: 30 },
+    holy_scepter:  { name: '聖王の錫杖',   unique: true, type: 'scepter',   slot: 'weapon', rank: 7, fixedCard: 'u_sanctum',     mats: { golem_soul: 1, elder_soul: 1, ebony: 2 },         difficulty: 30 },
+    shadow_king:   { name: '影王の装束',   unique: true, type: 'light',     slot: 'body',   rank: 7, fixedCard: 'u_shadowdance', mats: { queen_soul: 1, abyss_soul: 1, void_silk: 3 },     difficulty: 30 }
   });
 
   // 採集道具（良い道具ほど採集ミニゲームが楽になる）
