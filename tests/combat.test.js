@@ -215,13 +215,18 @@ test('すべてのカードとパワーのデータが正しい', () => {
   for (const b of Object.values(R.DATA.equipment.bases)) assert.ok(R.DATA.cards[b.fixedCard], b.name);
 });
 
-test('ドット絵のデータが正しい（16×16・使っている色がある・職業と敵の絵がそろっている）', () => {
-  for (const [id, sp] of Object.entries(R.DATA.sprites)) {
-    assert.strictEqual(sp.rows.length, 16, id);
+test('ドット絵のデータが正しい（16×16か32×32・使っている色がある・職業と敵とカードの絵がそろっている）', () => {
+  const check = (id, sp) => {
+    const n = sp.rows.length;
+    assert.ok(n === 16 || n === 32, `${id} の大きさ ${n}`);
     sp.rows.forEach((row, i) => {
-      assert.strictEqual(row.length, 16, `${id} の${i + 1}行目`);
+      assert.strictEqual(row.length, n, `${id} の${i + 1}行目`);
       for (const ch of row) if (ch !== '.') assert.ok(sp.pal[ch], `${id} の色 ${ch}`);
     });
+  };
+  for (const [id, sp] of Object.entries(R.DATA.sprites)) {
+    check(id, sp);
+    if (sp.small) { check(id + '(small)', sp.small); assert.strictEqual(sp.small.rows.length, 16, id); }
   }
   for (const id of Object.keys(R.DATA.jobs)) assert.ok(R.DATA.sprites[id], id);
   for (const id of Object.keys(R.DATA.enemies)) assert.ok(R.DATA.sprites[id], id);

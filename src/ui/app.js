@@ -68,7 +68,7 @@
     el.appendChild(R.UI.stage('camp', 'home-hero',
       h('div', { class: 'home-title' }, 'ラセン'),
       h('div', { class: 'home-sub' }, '拠点'),
-      h('div', { class: 'home-party' }, party.map(j => R.UI.sprite(j, 56)))));
+      h('div', { class: 'home-party' }, party.map(j => R.UI.sprite(j, 68)))));
     const menu = [
       { label: '練習戦闘', desc: '記録なし', icon: 'icon_practice', fn: () => show(practiceScreen), order: 80 },
       { label: '持ち物', desc: '素材・道具・Lv', icon: 'icon_bag', fn: () => show(inventoryScreen), order: 70 }

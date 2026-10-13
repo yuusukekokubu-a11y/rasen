@@ -4,6 +4,33 @@
 
   // カード1枚の見た目（戦闘以外の画面でも使う）
   //   spec: { cardId, upgraded, enchants }  stats: 数値をステータス込みで表示したいとき
+  // カードの絵（モチーフ）を、効果と装備の種類から決める。def.art があればそれを使う
+  function cardArt(def) {
+    if (def.art) return def.art;
+    if (def.type === 'power') return 'art_aura';
+    const dmg = def.effects.find(e => e.t === 'dmg');
+    if (dmg) {
+      if (dmg.element === 'fire') return 'art_fire';
+      if (dmg.element === 'ice') return 'art_ice';
+      if (dmg.element === 'thunder') return 'art_bolt';
+      const hits = dmg.hits || 1;
+      switch (def.pool) {
+        case 'sword': case 'heavy':
+          return dmg.target === 'all' ? 'art_sweep' : hits > 1 ? 'art_slash2' : (def.cost >= 2 || def.pool === 'heavy') ? 'art_impact' : 'art_slash';
+        case 'bow': return dmg.target === 'all' ? 'art_rain' : hits >= 3 ? 'art_arrows' : 'art_arrow';
+        case 'staff': case 'robe': return 'art_orb';
+        case 'starboard': return hits > 1 ? 'art_comet' : 'art_beam';
+        case 'scepter': return 'art_holy';
+        default: return 'art_dagger';
+      }
+    }
+    const first = def.effects[0] ? def.effects[0].t : '';
+    return {
+      block: def.pool === 'light' ? 'art_wind' : 'art_shield', ward: 'art_ward', heal: 'art_heal',
+      draw: 'art_cards', discard: 'art_cards', scry: 'art_eye', energy: 'art_gem', buff: 'art_up', exhaustChoice: 'art_purge'
+    }[first] || 'ico_type_' + def.type;
+  }
+
   function cardEl(spec, opts) {
     opts = opts || {};
     const def = R.Cards.getCardDef(spec.cardId, spec.upgraded);
@@ -18,8 +45,8 @@
       h('span', { class: 'card-cost' + (cost !== def.cost ? ' changed' : '') }, String(cost)),
       h('div', { class: 'card-name' }, def.displayName),
       h('div', { class: 'card-art' },
-        R.UI.sprite('ico_type_' + def.type, 28, { extraClass: 'type-ico' }),
-        opts.ownerJob ? R.UI.sprite(opts.ownerJob, 20, { extraClass: 'own-ico' }) : null),
+        R.UI.sprite(cardArt(def), 34, { extraClass: 'type-ico' }),
+        opts.ownerJob ? R.UI.sprite(opts.ownerJob, 16, { extraClass: 'own-ico' }) : null),
       h('div', { class: 'card-body' },
         h('div', { class: 'card-text' }, d.text),
         d.enchantText ? h('div', { class: 'card-ench' }, d.enchantText) : null),
@@ -51,6 +78,8 @@
     let message = '';
     let showPile = null;
     let fx = null;           // 直前の行動で起きたこと（数字を飛ばす・揺らす）
+    let played = null;       // 直前に使ったカード（敵や味方へ飛ばす演出用）
+    const reduceMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
     let banner = { text: '戦闘開始' };
     let lastTurn = combat.turn;
     const sceneKind = opts.scene && R.UI.BACKDROPS.includes(opts.scene) ? opts.scene : 'cave';
@@ -65,6 +94,7 @@
     }
     function act(res, before, endedTurn) {
       message = res && !res.ok ? res.error : '';
+      if (res && !res.ok) played = null;
       selection = [];
       if (before) {
         fx = { enemyDmg: {}, partyDmg: 0, heal: 0, block: 0, ward: 0, lunge: endedTurn ? before.attackers : [] };
@@ -88,6 +118,30 @@
       host.appendChild(f);
       setTimeout(() => f.remove(), 950);
     }
+    // 当たったところに絵（カードのモチーフ）をぱっと出す
+    function burst(host, art, cls) {
+      if (!host) return;
+      const b = h('div', { class: 'fx-burst ' + (cls || '') }, R.UI.sprite(art, 68));
+      host.appendChild(b);
+      setTimeout(() => b.remove(), 600);
+    }
+    // 使ったカードを、手札の位置から行き先へ飛ばす
+    function flyCard(p, dest, done) {
+      if (reduceMotion || !p.rect || !dest || typeof document.body.animate !== 'function') { done(); return; }
+      const el = p.el;
+      el.classList.add('fly-card');
+      Object.assign(el.style, { left: p.rect.left + 'px', top: p.rect.top + 'px', width: p.rect.width + 'px', height: p.rect.height + 'px' });
+      document.body.appendChild(el);
+      const d = dest.getBoundingClientRect();
+      const dx = d.left + d.width / 2 - (p.rect.left + p.rect.width / 2);
+      const dy = d.top + d.height * 0.45 - (p.rect.top + p.rect.height / 2);
+      const anim = el.animate([
+        { transform: 'translate(0, 0) scale(1) rotate(0deg)', opacity: 1 },
+        { transform: `translate(${dx * 0.15}px, ${dy * 0.15 - 24}px) scale(1.08) rotate(-4deg)`, opacity: 1, offset: 0.3 },
+        { transform: `translate(${dx}px, ${dy}px) scale(.3) rotate(${p.attack ? 12 : 0}deg)`, opacity: 0.2 }
+      ], { duration: 280, easing: 'ease-in' });
+      anim.onfinish = () => { el.remove(); done(); };
+    }
 
     function render() {
       clear(container);
@@ -98,7 +152,7 @@
       const enemies = h('div', { class: 'enemies', style: { gridTemplateColumns: `repeat(${combat.enemies.length}, minmax(0, 1fr))` } }, combat.enemies.map(e => {
         const info = e.alive ? combat.intentInfo(e) : null;
         const el = h('button', {
-          class: 'enemy' + (e.alive ? '' : ' dead') + (e.index === target && e.alive ? ' targeted' : '') + (e.boss ? ' boss' : ''),
+          class: 'enemy e-' + e.id + (e.alive ? '' : ' dead') + (e.index === target && e.alive ? ' targeted' : '') + (e.boss ? ' boss' : ''),
           disabled: !e.alive, 'aria-label': `${e.name}を狙う`,
           onclick: () => { if (e.alive) { target = e.index; render(); } }
         },
@@ -205,7 +259,17 @@
           owner: inst.owner, ownerJob: combat.chars[inst.owner].job, ownerName: combat.chars[inst.owner].name,
           stats: combat.currentStats(inst.owner),
           disabled: !playable,
-          onClick: () => { if (playable) doAct(() => combat.playCard(inst.iid, target)); else act({ ok: false, error: combat.pending ? '選択を先に済ませてください' : 'エネルギーが足りません' }); }
+          onClick: (ev) => {
+            if (playable) {
+              const def = R.Cards.getCardDef(inst.cardId, inst.upgraded);
+              played = {
+                rect: ev && ev.currentTarget ? ev.currentTarget.getBoundingClientRect() : null,
+                el: cardEl(inst, { owner: inst.owner, ownerJob: combat.chars[inst.owner].job, stats: combat.currentStats(inst.owner) }),
+                art: cardArt(def), attack: def.type === 'attack', target
+              };
+              doAct(() => combat.playCard(inst.iid, target));
+            } else act({ ok: false, error: combat.pending ? '選択を先に済ませてください' : 'エネルギーが足りません' });
+          }
         });
       }))));
 
@@ -233,18 +297,33 @@
         if (!banner.stay) banner = null;
       }
       if (fx) {
-        for (const [i, d] of Object.entries(fx.enemyDmg)) {
-          const el = enemyEls[i];
-          if (!el) continue;
-          el.classList.add('hit');
-          floatText(el, String(d), 'dmg');
-        }
-        for (const i of fx.lunge) if (enemyEls[i]) enemyEls[i].classList.add('lunge');
-        if (fx.partyDmg) { partyEl.classList.add('quake'); floatText(partyEl, `-${fx.partyDmg}`, 'party-dmg'); }
-        if (fx.heal) floatText(partyEl, `+${fx.heal}`, 'heal');
-        if (fx.block) floatText(partyEl, `盾+${fx.block}`, 'block-up');
-        if (fx.ward) floatText(partyEl, `結界+${fx.ward}`, 'ward-up');
-        fx = null;
+        const f = fx, p = played;
+        fx = null; played = null;
+        // 当たった瞬間の演出（ゆれ・数字・絵）
+        const impact = () => {
+          for (const [i, d] of Object.entries(f.enemyDmg)) {
+            const el = enemyEls[i];
+            if (!el) continue;
+            el.classList.add('hit');
+            floatText(el, String(d), 'dmg');
+            if (p && p.attack) burst(el, p.art);
+          }
+          if (p && p.attack && !Object.keys(f.enemyDmg).length) burst(enemyEls[p.target], p.art);
+          if (p && !p.attack) burst(partyEl, p.art, 'on-party');
+          for (const i of f.lunge) if (enemyEls[i]) enemyEls[i].classList.add('lunge');
+          if (f.partyDmg) {
+            partyEl.classList.add('quake');
+            floatText(partyEl, `-${f.partyDmg}`, 'party-dmg');
+            if (f.lunge.length) burst(partyEl, 'art_slash2', 'on-party enemy-claw');
+          }
+          if (f.heal) floatText(partyEl, `+${f.heal}`, 'heal');
+          if (f.block) floatText(partyEl, `盾+${f.block}`, 'block-up');
+          if (f.ward) floatText(partyEl, `結界+${f.ward}`, 'ward-up');
+        };
+        if (p && !combat.pending) {
+          const dest = p.attack ? (enemyEls[p.target] || stageEl) : partyEl;
+          flyCard(p, dest, impact);
+        } else impact();
       }
     }
 
@@ -252,5 +331,5 @@
     return { render };
   }
 
-  Object.assign(R.UI, { cardEl, mountCombat });
+  Object.assign(R.UI, { cardArt, cardEl, mountCombat });
 })(globalThis.RASEN = globalThis.RASEN || {});

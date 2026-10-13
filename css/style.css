@@ -126,7 +126,7 @@ td { font-variant-numeric: tabular-nums; }
 
 /* ===== 舞台（ドット絵の背景を敷いた枠） ===== */
 .stage { position: relative; overflow: hidden; border: 2px solid var(--void); border-radius: 6px; box-shadow: inset 0 0 0 2px var(--win-line), 0 4px 14px #000a; background: #000; }
-.stage > :not(.backdrop):not(.banner):not(.float) { position: relative; }
+.stage > :where(:not(.backdrop, .banner, .float)) { position: relative; }
 .stage::after { content: ''; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 2px var(--win-line), inset 0 0 40px #000c; border-radius: 4px; }
 
 /* ===== 拠点 ===== */
@@ -134,9 +134,7 @@ td { font-variant-numeric: tabular-nums; }
 .home-title { font-size: 46px; font-weight: 900; letter-spacing: .45em; text-indent: .45em; color: var(--gold-hi); line-height: 1;
   text-shadow: 0 3px 0 var(--void), 0 -2px 0 var(--void), 2px 0 0 var(--void), -2px 0 0 var(--void), 0 0 24px #e2bd6688; }
 .home-sub { margin-top: 8px; font-size: var(--fs-s); letter-spacing: .5em; text-indent: .5em; color: #d8cfb8; text-shadow: var(--outline); }
-.home-party { position: absolute; bottom: 18px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; }
 .home-party .sprite { filter: drop-shadow(0 2px 0 #0008); }
-.home-party .sprite:nth-child(2) { margin-top: -6px; }
 .menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .menu-item { display: flex; align-items: center; gap: 10px; text-align: left; padding: 10px 12px; min-height: 64px; }
 .menu-item.wide { grid-column: 1 / -1; min-height: 72px; }
@@ -306,16 +304,16 @@ button.primary .menu-desc { color: #4a3610; }
 .card.type-attack .card-art { background: radial-gradient(circle, #6a2a24, #2a1210); }
 .card.type-skill .card-art { background: radial-gradient(circle, #24406a, #101a2c); }
 .card.type-power .card-art { background: radial-gradient(circle, #6a5420, #2a2008); }
-.card-art .type-ico { width: 28px; height: 28px; opacity: .9; }
-.card-art .own-ico { position: absolute; right: 2px; bottom: 1px; width: 20px; height: 20px; }
+.card-art .type-ico { width: 34px !important; height: 34px !important; filter: drop-shadow(0 0 4px #0008); }
+.card-art::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, #ffffff08 0 1px, transparent 1px 3px); pointer-events: none; }
+.card-art .own-ico { position: absolute; right: 2px; bottom: 1px; width: 16px !important; height: 16px !important; }
 .card-body { flex: 1; display: flex; flex-direction: column; gap: 2px; margin-top: 4px; padding: 5px 5px 4px; border-radius: 3px; background: linear-gradient(#efe4c8, #d8c9a4); border: 1px solid var(--void); }
 .card-text { line-height: 1.35; font-weight: 600; }
 .card-ench { color: #7a4e0a; font-weight: 800; font-size: 10px; margin-top: auto; }
 .card-type { font-size: 9.5px; color: #c8b890; text-align: right; padding: 2px 2px 0; font-weight: 700; }
 .card.type-power { background: linear-gradient(#4a3c1e, #2a2210); }
 .cards.small .card { width: 96px; min-height: 140px; font-size: 10px; }
-.cards.small .card-art { height: 30px; }
-.cards.small .card-art .type-ico { width: 22px; height: 22px; }
+.cards.small .card-art { height: 36px; }
 .card.added { box-shadow: inset 0 0 0 2px var(--good), 0 0 0 2px var(--good); }
 .card.removed { box-shadow: inset 0 0 0 2px var(--bad), 0 0 0 2px var(--bad); filter: brightness(.7); }
 
@@ -430,9 +428,7 @@ button.primary .menu-desc { color: #4a3610; }
 .hand-grid .card { min-height: 112px; font-size: 10.5px; }
 .hand-grid .card-type { display: none; }
 .combat > .battle-stage { height: 196px; }
-.hand-grid .card-art { height: 26px; }
-.hand-grid .card-art .type-ico { width: 20px; height: 20px; }
-.hand-grid .card-art .own-ico { width: 18px; height: 18px; }
+.hand-grid .card-art { height: 36px; }
 .hand-grid .card-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hand-grid .choice-card .card { height: 100%; }
 
@@ -460,7 +456,7 @@ button.primary .menu-desc { color: #4a3610; }
   .combat > .side { grid-area: side; display: flex; flex-direction: column; gap: 8px; justify-content: flex-end; }
   .party .chars { grid-template-columns: 1fr; gap: 3px; }
   .party .char { padding: 2px 4px; }
-  .party .char .sprite { width: 24px !important; height: 24px !important; }
+  .party .char > .sprite { width: 24px !important; height: 24px !important; }
   .combat > .log-box { align-self: end; }
   .party .char-body { display: flex; align-items: center; gap: 6px; }
   .side .infobar { flex-wrap: wrap; justify-content: center; }
@@ -481,9 +477,11 @@ button.primary .menu-desc { color: #4a3610; }
   .hand-grid .card { min-height: 108px; }
   .party .chips .chip { padding-top: 0; padding-bottom: 0; }
   .party .char { padding: 1px 4px; }
-  .party .char .sprite { width: 20px !important; height: 20px !important; }
+  .party .char > .sprite { width: 20px !important; height: 20px !important; }
   .party .party-hp .bar { height: 18px; }
-  .hand-grid .card-art { height: 20px; }
+  .hand-grid .card-art { height: 30px; }
+  .hand-grid .card { font-size: 10px; }
+  .hand-grid .card-text { line-height: 1.25; }
   .hand-grid .card-body { margin-top: 2px; padding: 3px 4px; }
   .energy { width: 44px; height: 44px; }
   .energy b { font-size: 19px; }
@@ -494,3 +492,44 @@ button.primary .menu-desc { color: #4a3610; }
   .side .action-bar .row { flex-direction: row; }
   .side .action-bar .row button { flex: 1; min-height: 40px; padding: 4px 6px; }
 }
+
+/* ===== 戦闘の演出：飛ぶカード・当たったときの絵 ===== */
+.fly-card { position: fixed !important; z-index: 60; margin: 0; pointer-events: none; transform-origin: center; }
+.fx-burst { position: absolute; left: 50%; top: 42%; z-index: 28; pointer-events: none; transform: translate(-50%, -50%); animation: burst .55s ease-out forwards; }
+.fx-burst .sprite { width: 68px !important; height: 68px !important; filter: drop-shadow(0 0 6px #fff8); }
+.fx-burst.on-party { top: 50%; }
+.fx-burst.enemy-claw { filter: hue-rotate(150deg) saturate(3) brightness(.9); }
+@keyframes burst {
+  0% { transform: translate(-50%, -50%) scale(.4); opacity: 0; }
+  25% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+  60% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.1); opacity: 0; }
+}
+.party { position: relative; }
+
+/* ===== 待機中の小さな動き（2コマで切り替えるドット絵らしい動き） ===== */
+@keyframes idle { to { transform: translateY(-2px); } }
+@keyframes fly { from { transform: translateY(0); } to { transform: translateY(-7px); } }
+@keyframes squish { to { transform: translateY(2px) scale(1.07, .93); } }
+@keyframes breathe { to { transform: scale(1.03); } }
+.enemy-sprite { animation: idle 1.3s steps(2, jump-none) infinite alternate; transform-origin: 50% 100%; }
+.enemy:nth-child(2) .enemy-sprite { animation-delay: -.45s; }
+.enemy:nth-child(3) .enemy-sprite { animation-delay: -.9s; }
+.e-bat .enemy-sprite, .e-hornet .enemy-sprite, .e-wisp .enemy-sprite, .e-phantom .enemy-sprite, .e-gargoyle .enemy-sprite { animation: fly .9s ease-in-out infinite alternate; }
+.e-slime .enemy-sprite, .e-toad .enemy-sprite { animation: squish .8s steps(2, jump-none) infinite alternate; }
+.enemy.boss .enemy-sprite { animation: breathe 1.6s steps(3, jump-none) infinite alternate; }
+.enemy.hit .enemy-sprite { animation: hit .35s; }
+.enemy.lunge .enemy-sprite { animation: lunge .4s; }
+.char > .sprite, .home-party .sprite, .job-option .sprite { animation: idle 1.1s steps(2, jump-none) infinite alternate; }
+.char:nth-child(2) > .sprite, .home-party .sprite:nth-child(2) { animation-delay: -.35s; }
+.char:nth-child(3) > .sprite, .home-party .sprite:nth-child(3) { animation-delay: -.7s; }
+.dungeon-card .boss { animation: breathe 1.8s steps(3, jump-none) infinite alternate; transform-origin: 50% 100%; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+/* 拠点：3人はたき火のまわりの地面に立つ */
+.stage > .home-party { position: absolute; left: 0; right: 0; bottom: 22%; height: 68px; display: block; }
+.home-party .sprite { position: absolute; bottom: 0; transform-origin: 50% 100%; }
+.home-party .sprite:nth-child(1) { left: calc(40% - 34px); }
+.home-party .sprite:nth-child(2) { left: calc(70% - 34px); }
+.home-party .sprite:nth-child(3) { left: calc(86% - 34px); }
