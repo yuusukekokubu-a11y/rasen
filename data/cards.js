@@ -10,7 +10,8 @@
 //     { t:'dmg', v:6, scale:'atk'|'mag'|'none', hits:1, target:'enemy'|'all'|'random', element:'fire'|'ice'|'thunder' }
 //         ダメージ = v + 持ち主の攻撃力(atk) or 魔力(mag)。hits回くり返す
 //         plusPer:{ what:'block'|'discardedThisTurn'|'exhaustedThisCombat'|'cardsPlayedThisTurn', v:1 } で追加ダメージ
-//     { t:'block', v:5, scale:'def'|'mag'|'none' }   ブロック（ダメージを防ぐ盾）。既定は防御力が乗る
+//     { t:'block', v:5, scale:'def'|'mag'|'none' }   ブロック（ダメージを防ぐ盾。自分のターン開始時に消える）。既定は防御力が乗る
+//     { t:'ward', v:6 }                               結界（ターンをまたいで残る盾。毎ターン半分に減る）。既定は魔力が乗る
 //     { t:'heal', v:4 }                               回復（魔力が乗る）
 //     { t:'draw', v:1 } / { t:'energy', v:1 }
 //     { t:'status', s:'weak'|'vulnerable'|'burn'|'freeze'|'shock', v:2, target:'enemy'|'all' }
@@ -168,22 +169,25 @@
     bow_pin:        { name: '足止め', pool: 'bow', type: 'attack', cost: 1,
       effects: [{ t: 'dmg', v: 4 }, { t: 'status', s: 'weak', v: 2 }], upgrade: { effects: [{ t: 'dmg', v: 6 }, { t: 'status', s: 'weak', v: 2 }] } },
 
-    // ===== 錫杖（僧侶） =====
-    scep_prayer:    { name: '祈り', pool: 'scepter', type: 'skill', cost: 1, tags: ['magic'], exhaust: true,
-      effects: [{ t: 'heal', v: 4 }], upgrade: { effects: [{ t: 'heal', v: 6 }] } },
+    // ===== 錫杖（僧侶：結界役） =====
+    scep_prayer:    { name: '守りの祈り', pool: 'scepter', type: 'skill', cost: 1, tags: ['magic'],
+      effects: [{ t: 'ward', v: 4 }, { t: 'draw', v: 1 }], upgrade: { effects: [{ t: 'ward', v: 6 }, { t: 'draw', v: 1 }] } },
+    scep_ward:      { name: '結界', pool: 'scepter', type: 'skill', cost: 1, tags: ['magic'],
+      effects: [{ t: 'ward', v: 6 }], upgrade: { effects: [{ t: 'ward', v: 9 }] } },
     scep_smite:     { name: '聖撃', pool: 'scepter', type: 'attack', cost: 1, tags: ['magic'],
       effects: [{ t: 'dmg', v: 6, scale: 'mag' }], upgrade: { effects: [{ t: 'dmg', v: 9, scale: 'mag' }] } },
     scep_purge:     { name: '浄化', pool: 'scepter', type: 'skill', cost: 0,
       effects: [{ t: 'exhaustChoice', v: 1 }, { t: 'draw', v: 2 }], upgrade: { effects: [{ t: 'exhaustChoice', v: 1 }, { t: 'draw', v: 3 }] } },
     scep_offering:  { name: '献身', pool: 'scepter', type: 'skill', cost: 1, tags: ['magic'],
-      effects: [{ t: 'exhaustChoice', v: 1 }, { t: 'block', v: 7, scale: 'mag' }],
-      upgrade: { effects: [{ t: 'exhaustChoice', v: 1 }, { t: 'block', v: 10, scale: 'mag' }] } },
+      effects: [{ t: 'exhaustChoice', v: 1 }, { t: 'ward', v: 8 }],
+      upgrade: { effects: [{ t: 'exhaustChoice', v: 1 }, { t: 'ward', v: 11 }] } },
+    scep_reflect:   { name: '聖光反射', pool: 'scepter', type: 'attack', cost: 1, tags: ['magic'],
+      effects: [{ t: 'dmg', v: 0, scale: 'none', plusPer: { what: 'ward', v: 1 } }], upgrade: { cost: 0 } },
     scep_judgement: { name: '裁き', pool: 'scepter', type: 'attack', cost: 2, tags: ['magic'],
       effects: [{ t: 'dmg', v: 6, scale: 'mag', plusPer: { what: 'exhaustedThisCombat', v: 3 } }],
       upgrade: { effects: [{ t: 'dmg', v: 8, scale: 'mag', plusPer: { what: 'exhaustedThisCombat', v: 4 } }] } },
     scep_sanctuary: { name: '聖域', pool: 'scepter', type: 'skill', cost: 2, tags: ['magic'], exhaust: true,
-      effects: [{ t: 'block', v: 10, scale: 'mag' }, { t: 'heal', v: 2 }],
-      upgrade: { effects: [{ t: 'block', v: 14, scale: 'mag' }, { t: 'heal', v: 3 }] } },
+      effects: [{ t: 'ward', v: 16 }], upgrade: { effects: [{ t: 'ward', v: 22 }] } },
     scep_lightray:  { name: '光の矢', pool: 'scepter', type: 'attack', cost: 0, tags: ['magic'], exhaust: true,
       effects: [{ t: 'dmg', v: 5, scale: 'mag' }], upgrade: { effects: [{ t: 'dmg', v: 8, scale: 'mag' }] } },
 
@@ -213,9 +217,9 @@
     pw_ar_eagle:    { name: '鷹の目', pool: 'power_archer', type: 'power', cost: 2, effects: [{ t: 'power', id: 'ar_eagle' }] },
     pw_ar_hunter:   { name: '狩人の心得', pool: 'power_archer', type: 'power', cost: 1, effects: [{ t: 'power', id: 'ar_hunter' }] },
 
-    pw_pr_ward:     { name: '結界', pool: 'power_priest', type: 'power', cost: 1, effects: [{ t: 'power', id: 'pr_ward' }] },
+    pw_pr_ward:     { name: '加護', pool: 'power_priest', type: 'power', cost: 1, effects: [{ t: 'power', id: 'pr_ward' }] },
     pw_pr_ascetic:  { name: '苦行', pool: 'power_priest', type: 'power', cost: 1, effects: [{ t: 'power', id: 'pr_ascetic' }] },
-    pw_pr_grace:    { name: '恩寵', pool: 'power_priest', type: 'power', cost: 2, effects: [{ t: 'power', id: 'pr_grace' }] },
+    pw_pr_grace:    { name: '不朽の結界', pool: 'power_priest', type: 'power', cost: 2, effects: [{ t: 'power', id: 'pr_grace' }] },
     pw_pr_faith:    { name: '信仰', pool: 'power_priest', type: 'power', cost: 1, effects: [{ t: 'power', id: 'pr_faith' }] }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

@@ -73,6 +73,7 @@
           bar(combat.party.hp, combat.party.maxHp, 'hp'),
           h('div', { class: 'party-sub' },
             h('span', { class: 'block' }, `ブロック${combat.party.block}`),
+            combat.party.ward > 0 ? h('span', { class: 'ward' }, `結界${combat.party.ward}`) : null,
             incoming > 0 ? h('span', { class: 'incoming' }, `敵の攻撃予定 ${incoming}`) : null,
             combat.party.weak > 0 ? h('span', { class: 'status st-weak' }, `脱力${combat.party.weak}`) : null,
             combat.party.vulnerable > 0 ? h('span', { class: 'status st-vulnerable' }, `弱体${combat.party.vulnerable}`) : null)),

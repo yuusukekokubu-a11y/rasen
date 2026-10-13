@@ -40,7 +40,7 @@ test('盗賊：捨てた枚数でダメージが増える・捨てたときの�
   assert.ok(b);
 });
 
-test('僧侶：廃棄した枚数でダメージが増える・廃棄したときのパワー', () => {
+test('僧侶：廃棄した枚数でダメージが増える・廃棄したときに結界', () => {
   const c = combat(['priest', 'archer', 'thief']);
   const e = c.enemies[0];
   e.hp = 999; e.block = 0;
@@ -49,7 +49,7 @@ test('僧侶：廃棄した枚数でダメージが増える・廃棄したと�
   c.playCard(purge.iid);
   c.resolveChoice([x.iid]);
   assert.strictEqual(c.counters.exhaustedThisCombat, 1);
-  assert.ok(c.party.block >= 4, '苦行でブロック');
+  assert.ok(c.party.ward >= 3, '苦行で結界');
   c.energy = 5;
   c.playCard(judge.iid, 0);
   assert.strictEqual(999 - e.hp, 6 + c.statOf(0, 'mag') + 3);
@@ -106,4 +106,33 @@ test('すべての装備のランダムカードの候補がある', () => {
   for (const [id, b] of Object.entries(R.DATA.equipment.bases)) {
     assert.ok(Object.values(R.DATA.cards).some(c => c.pool === b.type), id);
   }
+});
+
+test('結界：ブロックの後にダメージを防ぎ、ターンをまたいで半分残る', () => {
+  const c = combat(['priest', 'archer', 'thief'], { encounter: ['slime'] });
+  const e = c.enemies[0];
+  e.intent = 'tackle';
+  const dmg = c.enemyHitDamage(e, e.def.moves.tackle);
+  c.hand = [];
+  c.party.block = 2;
+  c.party.ward = 20;
+  const hp = c.party.hp;
+  c.endTurn();
+  assert.strictEqual(c.party.hp, hp, '結界で防いだ');
+  assert.strictEqual(c.party.block, 0);
+  assert.strictEqual(c.party.ward, Math.floor((20 - (dmg - 2)) * R.DATA.config.combat.wardKeep));
+});
+
+test('結界：「不朽の結界」があれば減らない・聖光反射は結界の量だけダメージ', () => {
+  const c = combat(['priest', 'archer', 'thief'], { encounter: ['slime'] });
+  c.enemies[0].hp = 999; c.enemies[0].block = 0; c.enemies[0].intent = 'harden';
+  c.powers.push({ id: 'pr_grace', owner: 0 });
+  c.party.ward = 10;
+  c.hand = [];
+  c.endTurn();
+  assert.strictEqual(c.party.ward, 10);
+  c.enemies[0].block = 0;
+  const [card] = giveHand(c, [{ cardId: 'scep_reflect' }]);
+  c.playCard(card.iid, 0);
+  assert.strictEqual(999 - c.enemies[0].hp, 10);
 });

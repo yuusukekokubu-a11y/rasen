@@ -36,7 +36,8 @@
         block: 0,
         weak: 0,
         vulnerable: 0,
-        freshVulnerable: false
+        freshVulnerable: false,
+        ward: 0             // 結界：ターンをまたいで残る盾。ブロックの後にダメージを防ぐ
       };
 
       // デッキ
@@ -124,6 +125,9 @@
       this.turn++;
       if (this.turn > this.cfg.maxTurns) { this._finish('timeout'); return; }
       this.party.block = 0;
+      // 結界は少しずつ弱まる（パワー「不朽の結界」があれば弱まらない）
+      const keep = this.powers.some(p => R.DATA.powers[p.id].wardNoDecay) ? 1 : this.cfg.wardKeep;
+      this.party.ward = Math.floor(this.party.ward * keep);
       this.energy = this.cfg.energyPerTurn;
       this.counters.discardedThisTurn = 0;
       this.counters.cardsPlayedThisTurn = 0;
@@ -256,9 +260,13 @@
         let total = 0;
         for (let i = 0; i < hits; i++) {
           let d = this.enemyHitDamage(e, mv);
+          // ブロック → 結界 の順にダメージを防ぐ
           const blocked = Math.min(this.party.block, d);
           this.party.block -= blocked;
           d -= blocked;
+          const warded = Math.min(this.party.ward, d);
+          this.party.ward -= warded;
+          d -= warded;
           this.party.hp -= d;
           this.counters.damageTaken += d;
           total += d;
@@ -387,7 +395,7 @@
       let base = e.v + this.statOf(owner, scale);
       if (e.plusPer) {
         const what = e.plusPer.what;
-        const n = what === 'block' ? this.party.block : (this.counters[what] || 0);
+        const n = what === 'block' ? this.party.block : what === 'ward' ? this.party.ward : (this.counters[what] || 0);
         base += n * e.plusPer.v;
       }
       return base;
@@ -444,6 +452,11 @@
             const st = R.DATA.enchants.elements[ctx.enchElement].status;
             for (const t of hitTargets) if (t.alive) t.st[st] += 1;
           }
+          break;
+        }
+        case 'ward': {
+          const amount = Math.max(0, Math.floor((e.v + this.statOf(ctx.owner, e.scale || 'mag')) * mult));
+          this.party.ward += amount;
           break;
         }
         case 'block': {
@@ -646,6 +659,8 @@
             for (const t of targets) out.perEnemy[t.index] += this._dmgToEnemy(raw, t, element) * hits;
           } else if (e.t === 'block') {
             out.block += Math.floor((e.v + this.statOf(ctx.owner, e.scale || 'def')) * ctx.mult);
+          } else if (e.t === 'ward') {
+            out.ward = (out.ward || 0) + Math.floor((e.v + this.statOf(ctx.owner, e.scale || 'mag')) * ctx.mult);
           } else if (e.t === 'heal') {
             out.heal += Math.floor((e.v + this.statOf(ctx.owner, 'mag')) * ctx.mult);
           } else if (e.t === 'draw') out.draw += e.v;

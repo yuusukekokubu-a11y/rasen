@@ -21,7 +21,7 @@
       desc: '連続攻撃・手数',
       powers: ['pw_ar_stance', 'pw_ar_quiver', 'pw_ar_eagle', 'pw_ar_hunter'] },
     priest:     { name: '僧侶',     weapon: 'scepter',   armor: 'robe',  enabled: true,
-      desc: '回復・廃棄軸（カードを廃棄して得をする）',
+      desc: '結界（ターンをまたぐ盾）・廃棄軸',
       powers: ['pw_pr_ward', 'pw_pr_ascetic', 'pw_pr_grace', 'pw_pr_faith'] }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

@@ -7,6 +7,7 @@
 //               filter: { tag:'magic', type:'attack', owner:'self', minCost:2 }
 //   cardDiscarded : カードの効果で手札が捨てられるたびに発動する効果
 //   cardExhausted : カードが廃棄されるたびに発動する効果
+//   wardNoDecay   : true なら結界がターンごとに減らない
 //   効果の書き方は data/cards.js と同じ。'self' はパワーカードの持ち主のキャラ
 //
 // jobs.js の powers 配列の順番が解禁順（先頭は最初から使える）
@@ -64,12 +65,12 @@
       onPlay: [{ t: 'buff', stat: 'atk', v: 2, who: 'self' }] },
 
     // 僧侶
-    pr_ward:     { name: '結界', desc: '毎ターン開始時、ブロック2（魔力が乗る）',
-      turnStart: [{ t: 'block', v: 2, scale: 'mag' }] },
-    pr_ascetic:  { name: '苦行', desc: 'カードが廃棄されるたび、ブロック4（魔力が乗る）',
-      cardExhausted: [{ t: 'block', v: 4, scale: 'mag' }] },
-    pr_grace:    { name: '恩寵', desc: '毎ターン終了時、HPを1回復（魔力の半分が乗る）',
-      turnEnd: [{ t: 'heal', v: 1, magRate: 0.5 }] },
+    pr_ward:     { name: '加護', desc: '毎ターン開始時、結界2（魔力が乗る）',
+      turnStart: [{ t: 'ward', v: 2 }] },
+    pr_ascetic:  { name: '苦行', desc: 'カードが廃棄されるたび、結界3（魔力が乗る）',
+      cardExhausted: [{ t: 'ward', v: 3 }] },
+    pr_grace:    { name: '不朽の結界', desc: '結界が時間で減らなくなる',
+      wardNoDecay: true },
     pr_faith:    { name: '信仰', desc: 'このキャラの魔力+3',
       onPlay: [{ t: 'buff', stat: 'mag', v: 3, who: 'self' }] }
   };

@@ -6,13 +6,17 @@
     const def = c.cardDef(inst);
     const pv = c.previewCard(inst, targetIndex);
     const incoming = c.incomingDamage();
-    const needBlock = Math.max(0, incoming - c.party.block);
+    const needBlock = Math.max(0, incoming - c.party.block - c.party.ward);
     const missing = c.party.maxHp - c.party.hp;
     let s = 0;
 
     if (def.type === 'power') s += Math.max(15, 45 - c.turn * 4);
     s += pv.damage + pv.kills * 12;
     s += Math.min(pv.block, needBlock) * 1.3 + Math.max(0, pv.block - needBlock) * 0.1;
+    // 結界は次のターン以降にも残るので、余った分も少し評価する
+    const ward = pv.ward || 0;
+    const needAfterBlock = Math.max(0, needBlock - pv.block);
+    s += Math.min(ward, needAfterBlock) * 1.3 + Math.max(0, ward - needAfterBlock) * 0.5;
     if (c.party.hp < c.party.maxHp * 0.7) s += Math.min(pv.heal, missing) * 1.2;
     s += pv.draw * 4 + pv.energy * 6;
 

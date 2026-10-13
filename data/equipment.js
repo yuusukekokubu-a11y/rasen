@@ -79,7 +79,7 @@
     ancient_bow:    { name: '古木の弓',       type: 'bow', slot: 'weapon', rank: 3, fixedCard: 'bow_rain',         mats: { ancient_wood: 3, elder_heart: 1 }, difficulty: 12 },
     // --- 錫杖（大工） ---
     oak_scepter:    { name: 'カシの錫杖',     type: 'scepter', slot: 'weapon', rank: 1, fixedCard: 'scep_smite',   mats: { oak: 2, quartz: 1 },              difficulty: 2 },
-    maple_scepter:  { name: 'カエデの錫杖',   type: 'scepter', slot: 'weapon', rank: 2, fixedCard: 'scep_prayer',  mats: { maple: 2, quartz: 1, glowcap: 1 }, difficulty: 7 },
+    maple_scepter:  { name: 'カエデの錫杖',   type: 'scepter', slot: 'weapon', rank: 2, fixedCard: 'scep_ward',    mats: { maple: 2, quartz: 1, glowcap: 1 }, difficulty: 7 },
     ancient_scepter:{ name: '古木の錫杖',     type: 'scepter', slot: 'weapon', rank: 3, fixedCard: 'scep_judgement', mats: { ancient_wood: 2, star_shard: 1 }, difficulty: 12 },
     // --- 軽装（裁縫） ---
     cloth_hood:     { name: '布の頭巾',       type: 'light', slot: 'head', rank: 1, fixedCard: 'light_dodge',  mats: { flax: 1, bat_wing: 1 },          difficulty: 1 },

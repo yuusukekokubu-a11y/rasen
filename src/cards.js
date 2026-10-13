@@ -17,7 +17,7 @@
   }
 
   function hasEffect(def, t) { return def.effects.some(e => e.t === t); }
-  function hasPotency(def) { return def.effects.some(e => e.t === 'dmg' || e.t === 'block' || e.t === 'heal'); }
+  function hasPotency(def) { return def.effects.some(e => e.t === 'dmg' || e.t === 'block' || e.t === 'ward' || e.t === 'heal'); }
 
   // 付与効果を付けられるカードか
   function canApplyEnchant(enchantId, def) {
@@ -63,7 +63,7 @@
         let s = `${tgt}${el}${num(e.v, scale)}ダメージ`;
         if (e.hits && e.hits > 1) s += `×${e.hits}回`;
         if (e.plusPer) {
-          const what = { block: 'ブロック', discardedThisTurn: 'このターン捨てた枚数', exhaustedThisCombat: '廃棄した枚数', cardsPlayedThisTurn: 'このターン使った枚数' }[e.plusPer.what];
+          const what = { block: 'ブロック', ward: '結界', discardedThisTurn: 'このターン捨てた枚数', exhaustedThisCombat: '廃棄した枚数', cardsPlayedThisTurn: 'このターン使った枚数' }[e.plusPer.what];
           s = `${tgt}${e.v > 0 ? num(e.v, scale) + '＋' : ''}${what}×${e.plusPer.v}のダメージ`;
         }
         if (!stats && scale !== 'none') s += `（${STAT_NAMES[scale]}が乗る）`;
@@ -74,6 +74,10 @@
         let s = `ブロック${num(e.v, scale)}`;
         if (!stats && scale !== 'none') s += `（${STAT_NAMES[scale]}が乗る）`;
         return s;
+      }
+      case 'ward': {
+        const scale = e.scale || 'mag';
+        return `結界${num(e.v, scale)}` + (!stats && scale !== 'none' ? `（${STAT_NAMES[scale]}が乗る）` : '');
       }
       case 'heal': return `HPを${num(e.v, 'mag')}回復` + (stats ? '' : '（魔力が乗る）');
       case 'draw': return `${e.v}枚引く`;

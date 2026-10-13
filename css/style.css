@@ -70,6 +70,7 @@ th { color: var(--muted); font-weight: normal; }
 .in-buff, .in-debuff { color: #e6c46b; }
 .enemy-sub, .party-sub { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; font-size: .85em; }
 .block { color: var(--block); }
+.ward { color: #c9a8ff; }
 .incoming { color: #ff9a8a; }
 .status { background: #3d3346; padding: 0 6px; border-radius: 10px; }
 .st-burn { background: #5b2e1f; } .st-freeze { background: #1f3f5b; } .st-shock { background: #4f4a1a; }
