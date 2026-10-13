@@ -144,12 +144,15 @@
     render();
   }
 
+  // 進行中の題名（例：岩窟の洞・中級）
+  const runTitle = (run) => run.def.name + (run.endless ? '' : '・' + stageName(run.difficulty || 1));
+
   // ===== 進行中 =====
   function runScreen(el) {
     const run = G().run;
     if (!run) { R.UI.show(departScreen); return; }
     clear(el);
-    el.appendChild(R.UI.header(`${run.def.name}${run.difficulty > 1 ? `（難易度${run.difficulty}）` : ''}`, null, run.phase === 'battle' ? run.whereText() : null));
+    el.appendChild(R.UI.header(runTitle(run), null, run.phase === 'battle' ? run.whereText() : null));
 
     // 進み具合：場所の絵の上に、階ごとの戦闘の印（◆＝戦闘、●＝ボス）とHP
     const ended = run.phase === 'cleared' || run.phase === 'wiped';
@@ -228,15 +231,16 @@
     const combat = run.createCombat();
     // 戦闘中は場所だけを1行で出す（HPなどは戦闘画面にある）
     clear(el);
-    el.appendChild(R.UI.header(run.def.name + (run.difficulty > 1 ? `（難易度${run.difficulty}）` : ''), null, run.whereText()));
+    el.appendChild(R.UI.header(runTitle(run), null, run.whereText()));
     const area = h('div');
     el.appendChild(area);
+    window.scrollTo(0, 0);
     R.UI.mountCombat(area, combat, {
       scene: run.dungeonId,
       onFinish: () => {
         run.finishCombat(combat);
         G().saveRun();
-        R.UI.show(runScreen);
+        R.UI.show(runScreen, { top: true });
       }
     });
   }

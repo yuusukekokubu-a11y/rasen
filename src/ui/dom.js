@@ -25,7 +25,19 @@
       else el.appendChild(document.createTextNode(String(c)));
     }
   }
-  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); return el; }
+  // 中身を消す。描き直しの途中でページが一瞬短くなり、スクロール位置が一番上に戻ってしまうのを防ぐため、
+  // 次のコマまで元の高さを保っておく
+  function clear(el) {
+    if (el.firstChild && el.isConnected && typeof requestAnimationFrame === 'function') {
+      const height = el.offsetHeight;
+      if (height) {
+        el.style.minHeight = height + 'px';
+        requestAnimationFrame(() => { el.style.minHeight = ''; });
+      }
+    }
+    while (el.firstChild) el.removeChild(el.firstChild);
+    return el;
+  }
 
   function bar(cur, max, cls) {
     const pct = max > 0 ? Math.max(0, Math.min(100, (cur / max) * 100)) : 0;

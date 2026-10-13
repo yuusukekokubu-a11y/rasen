@@ -3,15 +3,28 @@
   const { h, clear, bar } = R.UI;
   const app = { el: null, screen: null };
 
-  function show(screenFn) {
+  // 画面を切り替える
+  //   同じ画面をもう一度出すとき（採集の結果・休憩など、画面の中身の更新）は、
+  //   ふわっと出す演出もスクロールの巻き戻しもせず、その場で描き直すだけにする
+  //   opts.top：同じ画面でも一番上に戻す（戦闘が終わって進行画面に戻るときなど）
+  let fadeTimer = null;
+  function show(screenFn, opts) {
+    opts = opts || {};
+    const same = screenFn === app.screen;
+    const y = window.scrollY;
     app.screen = screenFn;
     clear(app.el);
-    // 画面が切り替わるときにふわっと出す
-    app.el.classList.remove('screen-in');
-    void app.el.offsetWidth;
-    app.el.classList.add('screen-in');
+    if (!same) {
+      // 画面が切り替わるときだけふわっと出す。演出が終わったら目印を外す
+      // （外さないと、あとで画面の中身を描き直すたびに演出がくり返され、読み込み中のように見える）
+      app.el.classList.remove('screen-in');
+      void app.el.offsetWidth;
+      app.el.classList.add('screen-in');
+      clearTimeout(fadeTimer);
+      fadeTimer = setTimeout(() => app.el.classList.remove('screen-in'), 400);
+    }
     screenFn(app.el);
-    window.scrollTo(0, 0);
+    window.scrollTo(0, same && !opts.top ? y : 0);
   }
 
   // 画面の上のバー（もどるボタン＋題名）
