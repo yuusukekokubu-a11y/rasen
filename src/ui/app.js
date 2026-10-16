@@ -87,7 +87,7 @@
     const party = R.Game.state.party;
     // 夜の野営地の絵の上に、題名とパーティ
     el.appendChild(R.UI.stage('camp', 'home-hero',
-      h('div', { class: 'home-title' }, 'ラセン'),
+      h('div', { class: 'home-title' }, 'ラセンの工房'),
       h('div', { class: 'home-party' }, party.map(j => R.UI.sprite(j, 68)))));
     // 文字は名前だけ（説明は出さない）。シミュレーターは開発用なので「テスト用の機能」がオンのときだけ
     const debug = R.Game.state.settings && R.Game.state.settings.debug;

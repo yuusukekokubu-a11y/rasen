@@ -131,7 +131,7 @@ td { font-variant-numeric: tabular-nums; }
 
 /* ===== 拠点 ===== */
 .home-hero { height: 250px; margin: 12px 0 14px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 26px; }
-.home-title { font-size: 46px; font-weight: 900; letter-spacing: .45em; text-indent: .45em; color: var(--gold-hi); line-height: 1;
+.home-title { font-size: 34px; font-weight: 900; letter-spacing: .2em; text-indent: .2em; white-space: nowrap; color: var(--gold-hi); line-height: 1;
   text-shadow: 0 3px 0 var(--void), 0 -2px 0 var(--void), 2px 0 0 var(--void), -2px 0 0 var(--void), 0 0 24px #e2bd6688; }
 .home-sub { margin-top: 8px; font-size: var(--fs-s); letter-spacing: .5em; text-indent: .5em; color: #d8cfb8; text-shadow: var(--outline); }
 .home-party .sprite { filter: drop-shadow(0 2px 0 #0008); }

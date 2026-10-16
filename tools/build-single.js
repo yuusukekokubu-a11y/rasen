@@ -12,7 +12,7 @@ const safe = (s) => s.replace(/<\/script/gi, '<\\/script');
 const css = [...html.matchAll(/<link rel="stylesheet" href="([^"]+)">/g)].map(m => read(m[1])).join('\n');
 const scripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)]
   .map(m => `<script>/* ${m[1]} */\n${safe(read(m[1]))}\n</script>`).join('\n');
-const title = (html.match(/<title>([^<]*)<\/title>/) || [, 'ラセン'])[1];
+const title = (html.match(/<title>([^<]*)<\/title>/) || [, 'ラセンの工房'])[1];
 
 const page = `<title>${title}</title>
 <style>
