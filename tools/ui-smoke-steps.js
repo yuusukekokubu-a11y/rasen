@@ -85,6 +85,21 @@ module.exports.push(
     await page.click('text=細工');
     await page.click('.back-btn');
   } },
+  { name: '生産：Lvが高いと目利き・2択・再鍛錬が出る', run: async (page) => {
+    await page.evaluate(() => { const s = RASEN.Game.state; s.life.smith.lv = 20; s.materials.copper_ore = 99; s.materials.oak = 99; s.materials.wolf_pelt = 99; RASEN.Game.save(); });
+    await page.click('text=生産');
+    await page.waitForSelector('.recipe:has-text("銅の剣") .skill-chip:has-text("極")');
+    await page.click('.recipe:has-text("銅の剣") button:has-text("作る")');
+    await solvePuzzle(page);
+    await page.waitForSelector('.pick-title:has-text("再鍛錬")');
+    const before = await page.locator('.pick-panel:has(.pick-title:has-text("再鍛錬")) button:not([disabled])').count();
+    if (before !== 2) throw new Error('再鍛錬の枠が2つない');
+    await page.click('.pick-panel:has(.pick-title:has-text("再鍛錬")) button >> nth=0');
+    const after = await page.locator('.pick-panel:has(.pick-title:has-text("再鍛錬")) button:not([disabled])').count();
+    if (after !== 0) throw new Error('再鍛錬が2回以上できる');
+    await page.click('button:has-text("もどる")');
+    await page.click('.back-btn');
+  } },
   { name: '装備画面で付け替え', run: async (page) => {
     await page.click('.menu-item:has-text("装備")');
     await page.click('button:has-text("武器：")');

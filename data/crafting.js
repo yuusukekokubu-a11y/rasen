@@ -77,8 +77,10 @@
     // ===== 経験値 =====
     exp: { base: 14, perDifficulty: 2, quality: { normal: 1.0, fine: 1.2, best: 1.5 }, tool: 8 },
 
-    // 生産の固有スキル（ガチャの簡易的な天井）：生産Lv − レシピの難易度 がこの値以上なら、完成時に2択から選べる
+    // 生産の固有スキル（ガチャの簡易的な天井）：生産Lv − レシピの難易度 がこの値以上なら発動
+    //   appraise  ：目利き。作る前に「極」の枠が出る確率が見える
     //   cardChoice：ランダムカードを2枚の候補から選ぶ / slotChoice：ランダム枠を2組の候補から選ぶ
-    skills: { cardChoice: 3, slotChoice: 6 }
+    //   reforge   ：再鍛錬。完成後にランダム枠を1つだけ引き直せる（1回）
+    skills: { appraise: 1, cardChoice: 3, slotChoice: 6, reforge: 9 }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

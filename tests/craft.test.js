@@ -178,9 +178,12 @@ test('全レシピの素材がデータにある', () => {
 test('生産の固有スキル：Lv差で2択が発動（ランダムカード・ランダム枠）', () => {
   const sk = R.DATA.crafting.skills;
   const d = R.DATA.equipment.bases.copper_sword.difficulty;
-  assert.deepStrictEqual(R.Craft.craftSkills(d + sk.cardChoice - 1, d), { cardChoice: false, slotChoice: false });
-  assert.deepStrictEqual(R.Craft.craftSkills(d + sk.cardChoice, d), { cardChoice: true, slotChoice: false });
-  assert.deepStrictEqual(R.Craft.craftSkills(d + sk.slotChoice, d), { cardChoice: true, slotChoice: true });
+  const on = (lv) => Object.entries(R.Craft.craftSkills(lv, d)).filter(([, v]) => v).map(([k]) => k);
+  assert.deepStrictEqual(on(d + sk.appraise - 1), []);
+  assert.deepStrictEqual(on(d + sk.appraise), ['appraise']);
+  assert.deepStrictEqual(on(d + sk.cardChoice), ['appraise', 'cardChoice']);
+  assert.deepStrictEqual(on(d + sk.slotChoice), ['appraise', 'cardChoice', 'slotChoice']);
+  assert.deepStrictEqual(on(d + sk.reforge), ['appraise', 'cardChoice', 'slotChoice', 'reforge']);
   const rng = R.createRng(3);
   for (const baseId of ['copper_sword', 'copper_ring', 'oak_staff']) {
     const item = R.Craft.makeEquipment(baseId, { lv: 10, quality: 'normal', rng });
@@ -210,5 +213,17 @@ test('専用装備：ボスの魂で作るランク7。固有カードはラン�
   for (const [m, d] of Object.entries(R.DATA.materials).filter(([, d]) => d.kind === 'soul')) {
     assert.ok(Object.values(R.DATA.enemies).some(e => e.soul === m), `${m} を落とすボス`);
     assert.ok(uniques.some(([, b]) => b.mats[m]), `${m} を使う装備`);
+  }
+});
+
+test('再鍛錬：ランダム枠を1つだけ引き直し、もう1つは変わらない。付与効果は重複・衝突しない', () => {
+  const rng = R.createRng(11);
+  for (let n = 0; n < 200; n++) {
+    const item = R.Craft.makeEquipment(n % 2 ? 'copper_ring' : 'copper_sword', { lv: 20, quality: 'normal', rng });
+    const keep = JSON.stringify(item.slots[1]);
+    R.Craft.reforgeSlot(item, 0, 20, rng);
+    assert.strictEqual(JSON.stringify(item.slots[1]), keep);
+    const ids = item.slots.filter(x => x.kind === 'enchant').map(x => x.id);
+    if (ids.length === 2) assert.ok(ids[0] !== ids[1] && !R.Cards.enchantsConflict(ids[0], ids[1]));
   }
 });

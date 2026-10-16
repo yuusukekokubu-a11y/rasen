@@ -41,8 +41,10 @@
         return h('div', { class: 'recipe' + (ok && !owned ? '' : ' unavailable') },
           h('div', { class: 'recipe-main' },
             h('div', null, h('b', { class: rc.base && rc.base.unique ? 'unique-name' : null }, rc.name), h('span', { class: 'muted' }, `　難${rc.difficulty}`),
+              skills && skills.appraise ? h('span', { class: 'skill-chip' }, `極${Math.round(R.Craft.gradeChances(lv, rc.difficulty)[2] * 100)}%`) : null,
               skills && skills.cardChoice ? h('span', { class: 'skill-chip' }, 'カード2択') : null,
-              skills && skills.slotChoice ? h('span', { class: 'skill-chip' }, '枠2択') : null),
+              skills && skills.slotChoice ? h('span', { class: 'skill-chip' }, '枠2択') : null,
+              skills && skills.reforge ? h('span', { class: 'skill-chip' }, '再鍛錬') : null),
             h('div', { class: 'muted recipe-info' }, info),
             h('div', { class: 'recipe-mats' }, matReqView(rc.mats))),
           h('button', { class: ok && !owned ? 'primary' : '', disabled: !ok || owned, onclick: () => startCraft(rc) }, '作る'));
@@ -155,7 +157,9 @@
       if (ups) el.appendChild(h('div', { class: 'good' }, `${R.Life.LIVES[life]}Lvが上がった！（Lv${s.life[life].lv}）`));
       if (rc.kind === 'equip') {
         // 固有スキル（Lv差で発動）：ランダムカード・ランダム枠を2択から選べる。選び直すと詳細と比較だけ描き直す
-        const choices = R.Craft.equipmentChoices(made, lv, R.Craft.craftSkills(lv, rc.difficulty));
+        const skills = R.Craft.craftSkills(lv, rc.difficulty);
+        const choices = R.Craft.equipmentChoices(made, lv, skills);
+        let drawSlots = () => {};
         const detail = h('div');
         const drawDetail = () => {
           clear(detail);
@@ -184,7 +188,7 @@
         }
         if (choices.slots) {
           const row = h('div', { class: 'choice-row slots' });
-          const drawSlots = () => {
+          drawSlots = () => {
             clear(row);
             for (const set of choices.slots) {
               row.appendChild(h('button', { class: made.slots === set ? 'primary' : '', onclick: () => { made.slots = set; G().save(); drawSlots(); drawDetail(); } },
@@ -193,6 +197,20 @@
           };
           drawSlots();
           el.appendChild(h('div', { class: 'panel pick-panel' }, h('div', { class: 'pick-title' }, 'ランダム枠'), row));
+        }
+        if (skills.reforge) {
+          // 再鍛錬：今のランダム枠から1つ選んで引き直す（1回だけ）
+          const row = h('div', { class: 'choice-row slots' });
+          let used = false;
+          const drawReforge = () => {
+            clear(row);
+            made.slots.forEach((x, i) => row.appendChild(h('button', {
+              disabled: used,
+              onclick: () => { used = true; R.Craft.reforgeSlot(made, i, lv); G().save(); drawReforge(); drawSlots(); drawDetail(); }
+            }, (used ? '' : '↻ ') + R.UI.slotText(x))));
+          };
+          drawReforge();
+          el.appendChild(h('div', { class: 'panel pick-panel' }, h('div', { class: 'pick-title' }, '再鍛錬'), row));
         }
         el.appendChild(detail);
         drawDetail();

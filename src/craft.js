@@ -222,29 +222,41 @@
       !existing.some(e => R.Cards.enchantsConflict(e, id)));
   }
 
+  // ランダム枠を1つ作る（existing：同じ装備のほかの枠に付いている付与効果）
+  function rollOneSlot(base, targetDef, existing, lv, rng) {
+    const E = R.DATA.enchants;
+    const grade = rollGrade(lv, base.difficulty, rng);
+    const cands = targetDef ? enchantCandidates(targetDef, existing) : [];
+    if (cands.length && rng.chance(E.enchantChance)) {
+      const rw = C().enchantRarityWeights[grade];
+      const w = {};
+      for (const id of cands) w[id] = rw[E.list[id].rarity] || 1;
+      const id = rng.weighted(w);
+      const slot = { kind: 'enchant', id, grade };
+      if (id === 'element') slot.element = rng.pick(Object.keys(E.elements));
+      return slot;
+    }
+    const stat = rng.pick(C().statChoices);
+    const value = Math.max(1, Math.round(R.DATA.equipment.statRolls[stat][base.rank - 1] * R.DATA.equipment.gradeMult[grade]));
+    return { kind: 'stat', stat, value, grade };
+  }
+  const enchantIds = (slots) => slots.filter(s => s && s.kind === 'enchant').map(s => s.id);
+
   function rollSlots(base, enchantTarget, lv, rng) {
     const slots = [];
-    const E = R.DATA.enchants;
     const targetDef = enchantTarget ? R.Cards.getCardDef(enchantTarget) : null;
-    for (let i = 0; i < 2; i++) {
-      const grade = rollGrade(lv, base.difficulty, rng);
-      const existing = slots.filter(s => s.kind === 'enchant').map(s => s.id);
-      const cands = targetDef ? enchantCandidates(targetDef, existing) : [];
-      if (cands.length && rng.chance(E.enchantChance)) {
-        const rw = C().enchantRarityWeights[grade];
-        const w = {};
-        for (const id of cands) w[id] = rw[E.list[id].rarity] || 1;
-        const id = rng.weighted(w);
-        const slot = { kind: 'enchant', id, grade };
-        if (id === 'element') slot.element = rng.pick(Object.keys(E.elements));
-        slots.push(slot);
-      } else {
-        const stat = rng.pick(C().statChoices);
-        const value = Math.max(1, Math.round(R.DATA.equipment.statRolls[stat][base.rank - 1] * R.DATA.equipment.gradeMult[grade]));
-        slots.push({ kind: 'stat', stat, value, grade });
-      }
-    }
+    for (let i = 0; i < 2; i++) slots.push(rollOneSlot(base, targetDef, enchantIds(slots), lv, rng));
     return slots;
+  }
+
+  // 再鍛錬：ランダム枠を1つだけ引き直す（item.slots をその場で書き換える）
+  function reforgeSlot(item, index, lv, rng) {
+    rng = rng || R.createRng();
+    const base = R.DATA.equipment.bases[item.base];
+    const target = base.slot === 'accessory' ? item.power : base.fixedCard;
+    const others = item.slots.filter((_, i) => i !== index);
+    item.slots[index] = rollOneSlot(base, target ? R.Cards.getCardDef(target) : null, enchantIds(others), lv, rng);
+    return item.slots[index];
   }
 
   // 装備を1つ作る（ミニゲームの結果の品質を受け取る）
@@ -269,7 +281,7 @@
   function craftSkills(lv, difficulty) {
     const sk = C().skills;
     const diff = lv - difficulty;
-    return { cardChoice: diff >= sk.cardChoice, slotChoice: diff >= sk.slotChoice };
+    return { appraise: diff >= sk.appraise, cardChoice: diff >= sk.cardChoice, slotChoice: diff >= sk.slotChoice, reforge: diff >= sk.reforge };
   }
   // 完成した装備の「もう1つの候補」を作る（スキルが発動しているぶんだけ）
   //   cards: [今のランダムカード, 別のカード] / slots: [今のランダム枠, 別の組]
@@ -296,6 +308,6 @@
 
   R.Craft = {
     recipesFor, pieceCells, puzzleParams, blueprintFor, puzzleStart, puzzleSelect, placement, puzzlePlace, puzzleRotate, puzzleDiscard, puzzleQuality, canPlaceAnywhere, puzzleAutoStep,
-    unlockedPowerCount, unlockedPowers, rollAccessoryPower, rollGrade, gradeChances, enchantCandidates, rollSlots, makeEquipment, craftSkills, equipmentChoices, expFor
+    unlockedPowerCount, unlockedPowers, rollAccessoryPower, rollGrade, gradeChances, enchantCandidates, rollSlots, reforgeSlot, makeEquipment, craftSkills, equipmentChoices, expFor
   };
 })(globalThis.RASEN = globalThis.RASEN || {});
