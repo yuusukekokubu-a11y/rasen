@@ -179,11 +179,10 @@ test('生産の固有スキル：Lv差で2択が発動（ランダムカード�
   const sk = R.DATA.crafting.skills;
   const d = R.DATA.equipment.bases.copper_sword.difficulty;
   const on = (lv) => Object.entries(R.Craft.craftSkills(lv, d)).filter(([, v]) => v).map(([k]) => k);
-  assert.deepStrictEqual(on(d + sk.appraise - 1), []);
-  assert.deepStrictEqual(on(d + sk.appraise), ['appraise']);
-  assert.deepStrictEqual(on(d + sk.cardChoice), ['appraise', 'cardChoice']);
-  assert.deepStrictEqual(on(d + sk.slotChoice), ['appraise', 'cardChoice', 'slotChoice']);
-  assert.deepStrictEqual(on(d + sk.reforge), ['appraise', 'cardChoice', 'slotChoice', 'reforge']);
+  assert.deepStrictEqual(on(d + sk.cardChoice - 1), []);
+  assert.deepStrictEqual(on(d + sk.cardChoice), ['cardChoice']);
+  assert.deepStrictEqual(on(d + sk.slotChoice), ['cardChoice', 'slotChoice']);
+  assert.deepStrictEqual(on(d + sk.reforge), ['cardChoice', 'slotChoice', 'reforge']);
   const rng = R.createRng(3);
   for (const baseId of ['copper_sword', 'copper_ring', 'oak_staff']) {
     const item = R.Craft.makeEquipment(baseId, { lv: 10, quality: 'normal', rng });

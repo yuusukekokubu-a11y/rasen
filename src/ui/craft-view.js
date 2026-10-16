@@ -41,7 +41,6 @@
         return h('div', { class: 'recipe' + (ok && !owned ? '' : ' unavailable') },
           h('div', { class: 'recipe-main' },
             h('div', null, h('b', { class: rc.base && rc.base.unique ? 'unique-name' : null }, rc.name), h('span', { class: 'muted' }, `　難${rc.difficulty}`),
-              skills && skills.appraise ? h('span', { class: 'skill-chip' }, `極${Math.round(R.Craft.gradeChances(lv, rc.difficulty)[2] * 100)}%`) : null,
               skills && skills.cardChoice ? h('span', { class: 'skill-chip' }, 'カード2択') : null,
               skills && skills.slotChoice ? h('span', { class: 'skill-chip' }, '枠2択') : null,
               skills && skills.reforge ? h('span', { class: 'skill-chip' }, '再鍛錬') : null),

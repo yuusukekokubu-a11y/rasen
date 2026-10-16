@@ -281,7 +281,7 @@
   function craftSkills(lv, difficulty) {
     const sk = C().skills;
     const diff = lv - difficulty;
-    return { appraise: diff >= sk.appraise, cardChoice: diff >= sk.cardChoice, slotChoice: diff >= sk.slotChoice, reforge: diff >= sk.reforge };
+    return { cardChoice: diff >= sk.cardChoice, slotChoice: diff >= sk.slotChoice, reforge: diff >= sk.reforge };
   }
   // 完成した装備の「もう1つの候補」を作る（スキルが発動しているぶんだけ）
   //   cards: [今のランダムカード, 別のカード] / slots: [今のランダム枠, 別の組]

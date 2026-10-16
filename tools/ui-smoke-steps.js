@@ -85,10 +85,10 @@ module.exports.push(
     await page.click('text=細工');
     await page.click('.back-btn');
   } },
-  { name: '生産：Lvが高いと目利き・2択・再鍛錬が出る', run: async (page) => {
+  { name: '生産：Lvが高いと2択・再鍛錬が出る', run: async (page) => {
     await page.evaluate(() => { const s = RASEN.Game.state; s.life.smith.lv = 20; s.materials.copper_ore = 99; s.materials.oak = 99; s.materials.wolf_pelt = 99; RASEN.Game.save(); });
     await page.click('text=生産');
-    await page.waitForSelector('.recipe:has-text("銅の剣") .skill-chip:has-text("極")');
+    await page.waitForSelector('.recipe:has-text("銅の剣") .skill-chip:has-text("再鍛錬")');
     await page.click('.recipe:has-text("銅の剣") button:has-text("作る")');
     await solvePuzzle(page);
     await page.waitForSelector('.pick-title:has-text("再鍛錬")');
