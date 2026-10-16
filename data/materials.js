@@ -59,6 +59,25 @@
     dark_bone:    { name: '闇の骨',       kind: 'monster', rank: 6 },
     abyss_heart:  { name: '深淵の核',     kind: 'monster', rank: 6 },
     // ボスの魂（ランク7・専用装備の素材）。超級・地獄級のボスやボスラッシュでまれに出る
+    crab_shell:   { name: 'カニの甲羅',     kind: 'monster', rank: 2 },
+    jelly_gel:    { name: 'クラゲの傘',     kind: 'monster', rank: 2 },
+    fish_scale:   { name: '魚人のうろこ',   kind: 'monster', rank: 2 },
+    sea_pearl:    { name: '海の真珠',       kind: 'gem',     rank: 2 },
+    kraken_ink:   { name: '海魔の墨',       kind: 'monster', rank: 3 },
+    scorpion_tail:{ name: 'サソリの尾',     kind: 'monster', rank: 4 },
+    mummy_wrap:   { name: '古い包帯',       kind: 'monster', rank: 4 },
+    worm_fang:    { name: '大蛇の牙',       kind: 'monster', rank: 4 },
+    sand_gold:    { name: '砂金',           kind: 'ore',     rank: 4 },
+    pharaoh_mask: { name: '王の仮面',       kind: 'monster', rank: 5 },
+    thunder_feather: { name: '雷鳥の羽',    kind: 'monster', rank: 5 },
+    thunder_stone:{ name: '雷石',           kind: 'ore',     rank: 5 },
+    wyvern_scale: { name: '飛竜のうろこ',   kind: 'monster', rank: 5 },
+    raiju_horn:   { name: '雷獣の角',       kind: 'monster', rank: 6 },
+    void_lens:    { name: '虚ろの水晶体',   kind: 'gem',     rank: 6 },
+    clock_gear:   { name: '古い歯車',       kind: 'ore',     rank: 6 },
+    wraith_ash:   { name: '怨霊の灰',       kind: 'monster', rank: 6 },
+    time_sand:    { name: '時の砂',         kind: 'gem',     rank: 6 },
+    chrono_heart: { name: '時の心臓',       kind: 'monster', rank: 6 },
     golem_soul:   { name: '岩窟の主の魂', kind: 'soul', rank: 7 },
     elder_soul:   { name: '古樹の魂',     kind: 'soul', rank: 7 },
     queen_soul:   { name: '沼の女王の魂', kind: 'soul', rank: 7 },
@@ -66,6 +85,10 @@
     flame_soul:   { name: '炎帝の魂',     kind: 'soul', rank: 7 },
     ice_soul:     { name: '氷晶の魂',     kind: 'soul', rank: 7 },
     storm_soul:   { name: '嵐竜の魂',     kind: 'soul', rank: 7 },
-    abyss_soul:   { name: '深淵の魂',     kind: 'soul', rank: 7 }
+    abyss_soul:   { name: '深淵の魂',     kind: 'soul', rank: 7 },
+    kraken_soul:  { name: '海魔の魂',     kind: 'soul', rank: 7 },
+    pharaoh_soul: { name: '砂の王の魂',   kind: 'soul', rank: 7 },
+    raiju_soul:   { name: '雷獣の魂',     kind: 'soul', rank: 7 },
+    chrono_soul:  { name: '時の番人の魂', kind: 'soul', rank: 7 }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

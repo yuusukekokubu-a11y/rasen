@@ -134,6 +134,45 @@
       }
     },
 
+    shore: {
+      rank: 2,
+      name: '潮騒の洞', requires: ['marsh'],
+      recommend: '推奨ランク2〜3・雷が有効',
+      floors: [
+        { battles: [1, 1], encounters: { crab_single: 2, jelly_trio: 2, fishman_pair: 1 }, scale: { hp: 1.25, dmg: 1.25 } },
+        { battles: [1, 1], encounters: { crab_jelly: 2, fishman_pair: 2, jelly_trio: 1 }, scale: { hp: 1.25, dmg: 1.25 } },
+        { battles: [1, 1], encounters: { fishman_jelly: 2, crab_fishman: 2 }, scale: { hp: 1.32, dmg: 1.32 } },
+        { battles: [0, 0], encounters: {}, scale: { hp: 1.32, dmg: 1.32 }, boss: 'boss_kraken' }
+      ],
+      rewards: { weights: { mining: 3, logging: 2, gathering: 3, treasure: 3, rest: 2 }, restHealRatio: 0.35 },
+      gather: {
+        mining: [
+          { hardness: 4,  common: { iron_ore: 2 },                 rare: { sea_pearl: 1 } },
+          { hardness: 6,  common: { iron_ore: 2, mithril_ore: 1 }, rare: { quartz: 1 } },
+          { hardness: 8,  common: { mithril_ore: 2 },              rare: { sea_pearl: 1 } },
+          { hardness: 10, common: { mithril_ore: 2, iron_ore: 1 }, rare: { star_shard: 1 } }
+        ],
+        logging: [
+          { hardness: 4,  common: { maple: 2 },                    rare: { herb: 1 } },
+          { hardness: 6,  common: { maple: 2, ancient_wood: 1 },   rare: { glowcap: 1 } },
+          { hardness: 8,  common: { ancient_wood: 2 },             rare: { sea_pearl: 1 } },
+          { hardness: 10, common: { ancient_wood: 2 },             rare: { star_shard: 1 } }
+        ],
+        gathering: [
+          { amount: [2, 4], table: { herb: 2, flax: 2, jelly_gel: 1 } },
+          { amount: [2, 4], table: { herb: 2, glowcap: 1, sea_pearl: 1 } },
+          { amount: [3, 4], table: { glowcap: 2, jelly_gel: 1, sea_pearl: 1 } },
+          { amount: [3, 4], table: { glowcap: 2, sea_pearl: 1, star_shard: 1 } }
+        ],
+        treasure: [
+          { amount: [2, 3], table: { iron_ore: 2, spider_silk: 1, sea_pearl: 1, crab_shell: 1 } },
+          { amount: [2, 3], table: { iron_ore: 1, mithril_ore: 1, fish_scale: 1, quartz: 2 } },
+          { amount: [3, 4], table: { mithril_ore: 2, ancient_wood: 1, sea_pearl: 1, crab_shell: 1 } },
+          { amount: [3, 4], table: { mithril_ore: 2, spider_silk: 1, star_shard: 1, kraken_ink: 1 } }
+        ]
+      }
+    },
+
     ruins: {
       rank: 3,
       name: '星降る遺跡', requires: ['forest', 'marsh'],
@@ -252,6 +291,45 @@
       }
     },
 
+    desert: {
+      rank: 4,
+      name: '砂塵の墓所', requires: ['ruins'],
+      recommend: '推奨ランク4・炎が有効',
+      floors: [
+        { battles: [1, 1], encounters: { scorpion_single: 2, mummy_pair: 2, scorpion_mummy: 1 }, scale: { hp: 1.11, dmg: 1.11 } },
+        { battles: [1, 1], encounters: { scorpion_mummy: 2, worm_single: 2, scorpion_pair: 1 }, scale: { hp: 1.11, dmg: 1.11 } },
+        { battles: [1, 1], encounters: { worm_scorpion: 2, mummy_pair: 2, scorpion_pair: 1 }, scale: { hp: 1.16, dmg: 1.16 } },
+        { battles: [0, 0], encounters: {}, scale: { hp: 1.16, dmg: 1.16 }, boss: 'boss_pharaoh' }
+      ],
+      rewards: { weights: { mining: 4, logging: 2, gathering: 2, treasure: 3, rest: 2 }, restHealRatio: 0.35 },
+      gather: {
+        mining: [
+          { hardness: 14, common: { mithril_ore: 2, star_steel: 1 }, rare: { sand_gold: 1 } },
+          { hardness: 16, common: { star_steel: 2 },                 rare: { sand_gold: 1 } },
+          { hardness: 18, common: { star_steel: 2, mithril_ore: 1 }, rare: { star_shard: 1 } },
+          { hardness: 20, common: { star_steel: 2 },                 rare: { orichalcum: 1 } }
+        ],
+        logging: [
+          { hardness: 14, common: { ancient_wood: 2, world_wood: 1 }, rare: { herb: 1 } },
+          { hardness: 16, common: { world_wood: 2 },                  rare: { sand_gold: 1 } },
+          { hardness: 18, common: { world_wood: 2 },                  rare: { world_wood: 1 } },
+          { hardness: 20, common: { world_wood: 2 },                  rare: { sky_wood: 1 } }
+        ],
+        gathering: [
+          { amount: [2, 3], table: { herb: 2, glowcap: 1, mummy_wrap: 1 } },
+          { amount: [2, 3], table: { glowcap: 2, quartz: 1, moon_silk: 1 } },
+          { amount: [2, 4], table: { moon_silk: 2, sand_gold: 1, star_shard: 1 } },
+          { amount: [2, 4], table: { moon_silk: 2, sand_gold: 1, mummy_wrap: 1 } }
+        ],
+        treasure: [
+          { amount: [3, 4], table: { star_steel: 2, sand_gold: 2, quartz: 1, scorpion_tail: 1 } },
+          { amount: [3, 4], table: { star_steel: 1, world_wood: 1, sand_gold: 1, mummy_wrap: 1 } },
+          { amount: [3, 4], table: { star_steel: 2, moon_silk: 1, sand_gold: 1, worm_fang: 1 } },
+          { amount: [3, 5], table: { star_steel: 2, sand_gold: 2, world_wood: 1, orichalcum: 1 } }
+        ]
+      }
+    },
+
     skygarden: {
       rank: 5,
       name: '天空の庭', requires: ['volcano', 'glacier'],
@@ -286,6 +364,45 @@
           { amount: [3, 4], table: { orichalcum: 1, sky_wood: 1, cloud_silk: 1, sun_stone: 1, harpy_feather: 1 } },
           { amount: [3, 4], table: { orichalcum: 2, sky_wood: 1, cloud_silk: 1, griffin_claw: 1 } },
           { amount: [3, 4], table: { orichalcum: 1, sky_wood: 2, cloud_silk: 2, sun_stone: 1 } },
+          { amount: [3, 5], table: { orichalcum: 2, sky_wood: 2, cloud_silk: 1, adamant: 1 } }
+        ]
+      }
+    },
+
+    peak: {
+      rank: 5,
+      name: '雷鳴の峰', requires: ['volcano', 'glacier'],
+      recommend: '推奨ランク5・氷が有効',
+      floors: [
+        { battles: [1, 1], encounters: { tbird_pair: 2, tgolem_single: 2, wyvern_single: 1 }, scale: { hp: 1.14, dmg: 1.14 } },
+        { battles: [1, 1], encounters: { wyvern_tbird: 2, tgolem_single: 2, tbird_trio: 1 }, scale: { hp: 1.14, dmg: 1.14 } },
+        { battles: [1, 1], encounters: { tgolem_tbird: 2, wyvern_tbird: 2, tbird_trio: 1 }, scale: { hp: 1.2, dmg: 1.2 } },
+        { battles: [0, 0], encounters: {}, scale: { hp: 1.2, dmg: 1.2 }, boss: 'boss_raiju' }
+      ],
+      rewards: { weights: { mining: 4, logging: 3, gathering: 2, treasure: 3, rest: 2 }, restHealRatio: 0.35 },
+      gather: {
+        mining: [
+          { hardness: 18, common: { star_steel: 2, orichalcum: 1 }, rare: { thunder_stone: 1 } },
+          { hardness: 20, common: { orichalcum: 2 },                rare: { thunder_stone: 1 } },
+          { hardness: 22, common: { orichalcum: 2, star_steel: 1 }, rare: { sun_stone: 1 } },
+          { hardness: 24, common: { orichalcum: 2 },                rare: { adamant: 1 } }
+        ],
+        logging: [
+          { hardness: 18, common: { world_wood: 2, sky_wood: 1 }, rare: { thunder_feather: 1 } },
+          { hardness: 20, common: { sky_wood: 2 },                rare: { thunder_stone: 1 } },
+          { hardness: 22, common: { sky_wood: 2, world_wood: 1 }, rare: { sky_wood: 1 } },
+          { hardness: 24, common: { sky_wood: 2 },                rare: { ebony: 1 } }
+        ],
+        gathering: [
+          { amount: [2, 3], table: { glowcap: 2, moon_silk: 2, cloud_silk: 1 } },
+          { amount: [2, 3], table: { cloud_silk: 2, thunder_feather: 1, quartz: 1 } },
+          { amount: [2, 4], table: { cloud_silk: 2, thunder_stone: 1, glowcap: 1 } },
+          { amount: [2, 4], table: { cloud_silk: 2, sun_stone: 1, void_silk: 1 } }
+        ],
+        treasure: [
+          { amount: [3, 4], table: { orichalcum: 1, sky_wood: 1, thunder_stone: 1, thunder_feather: 1 } },
+          { amount: [3, 4], table: { orichalcum: 2, sky_wood: 1, cloud_silk: 1, wyvern_scale: 1 } },
+          { amount: [3, 4], table: { orichalcum: 1, sky_wood: 2, thunder_stone: 1, sun_stone: 1 } },
           { amount: [3, 5], table: { orichalcum: 2, sky_wood: 2, cloud_silk: 1, adamant: 1 } }
         ]
       }
@@ -326,6 +443,45 @@
           { amount: [3, 4], table: { adamant: 2, ebony: 1, void_silk: 1, dark_bone: 1 } },
           { amount: [3, 4], table: { adamant: 1, ebony: 2, void_silk: 2, blood_gem: 1 } },
           { amount: [3, 5], table: { adamant: 2, ebony: 2, void_silk: 2, blood_gem: 1 } }
+        ]
+      }
+    },
+
+    void: {
+      rank: 6,
+      name: '虚ろの回廊', requires: ['abyss'],
+      recommend: '推奨ランク6・雷が有効',
+      floors: [
+        { battles: [1, 1], encounters: { eye_pair: 2, wraith_pair: 2, cknight_single: 1 }, scale: { hp: 1.08, dmg: 1.08 } },
+        { battles: [1, 1], encounters: { wraith_eye: 2, cknight_single: 2, wraith_trio: 1 }, scale: { hp: 1.08, dmg: 1.08 } },
+        { battles: [1, 1], encounters: { cknight_eye: 2, wraith_trio: 2, wraith_eye: 1 }, scale: { hp: 1.08, dmg: 1.08 } },
+        { battles: [0, 0], encounters: {}, scale: { hp: 1.12, dmg: 1.12 }, boss: 'boss_chrono' }
+      ],
+      rewards: { weights: { mining: 3, logging: 3, gathering: 3, treasure: 4, rest: 2 }, restHealRatio: 0.35 },
+      gather: {
+        mining: [
+          { hardness: 22, common: { orichalcum: 2, adamant: 1 }, rare: { clock_gear: 1 } },
+          { hardness: 24, common: { adamant: 2 },                rare: { time_sand: 1 } },
+          { hardness: 26, common: { adamant: 2, orichalcum: 1 }, rare: { clock_gear: 1 } },
+          { hardness: 28, common: { adamant: 2 },                rare: { time_sand: 1 } }
+        ],
+        logging: [
+          { hardness: 22, common: { sky_wood: 2, ebony: 1 }, rare: { wraith_ash: 1 } },
+          { hardness: 24, common: { ebony: 2 },              rare: { time_sand: 1 } },
+          { hardness: 26, common: { ebony: 2, sky_wood: 1 }, rare: { ebony: 1 } },
+          { hardness: 28, common: { ebony: 2 },              rare: { time_sand: 1 } }
+        ],
+        gathering: [
+          { amount: [2, 3], table: { glowcap: 2, void_silk: 2, wraith_ash: 1 } },
+          { amount: [2, 3], table: { void_silk: 2, time_sand: 1, quartz: 1 } },
+          { amount: [2, 4], table: { void_silk: 2, time_sand: 1, void_lens: 1 } },
+          { amount: [2, 4], table: { void_silk: 2, time_sand: 1, blood_gem: 1 } }
+        ],
+        treasure: [
+          { amount: [3, 4], table: { adamant: 1, ebony: 1, void_silk: 1, time_sand: 1, clock_gear: 1 } },
+          { amount: [3, 4], table: { adamant: 2, ebony: 1, void_lens: 1, wraith_ash: 1 } },
+          { amount: [3, 4], table: { adamant: 1, ebony: 2, void_silk: 2, time_sand: 1 } },
+          { amount: [3, 5], table: { adamant: 2, ebony: 2, void_silk: 1, clock_gear: 1 } }
         ]
       }
     },
@@ -953,6 +1109,22 @@
       skygarden: [
         { from: 2, table: { adamant: 2, ebony: 2, void_silk: 2, harpy_feather: 1 } },
         { from: 4, table: { adamant: 2, ebony: 2, void_silk: 2, storm_horn: 1 } }
+      ],
+      shore: [
+        { from: 2, table: { mithril_ore: 2, ancient_wood: 1, sea_pearl: 2, kraken_ink: 1 } },
+        { from: 4, table: { mithril_ore: 2, star_shard: 1, kraken_ink: 1, star_steel: 1 } }
+      ],
+      desert: [
+        { from: 2, table: { orichalcum: 2, sky_wood: 1, sand_gold: 2, pharaoh_mask: 1 } },
+        { from: 4, table: { orichalcum: 2, cloud_silk: 1, sand_gold: 1, pharaoh_mask: 1 } }
+      ],
+      peak: [
+        { from: 2, table: { adamant: 2, ebony: 2, thunder_stone: 2, raiju_horn: 1 } },
+        { from: 4, table: { adamant: 2, ebony: 2, void_silk: 2, raiju_horn: 1 } }
+      ],
+      void: [
+        { from: 2, table: { adamant: 2, ebony: 2, time_sand: 2, chrono_heart: 1 } },
+        { from: 4, table: { adamant: 2, ebony: 2, void_silk: 2, chrono_heart: 1 } }
       ],
       abyss: [
         { from: 2, table: { adamant: 2, ebony: 2, void_silk: 2, blood_gem: 1 } },

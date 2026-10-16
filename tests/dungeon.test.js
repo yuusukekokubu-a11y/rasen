@@ -164,15 +164,17 @@ test('複数ダンジョン：前のダンジョンをクリアすると次が�
   assert.deepStrictEqual(r2.newlyUnlocked, []);
   assert.ok(!G.isUnlocked('ruins'));
   const r3 = clear('marsh');
-  assert.deepStrictEqual(r3.newlyUnlocked, ['ruins']);
+  assert.deepStrictEqual(r3.newlyUnlocked.sort(), ['ruins', 'shore']);
   const r4 = clear('ruins');
-  assert.deepStrictEqual(r4.newlyUnlocked.sort(), ['glacier', 'volcano']);
+  assert.deepStrictEqual(r4.newlyUnlocked.sort(), ['desert', 'glacier', 'volcano']);
   clear('volcano');
   assert.ok(!G.isUnlocked('skygarden'));
-  assert.deepStrictEqual(clear('glacier').newlyUnlocked, ['skygarden']);
+  assert.deepStrictEqual(clear('glacier').newlyUnlocked.sort(), ['peak', 'skygarden']);
   assert.deepStrictEqual(clear('skygarden').newlyUnlocked, ['abyss']);
-  assert.ok(!G.allCleared());
-  const r8 = clear('abyss');
+  assert.deepStrictEqual(clear('abyss').newlyUnlocked.sort(), ['spiral', 'void']);
+  // わき道（潮騒の洞・砂塵の墓所・雷鳴の峰・虚ろの回廊）もクリアすると全クリア
+  for (const id of ['shore', 'desert', 'peak']) { clear(id); assert.ok(!G.allCleared()); }
+  const r8 = clear('void');
   assert.ok(r8.allClearedNow && G.allCleared());
 });
 

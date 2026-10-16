@@ -27,6 +27,7 @@ const rows = [['cave', 'starter', 1], ['forest', 'rank2_plain', 1], ['marsh', 'r
   ['volcano', 'rank4_plain', 1], ['glacier', 'rank4_plain', 1], ['skygarden', 'rank4_plain', 1], ['skygarden', 'rank5_plain', 1],
   ['abyss', 'rank5_plain', 1], ['abyss', 'rank6_plain', 1], ['volcano', 'rank6_plain', 2],
   ['mine', 'starter', 1], ['grove', 'rank3_plain', 3], ['cocoon', 'rank4_plain', 4], ['vault', 'rank5_plain', 5], ['nest', 'rank3_plain', 3],
+  ['shore', 'rank2_plain', 1], ['desert', 'rank4_plain', 1], ['peak', 'rank5_plain', 1], ['void', 'rank6_plain', 1],
   ['bossrush', 'rank6_plain', 4], ['bossrush', 'rank6_plain', 5], ['bossrush', 'rank7_unique', 5], ['abyss', 'rank7_unique', 2]];
 for (const [d, p, diff] of rows) {
   const r = R.Sim.runDungeons({ members: R.Sim.presetMembers(p), n, seed: 1, dungeonId: d, difficulty: diff });

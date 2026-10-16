@@ -430,6 +430,197 @@
       drops: { abyss_heart: 1, blood_gem: 2 }
     },
 
+    // ===== 潮騒の洞（雷が有効） =====
+    crab: {
+      name: '大ガニ', hp: [64, 70],
+      moves: {
+        pinch: { name: 'はさみ', dmg: 13 },
+        twin:  { name: '両ばさみ', dmg: 7, hits: 2 },
+        shell: { name: '甲羅にこもる', block: 16 }
+      },
+      pattern: { type: 'cycle', seq: ['pinch', 'twin', 'shell'] },
+      elementMult: { thunder: 1.5, fire: 0.75 },
+      drops: { crab_shell: 1 }
+    },
+    jelly: {
+      name: '電気クラゲ', hp: [34, 38],
+      moves: {
+        sting: { name: '毒針', dmg: 8, debuff: { s: 'weak', v: 1 } },
+        zap:   { name: '放電', dmg: 5, hits: 2 }
+      },
+      pattern: { type: 'random', weights: { sting: 2, zap: 2 }, maxRepeat: 2 },
+      elementMult: { fire: 1.5, thunder: 0.5 },
+      drops: { jelly_gel: 1 }
+    },
+    fishman: {
+      name: '魚人', hp: [56, 62],
+      moves: {
+        spear: { name: '銛突き', dmg: 13 },
+        wave:  { name: '大波', dmg: 6, hits: 2, debuff: { s: 'vulnerable', v: 1 } },
+        guard: { name: '群れの守り', allyBlock: 8 }
+      },
+      pattern: { type: 'cycle', seq: ['spear', 'wave', 'guard'] },
+      elementMult: { thunder: 1.5 },
+      drops: { fish_scale: 1 }
+    },
+    kraken: {
+      name: '海魔クラーケン', hp: [410, 410], boss: true, soul: 'kraken_soul',
+      moves: {
+        ink:      { name: '墨', block: 18, debuff: { s: 'weak', v: 2 } },
+        crush:    { name: '締めつけ', dmg: 25 },
+        tentacle: { name: '八本足', dmg: 6, hits: 4 },
+        whirl:    { name: '渦潮', dmg: 10, hits: 2, debuff: { s: 'vulnerable', v: 1 } },
+        regrow:   { name: '再生', heal: 25, str: 2 }
+      },
+      pattern: { type: 'cycle', opening: 'ink', seq: ['crush', 'tentacle', 'whirl', 'regrow', 'crush', 'tentacle'] },
+      elementMult: { thunder: 1.5, fire: 0.75 },
+      drops: { kraken_ink: 1, sea_pearl: 2 }
+    },
+
+    // ===== 砂塵の墓所（炎が有効） =====
+    scorpion: {
+      name: '大サソリ', hp: [94, 102],
+      moves: {
+        claws:  { name: '両のはさみ', dmg: 10, hits: 2 },
+        sting:  { name: '毒尾', dmg: 15, debuff: { s: 'weak', v: 2 } },
+        burrow: { name: '砂にもぐる', block: 20 }
+      },
+      pattern: { type: 'cycle', seq: ['claws', 'sting', 'burrow'] },
+      elementMult: { fire: 1.25, ice: 1.25 },
+      drops: { scorpion_tail: 1 }
+    },
+    mummy: {
+      name: 'ミイラ', hp: [108, 118],
+      moves: {
+        strike: { name: '殴打', dmg: 22 },
+        wrap:   { name: '包帯しばり', dmg: 9, debuff: { s: 'weak', v: 2 } },
+        mend:   { name: '巻き直し', heal: 18, block: 10 }
+      },
+      pattern: { type: 'cycle', seq: ['strike', 'wrap', 'mend'] },
+      elementMult: { fire: 1.5, ice: 0.75 },
+      drops: { mummy_wrap: 1 }
+    },
+    sandworm: {
+      name: '砂の大蛇', hp: [140, 152],
+      moves: {
+        tail:   { name: '尾の打ちつけ', dmg: 11, hits: 2 },
+        devour: { name: '丸のみ', dmg: 27 },
+        burrow: { name: '砂中を進む', block: 22, str: 2 }
+      },
+      pattern: { type: 'cycle', seq: ['tail', 'devour', 'burrow'] },
+      elementMult: { fire: 1.25, thunder: 0.75 },
+      drops: { worm_fang: 1, star_steel: 1 }
+    },
+    pharaoh: {
+      name: '砂の王', hp: [640, 640], boss: true, soul: 'pharaoh_soul',
+      moves: {
+        command:   { name: '王の号令', block: 30, str: 3 },
+        sandstorm: { name: '砂嵐', dmg: 7, hits: 4 },
+        judgment:  { name: '王の裁き', dmg: 33 },
+        curse:     { name: '墓所の呪い', dmg: 11, debuff: { s: 'vulnerable', v: 2 } },
+        scarab:    { name: '甲虫の群れ', dmg: 13, hits: 2, debuff: { s: 'weak', v: 1 } }
+      },
+      pattern: { type: 'cycle', opening: 'command', seq: ['sandstorm', 'judgment', 'curse', 'scarab', 'command', 'judgment'] },
+      elementMult: { fire: 1.5, ice: 0.75 },
+      drops: { pharaoh_mask: 1, star_steel: 2 }
+    },
+
+    // ===== 雷鳴の峰（氷が有効・雷に強い） =====
+    thunderbird: {
+      name: '雷鳥', hp: [100, 108],
+      moves: {
+        dive:  { name: '急降下', dmg: 10, hits: 2 },
+        bolt:  { name: '雷撃', dmg: 22 },
+        preen: { name: '羽づくろい', block: 18 }
+      },
+      pattern: { type: 'cycle', seq: ['dive', 'bolt', 'preen'] },
+      elementMult: { ice: 1.5, thunder: 0.5 },
+      drops: { thunder_feather: 1 }
+    },
+    thunder_golem: {
+      name: '雷岩兵', hp: [160, 172],
+      moves: {
+        slam:   { name: '雷岩の拳', dmg: 28 },
+        charge: { name: '充電', block: 26, str: 2 },
+        quake:  { name: '放電の地鳴り', dmg: 10, hits: 2 }
+      },
+      pattern: { type: 'cycle', seq: ['slam', 'quake', 'charge'] },
+      elementMult: { ice: 1.25, thunder: 0.5, fire: 0.75 },
+      drops: { thunder_stone: 1, orichalcum: 1 }
+    },
+    wyvern: {
+      name: 'ワイバーン', hp: [148, 158],
+      moves: {
+        claw: { name: '鉤爪', dmg: 22 },
+        tail: { name: '毒の尾', dmg: 11, hits: 2, debuff: { s: 'weak', v: 1 } },
+        roar: { name: '咆哮', str: 3, debuff: { s: 'vulnerable', v: 1 } }
+      },
+      pattern: { type: 'cycle', seq: ['claw', 'tail', 'roar'] },
+      elementMult: { ice: 1.5 },
+      drops: { wyvern_scale: 1 }
+    },
+    raiju: {
+      name: '雷獣', hp: [820, 820], boss: true, soul: 'raiju_soul',
+      moves: {
+        roar:   { name: '雷の遠吠え', str: 4, debuff: { s: 'vulnerable', v: 2 } },
+        bolt:   { name: '轟雷', dmg: 33 },
+        claws:  { name: '稲妻の爪', dmg: 10, hits: 4 },
+        charge: { name: '雷をまとう', block: 40, heal: 25 },
+        rush:   { name: '雷光突進', dmg: 18, hits: 2, debuff: { s: 'weak', v: 1 } }
+      },
+      pattern: { type: 'cycle', opening: 'roar', seq: ['claws', 'bolt', 'rush', 'charge', 'bolt', 'claws'] },
+      elementMult: { ice: 1.5, thunder: 0.5 },
+      drops: { raiju_horn: 1, sun_stone: 2 }
+    },
+
+    // ===== 虚ろの回廊（雷が有効） =====
+    void_eye: {
+      name: '虚ろの眼', hp: [112, 120],
+      moves: {
+        gaze:  { name: '凝視', dmg: 10, debuff: { s: 'vulnerable', v: 2 } },
+        beam:  { name: '虚無の光', dmg: 30 },
+        blink: { name: 'まばたき', block: 22 }
+      },
+      pattern: { type: 'cycle', seq: ['gaze', 'beam', 'blink'] },
+      elementMult: { thunder: 1.5, fire: 0.75 },
+      drops: { void_lens: 1 }
+    },
+    clock_knight: {
+      name: '機械仕掛けの騎士', hp: [190, 204],
+      moves: {
+        triple: { name: '三連撃', dmg: 10, hits: 3 },
+        cut:    { name: '大振り', dmg: 33 },
+        wind:   { name: 'ぜんまいを巻く', block: 26, str: 3 }
+      },
+      pattern: { type: 'cycle', seq: ['triple', 'cut', 'wind'] },
+      elementMult: { thunder: 1.5, ice: 0.75 },
+      drops: { clock_gear: 1, adamant: 1 }
+    },
+    wraith: {
+      name: '怨霊', hp: [96, 104],
+      moves: {
+        drain: { name: '生気を吸う', dmg: 18, heal: 12 },
+        wail:  { name: '嘆き', dmg: 8, debuff: { s: 'weak', v: 2 } },
+        chill: { name: '冷たい手', dmg: 9, hits: 2 }
+      },
+      pattern: { type: 'random', weights: { drain: 2, wail: 1, chill: 2 }, maxRepeat: 1 },
+      elementMult: { fire: 1.5, thunder: 1.25, ice: 0.5 },
+      drops: { wraith_ash: 1 }
+    },
+    chrono: {
+      name: '時の番人', hp: [1060, 1060], boss: true, soul: 'chrono_soul',
+      moves: {
+        rewind:   { name: '巻き戻し', heal: 30, block: 30 },
+        tick:     { name: '秒針', dmg: 8, hits: 4 },
+        stop:     { name: '時止め', dmg: 13, hits: 2, debuff: { s: 'weak', v: 2 } },
+        judgment: { name: '終わりの刻', dmg: 38 },
+        hasten:   { name: '加速', str: 4, debuff: { s: 'vulnerable', v: 2 } }
+      },
+      pattern: { type: 'cycle', opening: 'hasten', seq: ['tick', 'judgment', 'stop', 'rewind', 'judgment', 'tick', 'hasten'] },
+      elementMult: { thunder: 1.25, fire: 1.25 },
+      drops: { chrono_heart: 1, blood_gem: 2 }
+    },
+
     // ===== スペシャルダンジョンの敵（強さはダンジョンの段ごとの倍率で上がる。素材は段ごとの「おまけ」で出る） =====
     ore_beetle: {
       name: '鉱石甲虫', hp: [40, 46],
@@ -634,6 +825,38 @@
     mimic_pair:        { name: 'ミミック×2', enemies: ['mimic', 'mimic'] },
     boss_mimic:        { name: '【ボス】大ミミック', enemies: ['mimic_king'], boss: true },
     boss_chimera:      { name: '【ボス】キメラ', enemies: ['chimera'], boss: true },
+    // 潮騒の洞
+    crab_single:       { name: '大ガニ', enemies: ['crab'] },
+    jelly_trio:        { name: '電気クラゲ×3', enemies: ['jelly', 'jelly', 'jelly'] },
+    fishman_pair:      { name: '魚人×2', enemies: ['fishman', 'fishman'] },
+    crab_jelly:        { name: '大ガニ＋電気クラゲ', enemies: ['crab', 'jelly'] },
+    fishman_jelly:     { name: '魚人＋電気クラゲ×2', enemies: ['fishman', 'jelly', 'jelly'] },
+    crab_fishman:      { name: '大ガニ＋魚人', enemies: ['crab', 'fishman'] },
+    boss_kraken:       { name: '【ボス】海魔クラーケン', enemies: ['kraken'], boss: true },
+    // 砂塵の墓所
+    scorpion_single:   { name: '大サソリ', enemies: ['scorpion'] },
+    mummy_pair:        { name: 'ミイラ×2', enemies: ['mummy', 'mummy'] },
+    scorpion_mummy:    { name: '大サソリ＋ミイラ', enemies: ['scorpion', 'mummy'] },
+    worm_single:       { name: '砂の大蛇', enemies: ['sandworm'] },
+    worm_scorpion:     { name: '砂の大蛇＋大サソリ', enemies: ['sandworm', 'scorpion'] },
+    scorpion_pair:     { name: '大サソリ×2', enemies: ['scorpion', 'scorpion'] },
+    boss_pharaoh:      { name: '【ボス】砂の王', enemies: ['pharaoh'], boss: true },
+    // 雷鳴の峰
+    tbird_pair:        { name: '雷鳥×2', enemies: ['thunderbird', 'thunderbird'] },
+    tgolem_single:     { name: '雷岩兵', enemies: ['thunder_golem'] },
+    wyvern_single:     { name: 'ワイバーン', enemies: ['wyvern'] },
+    wyvern_tbird:      { name: 'ワイバーン＋雷鳥', enemies: ['wyvern', 'thunderbird'] },
+    tgolem_tbird:      { name: '雷岩兵＋雷鳥', enemies: ['thunder_golem', 'thunderbird'] },
+    tbird_trio:        { name: '雷鳥×3', enemies: ['thunderbird', 'thunderbird', 'thunderbird'] },
+    boss_raiju:        { name: '【ボス】雷獣', enemies: ['raiju'], boss: true },
+    // 虚ろの回廊
+    eye_pair:          { name: '虚ろの眼×2', enemies: ['void_eye', 'void_eye'] },
+    wraith_pair:       { name: '怨霊×2', enemies: ['wraith', 'wraith'] },
+    cknight_single:    { name: '機械仕掛けの騎士', enemies: ['clock_knight'] },
+    cknight_eye:       { name: '機械仕掛けの騎士＋虚ろの眼', enemies: ['clock_knight', 'void_eye'] },
+    wraith_eye:        { name: '怨霊＋虚ろの眼', enemies: ['wraith', 'void_eye'] },
+    wraith_trio:       { name: '怨霊×3', enemies: ['wraith', 'wraith', 'wraith'] },
+    boss_chrono:       { name: '【ボス】時の番人', enemies: ['chrono'], boss: true },
     // 強化版（螺旋の塔の深い階）
     s_wolf_pair:       { name: '強・魔狼×2', enemies: ['wolf_s', 'wolf_s'] },
     s_spider_wolf:     { name: '強・大蜘蛛＋強・魔狼', enemies: ['spider_s', 'wolf_s'] },

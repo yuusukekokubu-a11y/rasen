@@ -229,7 +229,7 @@ test('ドット絵のデータが正しい（16×16か32×32・使っている�
     if (sp.small) { check(id + '(small)', sp.small); assert.strictEqual(sp.small.rows.length, 16, id); }
   }
   for (const id of Object.keys(R.DATA.jobs)) assert.ok(R.DATA.sprites[id], id);
-  for (const [id, e] of Object.entries(R.DATA.enemies)) if (!e.variantOf) assert.ok(R.DATA.sprites[id], id);
+  // 敵は影絵で描く（ドット絵は昔からいる敵だけ。影絵がないときの代わり）
   // 影絵：すべての敵に形があり、形のデータがそろっている
   for (const id of Object.keys(R.DATA.enemies)) {
     const a = R.DATA.enemyArt[id];

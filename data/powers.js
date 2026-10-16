@@ -98,6 +98,32 @@
     pr_spring:   { name: '聖なる泉', desc: '毎ターン終了時、HPを2回復（魔力の半分が乗る）',
       turnEnd: [{ t: 'heal', v: 2, magRate: 0.5 }] },
     pr_wrath:    { name: '神罰', desc: 'カードが廃棄されるたび、ランダムな敵に6ダメージ',
-      cardExhausted: [{ t: 'dmg', v: 6, scale: 'none', target: 'random' }] }
+      cardExhausted: [{ t: 'dmg', v: 6, scale: 'none', target: 'random' }] },
+
+    // ===== 追加（ボリューム2） =====
+    sw_tide:     { name: '潮騒の型', desc: '毎ターン開始時ブロック3、終了時ランダムな敵に3ダメージ',
+      turnStart: [{ t: 'block', v: 3 }], turnEnd: [{ t: 'dmg', v: 3, scale: 'none', target: 'random' }] },
+    sw_sunder:   { name: '攻防一体', desc: 'このキャラが攻撃カードを使うたび、ブロック2',
+      cardPlayed: { filter: { type: 'attack', owner: 'self' }, effects: [{ t: 'block', v: 2, scale: 'none' }] } },
+    mg_storm:    { name: '雷雲', desc: '毎ターン開始時、敵全体に感電1',
+      turnStart: [{ t: 'status', s: 'shock', v: 1, target: 'all' }] },
+    mg_echo:     { name: '残響', desc: '魔法カードを使うたび、ブロック2',
+      cardPlayed: { filter: { tag: 'magic' }, effects: [{ t: 'block', v: 2, scale: 'none' }] } },
+    as_tide:     { name: '潮汐', desc: '毎ターン開始時、結界2（魔力の半分が乗る）',
+      turnStart: [{ t: 'ward', v: 2, magRate: 0.5 }] },
+    as_hourglass:{ name: '時の砂', desc: '味方全員の攻撃力と魔力+1、1枚引く（1回だけ）',
+      onPlay: [{ t: 'buff', stat: 'atk', v: 1, who: 'party' }, { t: 'buff', stat: 'mag', v: 1, who: 'party' }, { t: 'draw', v: 1 }] },
+    th_sand:     { name: '砂隠れ', desc: '毎ターン開始時、敵全体に脱力1',
+      turnStart: [{ t: 'status', s: 'weak', v: 1, target: 'all' }] },
+    th_greed:    { name: '盗みの心得', desc: '毎ターン開始時、1枚引く',
+      turnStart: [{ t: 'draw', v: 1 }] },
+    ar_wind:     { name: '追い風の陣', desc: '毎ターン開始時、味方全員の攻撃力+1',
+      turnStart: [{ t: 'buff', stat: 'atk', v: 1, who: 'party' }] },
+    ar_harpoon:  { name: '銛の心得', desc: '毎ターン終了時、ランダムな敵に4ダメージ',
+      turnEnd: [{ t: 'dmg', v: 4, scale: 'none', target: 'random' }] },
+    pr_bell:     { name: '鐘の祈り', desc: 'カードが廃棄されるたび、1枚引く',
+      cardExhausted: [{ t: 'draw', v: 1 }] },
+    pr_bastion:  { name: '聖壁の祈り', desc: 'このキャラがスキルを使うたび、結界2',
+      cardPlayed: { filter: { type: 'skill', owner: 'self' }, effects: [{ t: 'ward', v: 2, magRate: 0 }] } }
   };
 })(globalThis.RASEN = globalThis.RASEN || {});

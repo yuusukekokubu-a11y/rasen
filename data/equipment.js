@@ -145,6 +145,44 @@
     abyss_crown:   { name: '深淵の冠',           type: 'accessory', slot: 'accessory', rank: 6, fixedCard: 'acc_whistle',  mats: { abyss_heart: 1, adamant: 1, blood_gem: 1 },     difficulty: 26 }
   });
 
+  // --- 別系統の装備（新しいダンジョンの素材で作る。同じランクで固定カードが違う） ---
+  Object.assign(bases, {
+    // ランク3：潮騒の洞
+    tide_sword:    { name: '潮騒の剣',       type: 'sword',     slot: 'weapon', rank: 3, fixedCard: 'sword_tide',     mats: { mithril_ore: 3, kraken_ink: 1 },                difficulty: 12 },
+    tide_staff:    { name: '潮の杖',         type: 'staff',     slot: 'weapon', rank: 3, fixedCard: 'staff_tide',     mats: { ancient_wood: 3, jelly_gel: 2 },                difficulty: 12 },
+    harpoon_bow:   { name: '銛弓',           type: 'bow',       slot: 'weapon', rank: 3, fixedCard: 'bow_harpoon',    mats: { ancient_wood: 3, fish_scale: 2 },               difficulty: 12 },
+    shell_helm:    { name: '甲羅の兜',       type: 'heavy',     slot: 'head',   rank: 3, fixedCard: 'heavy_shell',    mats: { mithril_ore: 2, crab_shell: 2 },                difficulty: 11 },
+    shell_armor:   { name: '甲羅の鎧',       type: 'heavy',     slot: 'body',   rank: 3, fixedCard: 'heavy_shell',    mats: { mithril_ore: 3, crab_shell: 3 },                difficulty: 13 },
+    pearl_hat:     { name: '真珠の帽子',     type: 'robe',      slot: 'head',   rank: 3, fixedCard: 'robe_pearl',     mats: { spider_silk: 2, sea_pearl: 1 },                 difficulty: 11 },
+    pearl_robe:    { name: '真珠のローブ',   type: 'robe',      slot: 'body',   rank: 3, fixedCard: 'robe_pearl',     mats: { spider_silk: 3, sea_pearl: 1, jelly_gel: 1 },   difficulty: 13 },
+    pearl_ring:    { name: '真珠の指輪',     type: 'accessory', slot: 'accessory', rank: 3, fixedCard: 'acc_pearl',   mats: { sea_pearl: 2, mithril_ore: 1 },                 difficulty: 11 },
+    // ランク4：砂塵の墓所
+    sand_dagger:   { name: '砂金の短剣',     type: 'dagger',    slot: 'weapon', rank: 4, fixedCard: 'dagger_sting',   mats: { star_steel: 2, scorpion_tail: 2 },              difficulty: 17 },
+    sand_staff:    { name: '砂嵐の杖',       type: 'staff',     slot: 'weapon', rank: 4, fixedCard: 'staff_sand',     mats: { world_wood: 3, worm_fang: 1 },                  difficulty: 17 },
+    sand_scepter:  { name: '砂金の錫杖',     type: 'scepter',   slot: 'weapon', rank: 4, fixedCard: 'scep_relic',     mats: { world_wood: 2, sand_gold: 2, mummy_wrap: 1 },   difficulty: 17 },
+    wrap_hood:     { name: '砂除けの頭巾',   type: 'light',     slot: 'head',   rank: 4, fixedCard: 'light_mirage',   mats: { moon_silk: 2, mummy_wrap: 2 },                  difficulty: 16 },
+    wrap_garb:     { name: '砂漠の装束',     type: 'light',     slot: 'body',   rank: 4, fixedCard: 'light_mirage',   mats: { moon_silk: 3, mummy_wrap: 2 },                  difficulty: 18 },
+    sand_amulet:   { name: '砂金の首飾り',   type: 'accessory', slot: 'accessory', rank: 4, fixedCard: 'acc_sand',    mats: { sand_gold: 2, star_steel: 1 },                  difficulty: 16 },
+    // ランク5：雷鳴の峰
+    thunder_sword: { name: '雷鳴の剣',       type: 'sword',     slot: 'weapon', rank: 5, fixedCard: 'sword_thunder',  mats: { orichalcum: 3, thunder_stone: 1 },              difficulty: 22 },
+    thunder_bow:   { name: '雷鳥の弓',       type: 'bow',       slot: 'weapon', rank: 5, fixedCard: 'bow_thunder',    mats: { sky_wood: 3, thunder_feather: 2 },              difficulty: 22 },
+    thunder_board: { name: '雷雲の星盤',     type: 'starboard', slot: 'weapon', rank: 5, fixedCard: 'star_thunder',   mats: { sky_wood: 2, thunder_stone: 1, thunder_feather: 1 }, difficulty: 22 },
+    wyvern_helm:   { name: '飛竜の兜',       type: 'heavy',     slot: 'head',   rank: 5, fixedCard: 'heavy_quake',    mats: { orichalcum: 2, wyvern_scale: 1 },               difficulty: 21 },
+    wyvern_armor:  { name: '飛竜の鎧',       type: 'heavy',     slot: 'body',   rank: 5, fixedCard: 'heavy_stand',    mats: { orichalcum: 4, wyvern_scale: 2 },               difficulty: 23 },
+    feather_hood:  { name: '羽根の頭巾',     type: 'light',     slot: 'head',   rank: 5, fixedCard: 'light_gale',     mats: { cloud_silk: 2, thunder_feather: 1 },            difficulty: 21 },
+    feather_garb:  { name: '雷鳥の装束',     type: 'light',     slot: 'body',   rank: 5, fixedCard: 'light_surf',     mats: { cloud_silk: 3, thunder_feather: 2 },            difficulty: 23 },
+    thunder_charm: { name: '雷石のお守り',   type: 'accessory', slot: 'accessory', rank: 5, fixedCard: 'acc_feather', mats: { thunder_stone: 1, orichalcum: 1, quartz: 2 },   difficulty: 21 },
+    // ランク6：虚ろの回廊
+    clock_sword:   { name: '時刻みの剣',     type: 'sword',     slot: 'weapon', rank: 6, fixedCard: 'sword_combo',    mats: { adamant: 3, clock_gear: 2 },                    difficulty: 27 },
+    clock_dagger:  { name: '刻の短剣',       type: 'dagger',    slot: 'weapon', rank: 6, fixedCard: 'dagger_storm',   mats: { adamant: 2, clock_gear: 1, wraith_ash: 1 },     difficulty: 27 },
+    void_staff:    { name: '虚ろの杖',       type: 'staff',     slot: 'weapon', rank: 6, fixedCard: 'staff_storm',    mats: { ebony: 3, void_lens: 1 },                       difficulty: 27 },
+    time_board:    { name: '砂時計の星盤',   type: 'starboard', slot: 'weapon', rank: 6, fixedCard: 'star_hourglass', mats: { ebony: 2, time_sand: 2 },                      difficulty: 27 },
+    time_scepter:  { name: '時の錫杖',       type: 'scepter',   slot: 'weapon', rank: 6, fixedCard: 'scep_chime',     mats: { ebony: 2, time_sand: 1, wraith_ash: 1 },        difficulty: 27 },
+    time_hat:      { name: '時の帽子',       type: 'robe',      slot: 'head',   rank: 6, fixedCard: 'robe_timeworn',  mats: { void_silk: 2, time_sand: 1 },                   difficulty: 26 },
+    time_robe:     { name: '時の法衣',       type: 'robe',      slot: 'body',   rank: 6, fixedCard: 'robe_timeworn',  mats: { void_silk: 3, wraith_ash: 1 },                  difficulty: 28 },
+    gear_ring:     { name: '歯車の指輪',     type: 'accessory', slot: 'accessory', rank: 6, fixedCard: 'acc_gear',    mats: { clock_gear: 1, adamant: 1, time_sand: 1 },      difficulty: 26 }
+  });
+
   // --- ランク7：専用装備（ボスの魂で作る。固定カードはその装備だけの固有カード） ---
   Object.assign(bases, {
     golem_armor:   { name: '大地の鎧',     unique: true, type: 'heavy',     slot: 'body',   rank: 7, fixedCard: 'u_earthwall',   mats: { golem_soul: 1, adamant: 3, dark_bone: 1 },        difficulty: 30 },
@@ -156,7 +194,11 @@
     storm_board:   { name: '嵐の星盤',     unique: true, type: 'starboard', slot: 'weapon', rank: 7, fixedCard: 'u_tempest',     mats: { storm_soul: 1, ebony: 2, sun_stone: 2 },          difficulty: 30 },
     abyss_ring:    { name: '深淵の指輪',   unique: true, type: 'accessory', slot: 'accessory', rank: 7, fixedCard: 'u_pact',    mats: { abyss_soul: 1, blood_gem: 2 },                    difficulty: 30 },
     holy_scepter:  { name: '聖王の錫杖',   unique: true, type: 'scepter',   slot: 'weapon', rank: 7, fixedCard: 'u_sanctum',     mats: { golem_soul: 1, elder_soul: 1, ebony: 2 },         difficulty: 30 },
-    shadow_king:   { name: '影王の装束',   unique: true, type: 'light',     slot: 'body',   rank: 7, fixedCard: 'u_shadowdance', mats: { queen_soul: 1, abyss_soul: 1, void_silk: 3 },     difficulty: 30 }
+    shadow_king:   { name: '影王の装束',   unique: true, type: 'light',     slot: 'body',   rank: 7, fixedCard: 'u_shadowdance', mats: { queen_soul: 1, abyss_soul: 1, void_silk: 3 },     difficulty: 30 },
+    kraken_robe:   { name: '海魔の法衣',   unique: true, type: 'robe',      slot: 'body',   rank: 7, fixedCard: 'u_maelstrom',   mats: { kraken_soul: 1, void_silk: 3, blood_gem: 1 },     difficulty: 30 },
+    pharaoh_crown: { name: '砂の王の冠',   unique: true, type: 'heavy',     slot: 'head',   rank: 7, fixedCard: 'u_sandking',    mats: { pharaoh_soul: 1, adamant: 2, dark_bone: 1 },      difficulty: 30 },
+    raiju_hood:    { name: '雷獣の頭巾',   unique: true, type: 'light',     slot: 'head',   rank: 7, fixedCard: 'u_raijin',      mats: { raiju_soul: 1, void_silk: 2, storm_horn: 1 },     difficulty: 30 },
+    chrono_watch:  { name: '時の懐中時計', unique: true, type: 'accessory', slot: 'accessory', rank: 7, fixedCard: 'u_timewarp', mats: { chrono_soul: 1, time_sand: 2, blood_gem: 1 }, difficulty: 30 }
   });
 
   // 採集道具（良い道具ほど採集ミニゲームが楽になる）

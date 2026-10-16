@@ -462,6 +462,135 @@
         for (let k = 0; k < 3; k++) { const off = ((t * (k % 2 ? 1 : -1) + k * 60) % W + W) % W; for (let x = -W; x < W; x += 90) T.haze(x + off, 112 + k * 9, 76, 8, '#6a3a9a', 0.35); }
       }
     },
+    // 潮騒の洞（海に開いた洞窟。奥に月夜の海、手前は濡れた岩と潮だまり）
+    shore: {
+      base(T, r, s) {
+        T.vgrad(0, H, ['#06101c', '#0a1828', '#0e2236', '#122c44']);
+        T.speckle(r, 0, 0, W, 110, ['#0a1622', '#142636', '#0e1c2c'], 500);
+        // 洞窟の口（楕円にくり抜いた空と海）
+        s.mouth = { cx: 150, cy: 62, rx: 74, ry: 44 };
+        const { cx, cy, rx, ry } = s.mouth;
+        for (let y = cy - ry; y < cy + ry; y++) for (let x = cx - rx; x < cx + rx; x++) {
+          const d = ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2;
+          if (d > 1) continue;
+          T.dot(x, y, y < 70 ? mix('#1a2a4a', '#3a5a8a', (y - (cy - ry)) / (70 - (cy - ry))) : mix('#1a4a6a', '#0e2a44', (y - 70) / (cy + ry - 70)));
+        }
+        T.glow(176, 40, 22, '#e8f0ff', 0.9);
+        for (let y = -6; y <= 6; y++) for (let x = -6; x <= 6; x++) if (x * x + y * y <= 36) T.dot(176 + x, 40 + y, x + y > 4 ? '#c8d8f0' : '#f0f6ff');
+        s.stars = []; for (let i = 0; i < 30; i++) { const a = r() * Math.PI * 2, d = Math.sqrt(r()); const x = cx + Math.cos(a) * rx * d, y = cy - ry + r() * (70 - cy + ry); if (((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 < 0.9) { s.stars.push({ x: Math.round(x), y: Math.round(y), c: '#ffffff', ph: Math.floor(r() * 16) }); T.dot(x, y, '#e8f0ff'); } }
+        // 鍾乳石
+        for (let x = 0; x < W; x += 5 + Math.floor(r() * 7)) { const h = 4 + r() * 18; for (let i = 0; i < h; i++) { const w = Math.max(1, Math.round((1 - i / h) * 3)); T.rect(x - w / 2, i, w, 1, i % 3 ? '#1a2e40' : '#24405a'); } }
+        // 手前の岩と潮だまり
+        T.ridge(r, 108, 3, '#0e1a26', 2, '#2a4a62');
+        T.vgrad(112, H, ['#14283a', '#0e1e2e', '#0a1622']);
+        s.pools = [[40, 126, 30], [200, 132, 40]];
+        for (const [px, py, pw] of s.pools) { T.rect(px - pw / 2, py, pw, 4, '#1a4a6a'); T.rect(px - pw / 2 + 2, py, pw - 4, 1, '#3a7aa0'); }
+        for (let i = 0; i < 18; i++) { const x = r() * W, y = 114 + r() * 26; T.rect(x, y, 3, 2, r() < 0.5 ? '#c86a5a' : '#e8d0a0'); }
+      },
+      anim(T, t, s) {
+        twinkle(T, s.stars, t, '#2a3a5a');
+        // 寄せては返す波（洞窟の口の下側）
+        const { cx, rx } = s.mouth;
+        for (let k = 0; k < 4; k++) { const y = 78 + k * 5 + Math.round(Math.sin((t + k * 3) * 0.5) * 1); const w = rx * 1.6 - k * 14; T.rect(cx - w / 2 + Math.sin((t + k) * 0.4) * 4, y, w, 1, k % 2 ? '#6aa8d0' : '#9ad0f0'); }
+        T.glow(176, 82, 18, '#e8f0ff', 0.4 + (t % 4) * 0.05);
+        // 潮だまりのきらめき
+        s.pools.forEach(([px, py, pw], i) => { const x = px - pw / 2 + ((t * 2 + i * 9) % pw); T.dot(x, py + 1, '#bfe8ff'); });
+      }
+    },
+    // 砂塵の墓所（砂漠の夕暮れ。ピラミッドと墓所の入口、流れる砂）
+    desert: {
+      base(T, r, s) {
+        T.vgrad(0, 96, ['#1a0e2a', '#3a1a3a', '#6a2e3a', '#a84a3a', '#d87a4a']);
+        T.glow(70, 84, 34, '#ffb05a', 0.9);
+        for (let y = -10; y <= 10; y++) for (let x = -10; x <= 10; x++) if (x * x + y * y <= 100 && 84 + y < 92) T.dot(70 + x, 84 + y, '#ffd08a');
+        // 遠くのピラミッド
+        const pyr = (cx, base, h, c, e) => { for (let i = 0; i < h; i++) { const w = (h - i) * 2; T.rect(cx - w / 2, base - i, w, 1, c); T.dot(cx - w / 2 + w - 1, base - i, e); } };
+        pyr(190, 92, 44, '#5a2e2a', '#3a1a1a'); pyr(232, 92, 26, '#4a2622', '#2e1414'); pyr(140, 92, 20, '#4a2622', '#2e1414');
+        // 砂丘
+        T.ridge(r, 94, 3, '#a86a3a', 3, '#d89a5a');
+        T.ridge(r, 104, 4, '#8a5430', 4, '#b87a48');
+        T.vgrad(112, H, ['#7a4828', '#6a3e22', '#5a341c']);
+        // 墓所の入口（石柱と暗い口）
+        T.rect(96, 70, 64, 42, '#5a3a28'); T.rect(96, 70, 64, 2, '#8a6040');
+        T.rect(112, 82, 32, 30, '#120a08');
+        for (const x of [100, 148]) { T.rect(x, 74, 8, 38, '#7a5236'); T.rect(x, 74, 2, 38, '#9a6e4a'); }
+        T.rect(92, 64, 72, 6, '#6a4630'); T.rect(92, 64, 72, 1, '#a07a50');
+        for (let i = 0; i < 6; i++) T.rect(114 + i * 5, 67, 3, 2, '#3a2418');
+        s.torches = [[104, 66], [152, 66]];
+        for (let i = 0; i < 60; i++) T.rect(r() * W, 114 + r() * 28, 2 + r() * 4, 1, '#8a5a34');
+      },
+      anim(T, t, s) {
+        for (const [x, y] of s.torches) flame(T, x, y, 6, t);
+        T.glow(128, 96, 24, '#ffa040', 0.35 + (t % 3) * 0.05);
+        // 吹きつける砂（横に流れる）
+        for (let i = 0; i < 40; i++) { const x = (W - ((t * 6 + i * 29) % (W + 40))) + 20, y = 70 + ((i * 37) % 70) + Math.sin((t + i) * 0.5) * 2; T.rect(x, y, 3, 1, i % 3 ? '#e8b878' : '#c89058'); }
+      }
+    },
+    // 雷鳴の峰（雷雲の下の岩山。ときどき稲妻が走る）
+    peak: {
+      base(T, r, s) {
+        T.vgrad(0, H, ['#0a0c18', '#141a2a', '#1e2638', '#283246', '#323e54']);
+        for (let i = 0; i < 16; i++) T.haze(r() * W - 30, r() * 50, 70 + r() * 50, 12 + r() * 10, '#2a3044', 0.8);
+        // 遠くの山（鋭い峰）
+        const peakAt = (cx, top, w, c, e) => { for (let y = top; y < 112; y++) { const k = (y - top) / (112 - top); const ww = Math.max(1, Math.round(w * k + (y % 7 === 0 ? 2 : 0))); T.rect(cx - ww / 2, y, ww, 1, c); T.dot(cx - ww / 2, y, e); } };
+        peakAt(60, 34, 90, '#1c2230', '#3a4660'); peakAt(170, 22, 120, '#181e2a', '#34405a'); peakAt(236, 50, 70, '#1c2230', '#3a4660');
+        // 雪の筋
+        for (let i = 0; i < 40; i++) { const x = 140 + r() * 60, y = 30 + r() * 30; T.rect(x, y, 2, 1, '#8a96b0'); }
+        // 手前の岩場
+        T.ridge(r, 108, 5, '#141820', 2, '#3a4458');
+        T.vgrad(116, H, ['#1a1e28', '#14181f', '#0e1118']);
+        for (let i = 0; i < 50; i++) T.rect(r() * W, 118 + r() * 24, 3 + r() * 6, 1, '#262c38');
+        // 雷石（青く光る石）
+        s.stones = [[34, 122], [96, 130], [214, 126]];
+        for (const [x, y] of s.stones) { T.rect(x - 3, y - 2, 6, 4, '#2a4a7a'); T.rect(x - 1, y - 1, 2, 2, '#7ab8ff'); }
+        // 稲妻の道筋（毎回同じ形）
+        s.bolts = [];
+        for (let b = 0; b < 2; b++) { const pts = []; let x = 80 + b * 100, y = 0; while (y < 90) { pts.push([x, y]); x += Math.round((r() - 0.5) * 14); y += 6 + Math.floor(r() * 6); } s.bolts.push(pts); }
+      },
+      anim(T, t, s) {
+        // 雷（ときどき光って、空がうっすら明るくなる）
+        const k = t % 28;
+        if (k < 3) {
+          const pts = s.bolts[Math.floor(t / 28) % 2];
+          if (k === 0) T.glow(pts[0][0], 40, 90, '#bfd8ff', 0.6);
+          for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]; const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)); for (let j = 0; j <= n; j++) T.dot(x0 + (x1 - x0) * j / n, y0 + (y1 - y0) * j / n, k === 2 ? '#7a9ad8' : '#ffffff'); }
+        }
+        s.stones.forEach(([x, y], i) => { if ((t + i * 4) % 10 < 3) T.glow(x, y, 10, '#7ab8ff', 0.6); });
+        // 横なぐりの雨
+        for (let i = 0; i < 30; i++) { const x = (i * 23 + t * 5) % W, y = (i * 41 + t * 9) % 112; T.dot(x, y, '#5a6a8a'); T.dot(x - 1, y + 1, '#4a5a78'); }
+      }
+    },
+    // 虚ろの回廊（宙に浮かぶ石の回廊。奥に大きな時計の輪、ちぎれた空間）
+    void: {
+      base(T, r, s) {
+        T.vgrad(0, H, ['#04030a', '#0a0716', '#120c24', '#1a1030', '#0e0a1a']);
+        s.stars = starField(T, r, 120, 140, ['#c8a0ff', '#ffffff', '#7ad8ff']);
+        // 大きな時計の輪
+        s.clock = { cx: 128, cy: 52, rad: 40 };
+        const { cx, cy, rad } = s.clock;
+        T.glow(cx, cy, rad + 14, '#6a4aa8', 0.5);
+        for (let a = 0; a < Math.PI * 2; a += 0.01) { T.dot(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad, '#8a7ac0'); T.dot(cx + Math.cos(a) * (rad - 3), cy + Math.sin(a) * (rad - 3), '#4a3a78'); }
+        for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; for (let d = rad - 8; d < rad - 4; d++) T.dot(cx + Math.cos(a) * d, cy + Math.sin(a) * d, '#c8b8ff'); }
+        // 浮かぶ石の破片
+        for (const [x, y, w] of [[20, 40, 18], [222, 30, 22], [40, 90, 12], [204, 86, 16]]) for (let i = 0; i < 6; i++) T.rect(x + i, y + i, w - i * 2, 1, i ? '#1e1830' : '#3a3058');
+        // 回廊の床（奥へ続く石畳）
+        for (let y = 100; y < H; y++) { const k = (y - 100) / (H - 100); const w = 60 + k * 196; T.rect(128 - w / 2, y, w, 1, y % 6 === 0 ? '#1a1428' : (y % 2 ? '#2a2240' : '#262038')); }
+        for (let i = -5; i <= 5; i++) for (let y = 100; y < H; y++) { const k = (y - 100) / (H - 100); T.dot(128 + i * (6 + k * 18), y, '#16121f'); }
+        // 柱（左右）
+        for (const x of [36, 212]) { T.rect(x, 40, 10, 72, '#1e1830'); T.rect(x, 40, 2, 72, '#3a3058'); T.rect(x - 3, 36, 16, 4, '#2a2240'); }
+      },
+      anim(T, t, s) {
+        twinkle(T, s.stars, t, '#120c24');
+        // 時計の針（ゆっくり回る）
+        const { cx, cy, rad } = s.clock;
+        const a1 = t * 0.08 - Math.PI / 2, a2 = t * 0.01 - Math.PI / 2;
+        for (let d = 0; d < rad - 10; d++) T.dot(cx + Math.cos(a1) * d, cy + Math.sin(a1) * d, '#e8d8ff');
+        for (let d = 0; d < rad - 20; d++) { T.dot(cx + Math.cos(a2) * d, cy + Math.sin(a2) * d, '#c8b8ff'); T.dot(cx + Math.cos(a2) * d + 1, cy + Math.sin(a2) * d, '#8a7ac0'); }
+        T.glow(cx, cy, 8, '#e8d8ff', 0.6);
+        // 舞い落ちる時の砂
+        for (let i = 0; i < 20; i++) { const y = (t * 1.2 + i * 17) % 110; T.dot((i * 53 + Math.sin((t + i) * 0.3) * 3 + W) % W, y, i % 2 ? '#e8d8a0' : '#c8a0ff'); }
+      }
+    },
     // 鉱石の坑道（木の支柱・線路・ランタン・壁の鉱石）
     mine: {
       base(T, r, s) {
